@@ -1526,8 +1526,7 @@ function exportSectionMarkdown(secId) {
   var brandName = b.core && b.core.name ? b.core.name : 'Brand';
   var sectionName = sec ? sec.label : secId;
   var dateStr = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
-  var NL = '
-';
+  var NL = String.fromCharCode(10);
   var md = '# ' + brandName + ' — ' + sectionName + NL + NL;
   md += '*Exported from Brand Hub — ' + dateStr + '*' + NL + NL + '---' + NL + NL;
 
