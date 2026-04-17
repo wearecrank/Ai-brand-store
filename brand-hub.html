@@ -1641,7 +1641,8 @@ function exportSectionPDF(secId) {
     if(s2.primaryFont){fLabel('Typography');fVal('Primary: '+s2.primaryFont+(s2.secondaryFont?' | Secondary: '+s2.secondaryFont:''));}
     var cols=(s2.colours||[]).filter(function(c){return c.name||c.hex;});
     if(cols.length){fLabel('Colour Palette');cols.forEach(function(c){fVal('• '+(c.name||'')+(c.hex?' ('+c.hex+')':'')+(c.role?' — '+c.role:''));});}
-    if(s2.dos){fLabel("Brand Do's");fVal(s2.dos);}\n    if(s2.donts){fLabel("Brand Don'ts");fVal(s2.donts);}
+    if(s2.dos){fLabel("Brand Dos");fVal(s2.dos);}
+    if(s2.donts){fLabel("Brand Donts");fVal(s2.donts);}
   } else if(secId === 's3') {
     var prods=(b.s3&&b.s3.items||[]).filter(function(p){return p.name;});
     prods.forEach(function(p){
@@ -1760,7 +1761,8 @@ function brandToMarkdown(b) {
       cols.forEach(function(c){ md += '- ' + (c.name || 'Colour') + (c.hex ? ' (' + c.hex + ')' : '') + (c.role ? ' - ' + c.role : '') + NL; });
       md += NL;
     }
-    if(s2.dos) md += "**Brand Do's:**" + NL + s2.dos + NL + NL;\n    if(s2.donts) md += "**Brand Don'ts:**" + NL + s2.donts + NL + NL;
+    if(s2.dos) md += "**Brand Dos:**" + NL + s2.dos + NL + NL;
+    if(s2.donts) md += "**Brand Donts:**" + NL + s2.donts + NL + NL;
   }
   var prods = (b.s3 && b.s3.items || []).filter(function(p){return p.name;});
   if(prods.length) {
@@ -1873,7 +1875,8 @@ function exportPDF() {
     if(s2.toneWords?.length){fLabel('Key Words');fVal(s2.toneWords.join(' · '));}
     if(s2.primaryFont||s2.secondaryFont){fLabel('Typography');fVal([s2.primaryFont&&`Primary: ${s2.primaryFont}`,s2.secondaryFont&&`Secondary: ${s2.secondaryFont}`,s2.fontNotes].filter(Boolean).join(' · '));}
     if(cols.length){fLabel('Colour Palette');checkPage(24);cols.forEach((c,ci)=>{const cx=margin+ci*22;if(cx+18>W-margin)return;try{const hex=c.hex||'#ccc';const r=parseInt(hex.slice(1,3),16)||200,g=parseInt(hex.slice(3,5),16)||200,bl=parseInt(hex.slice(5,7),16)||200;doc.setFillColor(r,g,bl);doc.circle(cx+6,y+6,6,'F');doc.setFontSize(6.5);doc.setTextColor(80,80,80);doc.setFont('helvetica','normal');if(c.name)doc.text(c.name,cx,y+16,{maxWidth:18});if(c.hex)doc.text(c.hex,cx,y+20,{maxWidth:18});}catch(e){}});y+=26;}
-    if(s2.dos){fLabel("Brand Do's");fVal(s2.dos);}\n    if(s2.donts){fLabel("Brand Don'ts");fVal(s2.donts);}
+    if(s2.dos){fLabel("Brand Dos");fVal(s2.dos);}
+    if(s2.donts){fLabel("Brand Donts");fVal(s2.donts);}
   }
 
   const prods=(b.s3?.items||[]).filter(p=>p.name);
