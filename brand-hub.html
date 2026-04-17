@@ -90,12 +90,12 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .sidebar-overlay.active{display:block}
 
 /* ── MAIN APP LAYOUT ── */
-#screen-app{flex-direction:row;height:100vh;overflow:hidden}
+#screen-app{flex-direction:row;height:100vh;overflow:hidden;max-width:100vw}
 /* Desktop: sidebar collapses by shrinking width */
-.sidebar{position:relative;width:240px;min-width:240px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:width 0.25s ease,min-width 0.25s ease;z-index:160;flex-shrink:0}
+.sidebar{position:relative;width:240px;min-width:240px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:width 0.25s ease,min-width 0.25s ease;z-index:160;flex-shrink:0;isolation:isolate;contain:strict}
 .sidebar.collapsed{width:0;min-width:0;border-right:none}
 .sidebar.collapsed *{visibility:hidden;pointer-events:none}
-.main-content{flex:1;overflow-y:auto;background:var(--bg);min-width:0}
+.main-content{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg);min-width:0;max-width:100%;position:relative}
 
 /* ── AI IMPORT ── */
 .import-bar{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--card-border);margin-bottom:20px}
@@ -157,7 +157,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .btn-ghost:hover{background:var(--surface);color:var(--text)}
 .btn-full{width:100%}
 .main-content{flex:1;overflow-y:auto;background:var(--bg);position:relative}
-.section-panel{display:none;padding:40px 48px;animation:fadeIn 0.2s ease;max-width:900px}
+.section-panel{display:none;padding:40px 48px;animation:fadeIn 0.2s ease;max-width:900px;width:100%;box-sizing:border-box}
 .section-panel.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .section-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--card-border)}
@@ -366,7 +366,7 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
     <div class="top-bar">
       <span class="save-indicator" id="save-indicator">All changes saved</span>
     </div>
-    <div id="section-panels"></div>
+    <div id="section-panels" style="width:100%;overflow-x:hidden"></div>
   </div>
 </div>
 
@@ -952,10 +952,14 @@ function navigateTo(sectionId) {
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.section === sectionId);
   });
-  document.querySelectorAll('.section-panel').forEach(el => {
-    el.classList.toggle('active', el.dataset.section === sectionId);
-  });
-  document.querySelector('.main-content').scrollTop = 0;
+  const container = document.getElementById('section-panels');
+  if (container) {
+    container.querySelectorAll('.section-panel').forEach(el => {
+      el.classList.toggle('active', el.dataset.section === sectionId);
+    });
+  }
+  const mc = document.querySelector('.main-content');
+  if (mc) mc.scrollTop = 0;
 }
 
 function buildSectionPanels() {
@@ -998,7 +1002,8 @@ function completeness(secId) {
 
 function updateCompleteness(secId) {
   const prog = completeness(secId);
-  const badge = document.querySelector(`[data-section="${secId}"] .completeness-badge`);
+  const container = document.getElementById('section-panels');
+  const badge = container ? container.querySelector(`[data-section="${secId}"] .completeness-badge`) : null;
   if (badge) {
     badge.textContent = `${prog.done} / ${prog.total}`;
     const pct = prog.total > 0 ? prog.done / prog.total : 0;
@@ -1371,9 +1376,13 @@ function setNestedField(obj, path, value) {
 }
 
 function refreshPanel(sec) {
-  const panel = document.querySelector(`[data-section="${sec.id}"]`);
+  const container = document.getElementById('section-panels');
+  if (!container) return;
+  const panel = container.querySelector(`[data-section="${sec.id}"]`);
   if (!panel) return;
+  const wasActive = panel.classList.contains('active');
   panel.innerHTML = buildPanelHTML(sec);
+  if (wasActive) panel.classList.add('active');
   initPanelBehaviours(panel, sec);
   updateCompleteness(sec.id);
 }
