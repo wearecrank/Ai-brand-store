@@ -664,8 +664,9 @@ function mergeIntoSection(secId, extracted) {
       if (!Array.isArray(section[key])) section[key] = [];
       section[key] = [...section[key], ...value];
     } else if (typeof value === 'string' && value.trim()) {
-      // For text fields, append if there's existing content\n      if (section[key] && section[key].toString().trim()) {
-        section[key] = section[key] + '\n\n' + value;
+      // For text fields, append if there's existing content
+      if (section[key] && section[key].toString().trim()) {
+        section[key] = section[key] + String.fromCharCode(10,10) + value;
       } else {
         section[key] = value;
       }
