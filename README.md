@@ -8,4 +8,5 @@ This might vary by client as some will only be SEO or PPC.
 
 To share a public file with a client to view do the following:
 
-https://github.com/wearecrank/Ai-brand-store/brand-hub.html
+https://wearecrank.github.io/Ai-brand-store/brand-hub.html
+
