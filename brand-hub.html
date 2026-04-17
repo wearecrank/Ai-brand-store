@@ -82,9 +82,45 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .new-brand-card:hover{border-color:var(--accent-border);color:var(--accent)}
 .loading-state{text-align:center;color:var(--text-muted);font-size:14px;padding:40px}
 
+/* ── MOBILE HAMBURGER ── */
+.hamburger{display:none;position:fixed;top:12px;left:12px;z-index:200;width:40px;height:40px;border-radius:var(--radius-sm);background:var(--sidebar-bg);border:1px solid var(--sidebar-border);cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:all var(--transition)}
+.hamburger:hover{border-color:var(--accent-border)}
+.hamburger span{display:block;width:18px;height:2px;background:var(--text-muted);border-radius:2px;transition:all 0.2s ease}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:150;backdrop-filter:blur(2px)}
+.sidebar-overlay.active{display:block}
+
 /* ── MAIN APP ── */
 #screen-app{flex-direction:row;height:100vh;overflow:hidden}
-.sidebar{width:240px;min-width:240px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.sidebar{width:240px;min-width:240px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:transform 0.25s ease;z-index:160}
+
+/* ── AI IMPORT ── */
+.import-bar{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--card-border);margin-bottom:20px}
+.btn-import{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);white-space:nowrap}
+.btn-import:hover{background:var(--accent);color:#0f0f0f}
+.btn-import svg{width:14px;height:14px;flex-shrink:0}
+.import-hint{font-size:11px;color:var(--text-dim)}
+.import-file-input{display:none}
+.import-loading{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--accent);font-family:var(--font-mono)}
+.import-spinner{width:14px;height:14px;border:2px solid var(--accent-border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.import-success{font-size:12px;color:var(--success);display:flex;align-items:center;gap:6px}
+.import-error{font-size:12px;color:var(--danger)}
+
+@media(max-width:768px){
+  .hamburger{display:flex}
+  .sidebar{position:fixed;left:0;top:0;height:100vh;transform:translateX(-100%);z-index:160}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{width:100%}
+  .top-bar{padding:10px 16px 10px 60px}
+  .section-panel{padding:24px 16px}
+  .form-row{grid-template-columns:1fr}
+  .form-row.triple{grid-template-columns:1fr}
+  .present-cover{flex-direction:column}
+  .present-body{padding:24px 16px 60px}
+  .present-topbar{padding:14px 16px}
+  .present-cover-info h1{font-size:32px}
+  .present-grid-2{grid-template-columns:1fr}
+}
 .sidebar-top{padding:20px 16px 16px;border-bottom:1px solid var(--sidebar-border)}
 .sidebar-brand-name{font-family:var(--font-display);font-size:17px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
 .sidebar-brand-tagline{font-size:11px;color:var(--text-dim);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -294,7 +330,11 @@ input[type="file"]{display:none}
 
 <!-- ════════ MAIN APP ════════ -->
 <div id="screen-app" class="screen">
-  <aside class="sidebar">
+  <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <aside class="sidebar" id="main-sidebar">
     <div class="sidebar-top">
       <div class="sidebar-logo-row">
         <div class="sidebar-logo-thumb" id="sb-logo-thumb"></div>
@@ -413,6 +453,7 @@ input[type="file"]{display:none}
 // ════════════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://kkowqiosuzbgoxueqkvf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtrb3dxaW9zdXpiZ294dWVxa3ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NDk2OTYsImV4cCI6MjA5MjAyNTY5Nn0.gc1jd3WPum60ycY-yH6hPuP297cZq4E-CNjM_u8ju6Q';
+const WORKER_URL = 'https://brand-hub-ai.marketing-569.workers.dev';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ════════════════════════════════════════════════════════════
@@ -444,11 +485,115 @@ let logoClickTimer = null;
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // Close sidebar on mobile when changing screens
+  closeMobileSidebar();
 }
 
 function esc(str) {
   if (!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ════════════════════════════════════════════════════════════
+// MOBILE SIDEBAR
+// ════════════════════════════════════════════════════════════
+function openMobileSidebar() {
+  document.getElementById('main-sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('active');
+}
+
+function closeMobileSidebar() {
+  document.getElementById('main-sidebar')?.classList.remove('open');
+  document.getElementById('sidebar-overlay')?.classList.remove('active');
+}
+
+document.getElementById('hamburger-btn').addEventListener('click', () => {
+  const sidebar = document.getElementById('main-sidebar');
+  if (sidebar.classList.contains('open')) closeMobileSidebar();
+  else openMobileSidebar();
+});
+
+document.getElementById('sidebar-overlay').addEventListener('click', closeMobileSidebar);
+
+// ════════════════════════════════════════════════════════════
+// AI IMPORT FROM MARKDOWN FILE
+// ════════════════════════════════════════════════════════════
+async function importMarkdownForSection(secId, file) {
+  const statusEl = document.getElementById(`import-status-${secId}`);
+  if (!statusEl) return;
+
+  // Show loading state
+  statusEl.innerHTML = `<div class="import-loading"><div class="import-spinner"></div>Reading file with AI…</div>`;
+
+  let content;
+  try {
+    content = await file.text();
+  } catch(e) {
+    statusEl.innerHTML = `<div class="import-error">Could not read file.</div>`;
+    setTimeout(() => statusEl.innerHTML = '', 3000);
+    return;
+  }
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, section: secId })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Worker returned ${response.status}`);
+    }
+
+    const text = await response.text();
+    let extracted;
+    try {
+      extracted = JSON.parse(text);
+    } catch(e) {
+      throw new Error('Could not parse AI response');
+    }
+
+    // Merge extracted data into current brand section
+    mergeIntoSection(secId, extracted);
+    triggerSave();
+
+    // Refresh the panel to show new data
+    const sec = SECTIONS.find(s => s.id === secId);
+    if (sec) refreshPanel(sec);
+    updateCompleteness(secId);
+
+    statusEl.innerHTML = `<div class="import-success">✓ Imported successfully</div>`;
+    setTimeout(() => statusEl.innerHTML = '', 3000);
+
+  } catch(e) {
+    console.error('Import error:', e);
+    statusEl.innerHTML = `<div class="import-error">Import failed — ${e.message}</div>`;
+    setTimeout(() => statusEl.innerHTML = '', 4000);
+  }
+}
+
+function mergeIntoSection(secId, extracted) {
+  if (!currentBrand[secId]) currentBrand[secId] = {};
+  const section = currentBrand[secId];
+
+  Object.entries(extracted).forEach(([key, value]) => {
+    if (value === null || value === undefined || value === '') return;
+
+    if (Array.isArray(value)) {
+      // For arrays, append new items rather than replace
+      if (!Array.isArray(section[key])) section[key] = [];
+      section[key] = [...section[key], ...value];
+    } else if (typeof value === 'string' && value.trim()) {
+      // For text fields, append if there's existing content
+      if (section[key] && section[key].toString().trim()) {
+        section[key] = section[key] + '\n\n' + value;
+      } else {
+        section[key] = value;
+      }
+    } else {
+      section[key] = value;
+    }
+  });
 }
 
 // ════════════════════════════════════════════════════════════
@@ -711,7 +856,7 @@ function buildSidebarNav() {
       <span class="nav-dot" style="background:${sec.color}"></span>
       <span class="nav-label-text">${sec.label}</span>
       <span class="nav-progress">${prog.done}/${prog.total}</span>`;
-    item.addEventListener('click', () => navigateTo(sec.id));
+    item.addEventListener('click', () => { navigateTo(sec.id); closeMobileSidebar(); });
     nav.appendChild(item);
   });
 }
@@ -793,6 +938,15 @@ function buildPanelHTML(sec) {
         </div>
       </div>
       <span class="completeness-badge" style="color:var(--text-dim);border-color:var(--card-border)">${prog.done} / ${prog.total}</span>
+    </div>
+    <div class="import-bar">
+      <label class="btn-import" for="import-file-${sec.id}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Import from file
+      </label>
+      <input class="import-file-input" type="file" id="import-file-${sec.id}" accept=".md,.txt,.markdown" data-import-section="${sec.id}">
+      <span class="import-hint">Upload a Markdown file — AI will extract and add relevant content</span>
+      <span id="import-status-${sec.id}"></span>
     </div>`;
   const builders = {core:buildCoreForm,s1:buildS1Form,s2:buildS2Form,s3:buildS3Form,s4:buildS4Form,s5:buildS5Form,s6:buildS6Form};
   return header + (builders[sec.id] ? builders[sec.id]() : '');
@@ -1129,6 +1283,13 @@ document.addEventListener('change', e => {
       refreshPanel(SECTIONS[0]);
     };
     reader.readAsDataURL(file);
+  }
+
+  // AI import file inputs
+  const secId = e.target.dataset.importSection;
+  if (secId && e.target.files?.[0]) {
+    importMarkdownForSection(secId, e.target.files[0]);
+    e.target.value = ''; // reset so same file can be re-imported
   }
 });
 
