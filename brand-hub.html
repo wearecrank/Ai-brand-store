@@ -627,9 +627,7 @@ async function fetchUrlForProduct(productIndex, url, sec) {
     if (!item) return;
 
     if (extracted.name && !item.name) item.name = extracted.name;
-    if (extracted.desc) item.desc = item.desc ? item.desc + '
-
-' + extracted.desc : extracted.desc;
+    if (extracted.desc) item.desc = item.desc ? item.desc + '\n\n' + extracted.desc : extracted.desc;
     if (extracted.category) item.category = extracted.category;
     if (extracted.price && !item.price) item.price = extracted.price;
     if (extracted.features && extracted.features.length) {
@@ -707,16 +705,25 @@ document.getElementById('login-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') attemptLogin();
 });
 
+async function hashPin(pin) {
+  const enc = new TextEncoder().encode(pin + 'brandhub_salt_2025');
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
 async function attemptLogin() {
   const name = document.getElementById('login-name').value.trim().toLowerCase();
   const pin = pinEntry;
   if (!name || pin.length < 4) return;
 
+  // Hash the PIN before checking against the database
+  const pinHash = await hashPin(pin);
+
   const { data, error } = await sb
     .from('users')
     .select('*')
     .ilike('name', name)
-    .eq('pin', pin)
+    .eq('pin_hash', pinHash)
     .single();
 
   if (error || !data) {
