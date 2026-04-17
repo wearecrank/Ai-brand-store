@@ -1510,63 +1510,16 @@ document.getElementById('btn-export-md').addEventListener('click', exportMarkdow
 
 function exportMarkdown() {
   const b = currentBrand;
-  const dateStr = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  let md = `# Brand Profile: ${b.core?.name||'Untitled'}\n\n*Exported from Brand Hub — ${dateStr}*\n\n`;
+  const dateStr = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+  let md = '# Brand Profile: ' + (b.core?.name || 'Untitled') + '\n\n';
+  md += '*Exported from Brand Hub — ' + dateStr + '*\n\n';
   md += brandToMarkdown(b);
-  const c = b.core||{};
-  md += `## Brand Identity\n\n`;
-  if(c.name) md+=`**Brand Name:** ${c.name}\n\n`;
-  if(c.tagline) md+=`**Tagline:** ${c.tagline}\n\n`;
-  if(c.founded) md+=`**Founded:** ${c.founded}\n\n`;
-  if(c.industry) md+=`**Industry:** ${c.industry}\n\n`;
-  if(c.overview) md+=`**Overview:**\n${c.overview}\n\n`;
-  const s1=b.s1||{};
-  if(s1.purpose||s1.values?.length||s1.proposition||s1.mission||s1.vision){
-    md+=`---\n\n## Purpose & Values\n\n`;
-    if(s1.purpose) md+=`**Brand Purpose:**\n${s1.purpose}\n\n`;
-    if(s1.values?.filter(v=>v.name).length){md+=`**Core Values:**\n`;s1.values.filter(v=>v.name).forEach(v=>{md+=`- **${v.name}**${v.desc?': '+v.desc:''}\n`;});md+='\n';}
-    if(s1.proposition) md+=`**Value Proposition:**\n${s1.proposition}\n\n`;
-    if(s1.mission) md+=`**Mission Statement:**\n${s1.mission}\n\n`;
-    if(s1.vision) md+=`**Vision Statement:**\n${s1.vision}\n\n`;
-  }
-  const s2=b.s2||{};
-  if(s2.toneDesc||s2.primaryFont||s2.colours?.length||s2.dos){
-    md+=`---\n\n## Brand Guidelines\n\n`;
-    if(s2.toneDesc) md+=`**Tone of Voice:**\n${s2.toneDesc}\n\n`;
-    if(s2.toneWords?.length) md+=`**Key Words:** ${s2.toneWords.join(', ')}\n\n`;
-    if(s2.primaryFont||s2.secondaryFont){md+=`**Typography:**`;if(s2.primaryFont)md+=` Primary: ${s2.primaryFont}`;if(s2.secondaryFont)md+=` | Secondary: ${s2.secondaryFont}`;if(s2.fontNotes)md+=` | ${s2.fontNotes}`;md+='\n\n';}
-    const cols=(s2.colours||[]).filter(c=>c.name||c.hex);
-    if(cols.length){md+=`**Colour Palette:**\n`;cols.forEach(c=>{md+=`- ${c.name||'Colour'}${c.hex?' ('+c.hex+')':''}${c.role?' — '+c.role:''}\n`;});md+='\n';}
-    if(s2.dos) md+=`**Brand Do's:**\n${s2.dos}\n\n`;
-    if(s2.donts) md+=`**Brand Don'ts:**\n${s2.donts}\n\n`;
-  }
-  const prods=(b.s3?.items||[]).filter(p=>p.name);
-  if(prods.length){md+=`---\n\n## Products & Services\n\n`;prods.forEach(p=>{md+=`### ${p.name} *(${p.category||'product'})*\n`;if(p.desc)md+=`${p.desc}\n\n`;const f=p.features?.filter(Boolean)||[];if(f.length){md+=`**Key Features:**\n`;f.forEach(x=>md+=`- ${x}\n`);md+='\n';}if(p.price)md+=`**Pricing:** ${p.price}\n\n`;});}
-  const s4=b.s4||{};
-  const comps=(s4.competitors||[]).filter(c=>c.name);
-  const diffs=(s4.differences||[]).filter(d=>d.text);
-  if(comps.length||diffs.length||s4.positioning){
-    md+=`---\n\n## Competition & Points of Difference\n\n`;
-    if(comps.length){md+=`### Competitors\n\n`;comps.forEach(c=>{md+=`**${c.name}**`;if(c.desc)md+=`: ${c.desc}`;md+='\n';if(c.strengths)md+=`- Strengths: ${c.strengths}\n`;if(c.weaknesses)md+=`- Weaknesses: ${c.weaknesses}\n`;md+='\n';});}
-    if(diffs.length){md+=`### Points of Difference\n\n`;diffs.forEach((d,i)=>md+=`${i+1}. ${d.text}\n`);md+='\n';}
-    if(s4.positioning) md+=`**Market Positioning:**\n${s4.positioning}\n\n`;
-  }
-  const s5=b.s5||{};
-  if(s5.revenue||s5.margin||s5.funding||s5.milestones||s5.targets){
-    md+=`---\n\n## Financials\n\n`;
-    if(s5.revenue)md+=`**Revenue:** ${s5.revenue}\n\n`;if(s5.margin)md+=`**Profit Margin:** ${s5.margin}\n\n`;if(s5.funding)md+=`**Funding Stage:** ${s5.funding}\n\n`;if(s5.milestones)md+=`**Key Milestones:**\n${s5.milestones}\n\n`;if(s5.targets)md+=`**Growth Targets:**\n${s5.targets}\n\n`;
-  }
-  const s6=b.s6||{};
-  const pers=(s6.personas||[]).filter(p=>p.name);
-  if(s6.summary||pers.length){
-    md+=`---\n\n## Target Audience\n\n`;
-    if(s6.summary)md+=`**Audience Summary:**\n${s6.summary}\n\n`;
-    pers.forEach(p=>{md+=`### ${p.name}\n`;if(p.age||p.location)md+=`*${[p.age,p.location].filter(Boolean).join(' · ')}*\n\n`;if(p.needs)md+=`**Needs & Pain Points:** ${p.needs}\n\n`;if(p.motivations)md+=`**Motivations:** ${p.motivations}\n\n`;if(p.channels)md+=`**Channels:** ${p.channels}\n\n`;});
-  }
-  const blob = new Blob([md],{type:'text/markdown'});
+  const blob = new Blob([md], {type: 'text/markdown'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href=url; a.download=`${(b.core?.name||'brand').replace(/[^a-z0-9]/gi,'_').toLowerCase()}_brand_profile.md`; a.click();
+  a.href = url;
+  a.download = (b.core?.name || 'brand').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_brand_profile.md';
+  a.click();
   URL.revokeObjectURL(url);
 }
 
@@ -1620,177 +1573,106 @@ ${'='.repeat(60)}
 }
 
 function brandToMarkdown(b) {
-  let md = '';
-  const c = b.core || {};
-  md += `# Brand Profile: ${c.name || 'Untitled'}
-
-`;
-  md += `## Brand Identity
-
-`;
-  if(c.name) md+=`**Brand Name:** ${c.name}
-
-`;
-  if(c.tagline) md+=`**Tagline:** ${c.tagline}
-
-`;
-  if(c.founded) md+=`**Founded:** ${c.founded}
-
-`;
-  if(c.industry) md+=`**Industry:** ${c.industry}
-
-`;
-  if(c.overview) md+=`**Overview:**
-${c.overview}
-
-`;
-  const s1=b.s1||{};
-  if(s1.purpose||s1.values?.length||s1.proposition||s1.mission||s1.vision){
-    md+=`---
-
-## Purpose & Values
-
-`;
-    if(s1.purpose) md+=`**Brand Purpose:**
-${s1.purpose}
-
-`;
-    if(s1.values?.filter(v=>v.name).length){md+=`**Core Values:**
-`;s1.values.filter(v=>v.name).forEach(v=>{md+=`- **${v.name}**${v.desc?': '+v.desc:''}
-`;});md+='
-';}
-    if(s1.proposition) md+=`**Value Proposition:**
-${s1.proposition}
-
-`;
-    if(s1.mission) md+=`**Mission Statement:**
-${s1.mission}
-
-`;
-    if(s1.vision) md+=`**Vision Statement:**
-${s1.vision}
-
-`;
+  var NL = '\n';
+  var md = '';
+  var c = b.core || {};
+  md += '# Brand Profile: ' + (c.name || 'Untitled') + NL + NL;
+  md += '## Brand Identity' + NL + NL;
+  if(c.name) md += '**Brand Name:** ' + c.name + NL + NL;
+  if(c.tagline) md += '**Tagline:** ' + c.tagline + NL + NL;
+  if(c.founded) md += '**Founded:** ' + c.founded + NL + NL;
+  if(c.industry) md += '**Industry:** ' + c.industry + NL + NL;
+  if(c.overview) md += '**Overview:**' + NL + c.overview + NL + NL;
+  var s1 = b.s1 || {};
+  if(s1.purpose || (s1.values && s1.values.length) || s1.proposition || s1.mission || s1.vision) {
+    md += '---' + NL + NL + '## Purpose & Values' + NL + NL;
+    if(s1.purpose) md += '**Brand Purpose:**' + NL + s1.purpose + NL + NL;
+    var vals = (s1.values || []).filter(function(v){return v.name;});
+    if(vals.length) {
+      md += '**Core Values:**' + NL;
+      vals.forEach(function(v){ md += '- **' + v.name + '**' + (v.desc ? ': ' + v.desc : '') + NL; });
+      md += NL;
+    }
+    if(s1.proposition) md += '**Value Proposition:**' + NL + s1.proposition + NL + NL;
+    if(s1.mission) md += '**Mission Statement:**' + NL + s1.mission + NL + NL;
+    if(s1.vision) md += '**Vision Statement:**' + NL + s1.vision + NL + NL;
   }
-  const s2=b.s2||{};
-  if(s2.toneDesc||s2.primaryFont||s2.colours?.length||s2.dos){
-    md+=`---
-
-## Brand Guidelines
-
-`;
-    if(s2.toneDesc) md+=`**Tone of Voice:**
-${s2.toneDesc}
-
-`;
-    if(s2.toneWords?.length) md+=`**Key Words:** ${s2.toneWords.join(', ')}
-
-`;
-    if(s2.primaryFont||s2.secondaryFont){md+=`**Typography:**`;if(s2.primaryFont)md+=` Primary: ${s2.primaryFont}`;if(s2.secondaryFont)md+=` | Secondary: ${s2.secondaryFont}`;if(s2.fontNotes)md+=` | ${s2.fontNotes}`;md+='
-
-';}
-    const cols=(s2.colours||[]).filter(c=>c.name||c.hex);
-    if(cols.length){md+=`**Colour Palette:**
-`;cols.forEach(c=>{md+=`- ${c.name||'Colour'}${c.hex?' ('+c.hex+')':''}${c.role?' — '+c.role:''}
-`;});md+='
-';}
-    if(s2.dos) md+=`**Brand Do's:**
-${s2.dos}
-
-`;
-    if(s2.donts) md+=`**Brand Don'ts:**
-${s2.donts}
-
-`;
+  var s2 = b.s2 || {};
+  if(s2.toneDesc || s2.primaryFont || (s2.colours && s2.colours.length) || s2.dos) {
+    md += '---' + NL + NL + '## Brand Guidelines' + NL + NL;
+    if(s2.toneDesc) md += '**Tone of Voice:**' + NL + s2.toneDesc + NL + NL;
+    if(s2.toneWords && s2.toneWords.length) md += '**Key Words:** ' + s2.toneWords.join(', ') + NL + NL;
+    if(s2.primaryFont || s2.secondaryFont) {
+      md += '**Typography:**';
+      if(s2.primaryFont) md += ' Primary: ' + s2.primaryFont;
+      if(s2.secondaryFont) md += ' | Secondary: ' + s2.secondaryFont;
+      if(s2.fontNotes) md += ' | ' + s2.fontNotes;
+      md += NL + NL;
+    }
+    var cols = (s2.colours || []).filter(function(c){return c.name || c.hex;});
+    if(cols.length) {
+      md += '**Colour Palette:**' + NL;
+      cols.forEach(function(c){ md += '- ' + (c.name || 'Colour') + (c.hex ? ' (' + c.hex + ')' : '') + (c.role ? ' - ' + c.role : '') + NL; });
+      md += NL;
+    }
+    if(s2.dos) md += "**Brand Do's:**" + NL + s2.dos + NL + NL;
+    if(s2.donts) md += "**Brand Don'ts:**" + NL + s2.donts + NL + NL;
   }
-  const prods=(b.s3?.items||[]).filter(p=>p.name);
-  if(prods.length){md+=`---
-
-## Products & Services
-
-`;prods.forEach(p=>{md+=`### ${p.name} *(${p.category||'product'})*
-`;if(p.url)md+=`**URL:** ${p.url}
-`;if(p.desc)md+=`${p.desc}
-
-`;const f=p.features?.filter(Boolean)||[];if(f.length){md+=`**Key Features:**
-`;f.forEach(x=>md+=`- ${x}
-`);md+='
-';}if(p.price)md+=`**Pricing:** ${p.price}
-
-`;});}
-  const s4=b.s4||{};
-  const comps=(s4.competitors||[]).filter(c=>c.name);
-  const diffs=(s4.differences||[]).filter(d=>d.text);
-  if(comps.length||diffs.length||s4.positioning){
-    md+=`---
-
-## Competition & Points of Difference
-
-`;
-    if(comps.length){md+=`### Competitors
-
-`;comps.forEach(c=>{md+=`**${c.name}**`;if(c.desc)md+=`: ${c.desc}`;md+='
-';if(c.strengths)md+=`- Strengths: ${c.strengths}
-`;if(c.weaknesses)md+=`- Weaknesses: ${c.weaknesses}
-`;md+='
-';});}
-    if(diffs.length){md+=`### Points of Difference
-
-`;diffs.forEach((d,i)=>md+=`${i+1}. ${d.text}
-`);md+='
-';}
-    if(s4.positioning) md+=`**Market Positioning:**
-${s4.positioning}
-
-`;
+  var prods = (b.s3 && b.s3.items || []).filter(function(p){return p.name;});
+  if(prods.length) {
+    md += '---' + NL + NL + '## Products & Services' + NL + NL;
+    prods.forEach(function(p) {
+      md += '### ' + p.name + ' *(' + (p.category || 'product') + ')*' + NL;
+      if(p.url) md += '**URL:** ' + p.url + NL;
+      if(p.desc) md += p.desc + NL + NL;
+      var f = (p.features || []).filter(Boolean);
+      if(f.length) { md += '**Key Features:**' + NL; f.forEach(function(x){ md += '- ' + x + NL; }); md += NL; }
+      if(p.price) md += '**Pricing:** ' + p.price + NL + NL;
+    });
   }
-  const s5=b.s5||{};
-  if(s5.revenue||s5.margin||s5.funding||s5.milestones||s5.targets){
-    md+=`---
-
-## Financials
-
-`;
-    if(s5.revenue)md+=`**Revenue:** ${s5.revenue}
-
-`;
-    if(s5.margin)md+=`**Profit Margin:** ${s5.margin}
-
-`;
-    if(s5.funding)md+=`**Funding Stage:** ${s5.funding}
-
-`;
-    if(s5.milestones)md+=`**Key Milestones:**
-${s5.milestones}
-
-`;
-    if(s5.targets)md+=`**Growth Targets:**
-${s5.targets}
-
-`;
+  var s4 = b.s4 || {};
+  var comps = (s4.competitors || []).filter(function(c){return c.name;});
+  var diffs = (s4.differences || []).filter(function(d){return d.text;});
+  if(comps.length || diffs.length || s4.positioning) {
+    md += '---' + NL + NL + '## Competition & Points of Difference' + NL + NL;
+    if(comps.length) {
+      md += '### Competitors' + NL + NL;
+      comps.forEach(function(c) {
+        md += '**' + c.name + '**' + (c.desc ? ': ' + c.desc : '') + NL;
+        if(c.strengths) md += '- Strengths: ' + c.strengths + NL;
+        if(c.weaknesses) md += '- Weaknesses: ' + c.weaknesses + NL;
+        md += NL;
+      });
+    }
+    if(diffs.length) {
+      md += '### Points of Difference' + NL + NL;
+      diffs.forEach(function(d,i){ md += (i+1) + '. ' + d.text + NL; });
+      md += NL;
+    }
+    if(s4.positioning) md += '**Market Positioning:**' + NL + s4.positioning + NL + NL;
   }
-  const s6=b.s6||{};
-  const pers=(s6.personas||[]).filter(p=>p.name);
-  if(s6.summary||pers.length){
-    md+=`---
-
-## Target Audience
-
-`;
-    if(s6.summary)md+=`**Audience Summary:**
-${s6.summary}
-
-`;
-    pers.forEach(p=>{md+=`### ${p.name}
-`;if(p.age||p.location)md+=`*${[p.age,p.location].filter(Boolean).join(' · ')}*
-
-`;if(p.needs)md+=`**Needs & Pain Points:** ${p.needs}
-
-`;if(p.motivations)md+=`**Motivations:** ${p.motivations}
-
-`;if(p.channels)md+=`**Channels:** ${p.channels}
-
-`;});
+  var s5 = b.s5 || {};
+  if(s5.revenue || s5.margin || s5.funding || s5.milestones || s5.targets) {
+    md += '---' + NL + NL + '## Financials' + NL + NL;
+    if(s5.revenue) md += '**Revenue:** ' + s5.revenue + NL + NL;
+    if(s5.margin) md += '**Profit Margin:** ' + s5.margin + NL + NL;
+    if(s5.funding) md += '**Funding Stage:** ' + s5.funding + NL + NL;
+    if(s5.milestones) md += '**Key Milestones:**' + NL + s5.milestones + NL + NL;
+    if(s5.targets) md += '**Growth Targets:**' + NL + s5.targets + NL + NL;
+  }
+  var s6 = b.s6 || {};
+  var pers = (s6.personas || []).filter(function(p){return p.name;});
+  if(s6.summary || pers.length) {
+    md += '---' + NL + NL + '## Target Audience' + NL + NL;
+    if(s6.summary) md += '**Audience Summary:**' + NL + s6.summary + NL + NL;
+    pers.forEach(function(p) {
+      md += '### ' + p.name + NL;
+      var loc = [p.age, p.location].filter(Boolean).join(' · ');
+      if(loc) md += '*' + loc + '*' + NL + NL;
+      if(p.needs) md += '**Needs & Pain Points:** ' + p.needs + NL + NL;
+      if(p.motivations) md += '**Motivations:** ' + p.motivations + NL + NL;
+      if(p.channels) md += '**Channels:** ' + p.channels + NL + NL;
+    });
   }
   return md;
 }
