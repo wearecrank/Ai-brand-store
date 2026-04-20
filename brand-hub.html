@@ -863,20 +863,16 @@ async function loadBrands() {
         <button class="btn-icon" data-del="${b.id}" title="Delete brand">✕</button>
       </div>`;
     card.addEventListener('click', e => {
-      if (e.target.closest('[data-del]')) return;
+      if (e.target.closest('[data-del]') || e.target.closest('[data-dupe]')) return;
       openBrand(b);
     });
-    card.querySelector('[data-dup]').addEventListener('click', e => {
+    card.querySelector('[data-dupe]').addEventListener('click', e => {
       e.stopPropagation();
       duplicateBrand(b);
     });
     card.querySelector('[data-del]').addEventListener('click', e => {
       e.stopPropagation();
       confirmDelete(b.id, core.name);
-    });
-    card.querySelector('[data-dupe]').addEventListener('click', e => {
-      e.stopPropagation();
-      duplicateBrand(b);
     });
     grid.appendChild(card);
   });
