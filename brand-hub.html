@@ -1955,6 +1955,20 @@ function clientSlugify(str) {
     .replace(/^-|-$/g, '');
 }
 
+/** Absolute origin only; prepends https:// if the user omitted the scheme (otherwise fetch() is relative to GitHub Pages → 405). */
+function normalizePipelineBaseUrl(raw) {
+  var s = String(raw || '').trim().replace(/\/$/, '');
+  if (!s) return '';
+  if (!/^https?:\/\//i.test(s)) s = 'https://' + s.replace(/^\/+/, '');
+  try {
+    var u = new URL(s);
+    if (!u.hostname) return '';
+    return u.origin;
+  } catch (e) {
+    return '';
+  }
+}
+
 function getFullBrandProfileMarkdown() {
   const b = currentBrand;
   const dateStr = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
@@ -1989,15 +2003,21 @@ async function pushProfileToIntentForgePipeline() {
     return;
   }
 
-  var base = sessionStorage.getItem(PIPELINE_BASE_KEY) || '';
+  var baseRaw = sessionStorage.getItem(PIPELINE_BASE_KEY) || '';
   var token = sessionStorage.getItem(PIPELINE_TOKEN_KEY) || '';
 
-  if (!base) {
-    base = window.prompt('Pipeline dashboard base URL (no trailing slash), e.g. https://your-service.up.railway.app', '');
-    if (!base) return;
-    base = String(base).trim().replace(/\/$/, '');
-    sessionStorage.setItem(PIPELINE_BASE_KEY, base);
+  if (!baseRaw) {
+    baseRaw = window.prompt('Pipeline dashboard base URL (no trailing slash), e.g. https://pipeline-dashboard-production.up.railway.app', '');
+    if (!baseRaw) return;
+    baseRaw = String(baseRaw).trim();
   }
+  var base = normalizePipelineBaseUrl(baseRaw);
+  if (!base) {
+    sessionStorage.removeItem(PIPELINE_BASE_KEY);
+    alert('Invalid pipeline URL. Include the hostname, e.g. https://pipeline-dashboard-production.up.railway.app');
+    return;
+  }
+  sessionStorage.setItem(PIPELINE_BASE_KEY, base);
   if (!token) {
     token = window.prompt('Ingest secret — same value as BRAND_HUB_INGEST_SECRET on pipeline-dashboard. It will be stored only in this tab\'s session storage if you confirm below.', '');
     if (!token) return;
