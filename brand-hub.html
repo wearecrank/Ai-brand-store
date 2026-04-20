@@ -372,6 +372,7 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
       <button class="btn btn-secondary btn-full" id="btn-export-section-pdf">↓ Export section to PDF</button>
       <button class="btn btn-secondary btn-full" id="btn-export-md">↓ Export all to AI</button>
       <button class="btn btn-secondary btn-full" id="btn-export-pdf">↓ Export all to PDF</button>
+      <button class="btn btn-secondary btn-full" id="btn-push-pipeline">↑ Push to Intent Forge pipeline</button>
       <button class="btn btn-primary btn-full" id="btn-present">▶ Present</button>
     </div>
   </aside>
@@ -1941,12 +1942,31 @@ document.getElementById('btn-export-section-md').addEventListener('click', () =>
 document.getElementById('btn-export-section-pdf').addEventListener('click', () => exportSectionPDF(activeSection));
 document.getElementById('btn-export-md').addEventListener('click', exportMarkdown);
 
-function exportMarkdown() {
+// Intent Forge pipeline-dashboard: same markdown as “Export all to AI” → POST /api/ingest/brand-hub
+var PIPELINE_BASE_KEY = 'intentforge_pipeline_base';
+var PIPELINE_TOKEN_KEY = 'intentforge_pipeline_token';
+
+function clientSlugify(str) {
+  return String(str)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function getFullBrandProfileMarkdown() {
   const b = currentBrand;
   const dateStr = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
   let md = '# Organisation Profile: ' + (b.core?.name || 'Untitled') + '\n\n';
   md += '*Exported from Brand Hub — ' + dateStr + '*\n\n';
   md += brandToMarkdown(b);
+  return md;
+}
+
+function exportMarkdown() {
+  const b = currentBrand;
+  const md = getFullBrandProfileMarkdown();
   const blob = new Blob([md], {type: 'text/markdown'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1955,6 +1975,67 @@ function exportMarkdown() {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+async function pushProfileToIntentForgePipeline() {
+  var b = currentBrand;
+  var brandName = (b.core && b.core.name) ? String(b.core.name).trim() : '';
+  if (!brandName) {
+    alert('Set a brand name in Organisation Info before pushing.');
+    return;
+  }
+  var brandSlug = clientSlugify(brandName);
+  if (!brandSlug) {
+    alert('Could not derive a pipeline brand id from this name. Use letters or numbers in the brand name.');
+    return;
+  }
+
+  var base = sessionStorage.getItem(PIPELINE_BASE_KEY) || '';
+  var token = sessionStorage.getItem(PIPELINE_TOKEN_KEY) || '';
+
+  if (!base) {
+    base = window.prompt('Pipeline dashboard base URL (no trailing slash), e.g. https://your-service.up.railway.app', '');
+    if (!base) return;
+    base = String(base).trim().replace(/\/$/, '');
+    sessionStorage.setItem(PIPELINE_BASE_KEY, base);
+  }
+  if (!token) {
+    token = window.prompt('Ingest secret — same value as BRAND_HUB_INGEST_SECRET on pipeline-dashboard. It will be stored only in this tab\'s session storage if you confirm below.', '');
+    if (!token) return;
+    token = String(token).trim();
+    if (window.confirm('Remember this secret in session storage for this browser tab? (Clear site data to remove.)')) {
+      sessionStorage.setItem(PIPELINE_TOKEN_KEY, token);
+    }
+  }
+
+  var md = getFullBrandProfileMarkdown();
+  var btn = document.getElementById('btn-push-pipeline');
+  var prevText = btn ? btn.textContent : '';
+  try {
+    if (btn) { btn.disabled = true; btn.textContent = 'Pushing…'; }
+    var res = await fetch(base + '/api/ingest/brand-hub', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        brand_slug: brandSlug,
+        brand_name: brandName,
+        markdown: md,
+        source_url: 'https://wearecrank.github.io/Ai-brand-store/brand-hub.html'
+      })
+    });
+    var data = await res.json().catch(function () { return {}; });
+    if (!res.ok) throw new Error(data.error || res.statusText);
+    alert('Pushed to pipeline. Brand id: ' + (data.brand_id || brandSlug) + '. Check Pipeline Dashboard → Brands.');
+  } catch (e) {
+    alert('Push failed: ' + (e.message || String(e)));
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = prevText; }
+  }
+}
+
+document.getElementById('btn-push-pipeline').addEventListener('click', pushProfileToIntentForgePipeline);
 
 // ════════════════════════════════════════════════════════════
 // EXPORT ALL BRANDS: MARKDOWN
