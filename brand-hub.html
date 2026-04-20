@@ -477,6 +477,33 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
 const SUPABASE_URL = 'https://kkowqiosuzbgoxueqkvf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtrb3dxaW9zdXpiZ294dWVxa3ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NDk2OTYsImV4cCI6MjA5MjAyNTY5Nn0.gc1jd3WPum60ycY-yH6hPuP297cZq4E-CNjM_u8ju6Q';
 const WORKER_URL = 'https://brand-hub-ai.marketing-569.workers.dev';
+
+// ── REQUEST QUEUE — prevents rate limiting by serialising AI calls ──
+const aiQueue = {
+  queue: [],
+  running: false,
+  add: function(fn) {
+    return new Promise(function(resolve, reject) {
+      aiQueue.queue.push(function() {
+        return fn().then(resolve).catch(reject);
+      });
+      aiQueue.run();
+    });
+  },
+  run: async function() {
+    if (aiQueue.running || aiQueue.queue.length === 0) return;
+    aiQueue.running = true;
+    while (aiQueue.queue.length > 0) {
+      const task = aiQueue.queue.shift();
+      try { await task(); } catch(e) { /* errors handled inside each task */ }
+      if (aiQueue.queue.length > 0) {
+        // Wait 2 seconds between requests to stay within rate limits
+        await new Promise(function(r){ setTimeout(r, 2000); });
+      }
+    }
+    aiQueue.running = false;
+  }
+};
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ════════════════════════════════════════════════════════════
@@ -572,7 +599,11 @@ async function importMarkdownForSection(secId, file) {
     return;
   }
 
-  statusEl.innerHTML = '<div class="import-loading"><div class="import-spinner"></div>Reading file with AI…</div>';
+  if (aiQueue.queue.length > 0 || aiQueue.running) {
+    statusEl.innerHTML = '<div class="import-loading"><div class="import-spinner"></div>Queued…</div>';
+  } else {
+    statusEl.innerHTML = '<div class="import-loading"><div class="import-spinner"></div>Reading file with AI…</div>';
+  }
 
   const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -594,12 +625,17 @@ async function importMarkdownForSection(secId, file) {
       requestBody = { section: secId, content: text, filename: file.name };
     }
 
-    const response = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
+    const response = await aiQueue.add(async function() {
+      return fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
     });
 
+    if (response.status === 429) {
+      throw new Error('Daily AI limit reached — resets at midnight UTC.');
+    }
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Error ' + response.status);
@@ -676,12 +712,17 @@ async function fetchUrlForSection(secId, url) {
   statusEl.innerHTML = '<div class="import-loading"><div class="import-spinner"></div>Fetching URL…</div>';
 
   try {
-    const response = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ section: secId, url: url, fetchUrl: true })
+    const response = await aiQueue.add(async function() {
+      return fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section: secId, url: url, fetchUrl: true })
+      });
     });
 
+    if (response.status === 429) {
+      throw new Error('Daily AI limit reached — resets at midnight UTC. To reset now, delete today’s spend key in Cloudflare KV.');
+    }
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Error ' + response.status);
@@ -707,7 +748,7 @@ async function fetchUrlForSection(secId, url) {
   } catch(e) {
     console.error('URL fetch error:', e);
     statusEl.innerHTML = '<div class="import-error">' + e.message + '</div>';
-    setTimeout(() => statusEl.innerHTML = '', 4000);
+    setTimeout(() => statusEl.innerHTML = '', 6000);
   }
 }
 
