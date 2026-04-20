@@ -33,6 +33,7 @@
   --transition: 0.2s ease;
   --s0:#c8a96e; --s1:#7b9ea6; --s2:#9b7bb8;
   --s3:#6aaa7e; --s4:#c07b5a; --s5:#7898c8; --s6:#b87b9a;
+  --s7:#e8a87c; --s8:#7ab8a0; --s9:#a09bc8; --s10:#c8a96e;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
@@ -98,11 +99,19 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .main-content{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg);min-width:0;max-width:100%;position:relative}
 
 /* ── AI IMPORT ── */
-.import-bar{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--card-border);margin-bottom:20px}
+.import-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--card-border);margin-bottom:20px}
+.import-bar-row2{display:flex;align-items:center;gap:8px;width:100%;margin-top:6px}
+.url-import-input{flex:1;background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12px;padding:7px 10px;outline:none;transition:border-color var(--transition)}
+.url-import-input:focus{border-color:var(--accent-border)}
+.url-import-input::placeholder{color:var(--text-dim)}
+.import-filename{font-size:11px;color:var(--text-dim);font-style:italic;margin-top:2px;width:100%}
 .btn-import{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);white-space:nowrap}
 .btn-import:hover{background:var(--accent);color:#0f0f0f}
 .btn-import svg{width:14px;height:14px;flex-shrink:0}
 .import-hint{font-size:11px;color:var(--text-dim)}
+.conditional-section{display:none}
+.conditional-section.visible{display:block}
+.business-type-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;font-family:var(--font-mono);margin-left:8px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border)}
 .btn-section-export{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--card-border);color:var(--text-muted);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);white-space:nowrap}
 .btn-section-export:hover{background:var(--surface2);color:var(--text);border-color:var(--accent-border)}
 .import-file-input{display:none}
@@ -132,15 +141,15 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
   .present-cover-info h1{font-size:32px}
   .present-grid-2{grid-template-columns:1fr}
 }
-.sidebar-top{padding:10px 16px 10px;border-bottom:1px solid var(--sidebar-border)}
+.sidebar-top{padding:10px 16px 10px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0}
 .sidebar-brand-name{font-family:var(--font-display);font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
 .sidebar-brand-tagline{font-size:11px;color:var(--text-dim);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sidebar-logo-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .sidebar-logo-thumb{width:28px;height:28px;border-radius:4px;background:var(--surface);overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:12px;color:var(--accent);flex-shrink:0}
 .sidebar-logo-thumb img{width:100%;height:100%;object-fit:contain}
-.sidebar-home-btn{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);cursor:pointer;margin-top:10px;transition:color var(--transition);background:none;border:none;font-family:var(--font-body);padding:0;letter-spacing:0.5px}
+.sidebar-home-btn{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);cursor:pointer;margin-top:6px;transition:color var(--transition);background:none;border:none;font-family:var(--font-body);padding:0;letter-spacing:0.5px}
 .sidebar-home-btn:hover{color:var(--accent)}
-.sidebar-nav{overflow-y:auto;padding:8px 0;flex:1;min-height:0;max-height:calc(100vh - 220px)}
+.sidebar-nav{overflow-y:auto;padding:8px 0;flex:1;min-height:0}
 .nav-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);padding:8px 16px 4px;font-weight:500}
 .nav-item{display:flex;align-items:center;gap:8px;padding:6px 16px;cursor:pointer;transition:background var(--transition);border-left:3px solid transparent}
 .nav-item:hover{background:var(--surface)}
@@ -149,7 +158,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .nav-item .nav-label-text{font-size:13px;color:var(--text-muted);flex:1;letter-spacing:0;padding:0;text-transform:none;font-weight:400}
 .nav-item.active .nav-label-text{color:var(--text);font-weight:500}
 .nav-progress{font-size:10px;color:var(--text-dim);font-family:var(--font-mono)}
-.sidebar-bottom{padding:8px;border-top:1px solid var(--sidebar-border);display:flex;flex-direction:column;gap:4px;flex-shrink:0;min-height:fit-content}
+.sidebar-bottom{padding:8px 8px 16px;border-top:1px solid var(--sidebar-border);display:flex;flex-direction:column;gap:6px;flex-shrink:0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 12px;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);border:none;white-space:nowrap}
 .btn-primary{background:var(--accent);color:#0f0f0f}
 .btn-primary:hover{background:#d4b87a}
@@ -359,8 +368,10 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
     </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
     <div class="sidebar-bottom">
-      <button class="btn btn-secondary btn-full" id="btn-export-md">↓ Export this brand for AI</button>
-      <button class="btn btn-secondary btn-full" id="btn-export-pdf">↓ Export this brand for PDF</button>
+      <button class="btn btn-secondary btn-full" id="btn-export-section-md">↓ Export section to AI</button>
+      <button class="btn btn-secondary btn-full" id="btn-export-section-pdf">↓ Export section to PDF</button>
+      <button class="btn btn-secondary btn-full" id="btn-export-md">↓ Export all to AI</button>
+      <button class="btn btn-secondary btn-full" id="btn-export-pdf">↓ Export all to PDF</button>
       <button class="btn btn-primary btn-full" id="btn-present">▶ Present</button>
     </div>
   </aside>
@@ -472,13 +483,16 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 // SECTIONS CONFIG
 // ════════════════════════════════════════════════════════════
 const SECTIONS = [
-  {id:'core',label:'Brand Identity',icon:'◎',color:'var(--s0)',desc:'The baseline identity at a glance'},
+  {id:'core',label:'Organisation Info',icon:'◎',color:'var(--s0)',desc:'The baseline information about this organisation'},
   {id:'s1',label:'Purpose & Values',icon:'⬡',color:'var(--s1)',desc:'Why the brand exists and what it stands for'},
   {id:'s2',label:'Brand Guidelines',icon:'◈',color:'var(--s2)',desc:'Voice, typography, colour and usage'},
   {id:'s3',label:'Products & Services',icon:'◧',color:'var(--s3)',desc:'What the brand offers'},
-  {id:'s4',label:'Competition',icon:'◌',color:'var(--s4)',desc:'Competitors and points of difference'},
-  {id:'s5',label:'Financials',icon:'◫',color:'var(--s5)',desc:'Revenue, funding and targets'},
-  {id:'s6',label:'Target Audience',icon:'◉',color:'var(--s6)',desc:'Who the brand is speaking to'}
+  {id:'s4',label:'Competition',icon:'◌',color:'var(--s4)',desc:'Key competitors'},
+  {id:'s5',label:'Sales Process',icon:'◫',color:'var(--s5)',desc:'How the brand sells and converts'},
+  {id:'s6',label:'Target Audience',icon:'◉',color:'var(--s6)',desc:'Who the brand is speaking to'},
+  {id:'s7',label:'Social Proof',icon:'◆',color:'var(--s7)',desc:'Testimonials, case studies and key stats'},
+  {id:'s8',label:'Channels & Keywords',icon:'◭',color:'var(--s8)',desc:'Where the brand shows up and what it ranks for'},
+  {id:'s10',label:'Sales Process',icon:'◑',color:'var(--s10)',desc:'How the brand sells and converts'}
 ];
 
 // ════════════════════════════════════════════════════════════
@@ -548,107 +562,152 @@ window.addEventListener('resize', () => {
 // AI IMPORT FROM MARKDOWN FILE
 // ════════════════════════════════════════════════════════════
 async function importMarkdownForSection(secId, file) {
-  const statusEl = document.getElementById(`import-status-${secId}`);
+  const statusEl = document.getElementById('import-status-' + secId);
   if (!statusEl) return;
 
-  // Show loading state
-  statusEl.innerHTML = `<div class="import-loading"><div class="import-spinner"></div>Reading file with AI…</div>`;
-
-  let content;
-  try {
-    content = await file.text();
-  } catch(e) {
-    statusEl.innerHTML = `<div class="import-error">Could not read file.</div>`;
-    setTimeout(() => statusEl.innerHTML = '', 3000);
+  // 10MB limit
+  if (file.size > 10 * 1024 * 1024) {
+    statusEl.innerHTML = '<div class="import-error">File too large — maximum 10MB.</div>';
+    setTimeout(() => statusEl.innerHTML = '', 4000);
     return;
   }
 
+  statusEl.innerHTML = '<div class="import-loading"><div class="import-spinner"></div>Reading file with AI…</div>';
+
+  const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
   try {
+    let requestBody;
+
+    if (isPDF) {
+      // Read PDF as base64
+      const base64 = await new Promise(function(resolve, reject) {
+        const reader = new FileReader();
+        reader.onload = function(e) { resolve(e.target.result.split(',')[1]); };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      requestBody = { section: secId, pdf: base64, filename: file.name };
+    } else {
+      // Read text file
+      const text = await file.text();
+      requestBody = { section: secId, content: text, filename: file.name };
+    }
+
     const response = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content, section: secId })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Worker returned ${response.status}`);
-    }
-
-    const text = await response.text();
-    let extracted;
-    try {
-      extracted = JSON.parse(text);
-    } catch(e) {
-      throw new Error('Could not parse AI response');
-    }
-
-    // Merge extracted data into current brand section
-    mergeIntoSection(secId, extracted);
-    triggerSave();
-
-    // Refresh the panel to show new data
-    const sec = SECTIONS.find(s => s.id === secId);
-    if (sec) refreshPanel(sec);
-    updateCompleteness(secId);
-
-    statusEl.innerHTML = `<div class="import-success">✓ Imported successfully</div>`;
-    setTimeout(() => statusEl.innerHTML = '', 3000);
-
-  } catch(e) {
-    console.error('Import error:', e);
-    statusEl.innerHTML = `<div class="import-error">Import failed — ${e.message}</div>`;
-    setTimeout(() => statusEl.innerHTML = '', 4000);
-  }
-}
-
-async function fetchUrlForProduct(productIndex, url, sec) {
-  const statusEl = document.getElementById(`url-fetch-status-${productIndex}`);
-  const fetchBtn = document.querySelector(`[data-fetch-url="${productIndex}"]`);
-
-  if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent);font-family:var(--font-mono)">Fetching page…</span>';
-  if (fetchBtn) { fetchBtn.disabled = true; fetchBtn.textContent = 'Fetching…'; }
-
-  try {
-    const response = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, section: 'url_product' })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.message || `Error ${response.status}`);
+      throw new Error(err.message || 'Error ' + response.status);
+    }
+
+    const text2 = await response.text();
+    let extracted;
+    try { extracted = JSON.parse(text2); } catch(e) { throw new Error('Could not parse response'); }
+
+    mergeIntoSection(secId, extracted);
+
+    // Save filename only — not the file contents
+    if (!currentBrand[secId]) currentBrand[secId] = {};
+    currentBrand[secId]._importedFile = file.name;
+
+    triggerSave();
+    const sec = SECTIONS.find(function(s) { return s.id === secId; });
+    if (sec) refreshPanel(sec);
+    updateCompleteness(secId);
+
+    statusEl.innerHTML = '<div class="import-success">✓ Imported from ' + file.name + '</div>';
+    setTimeout(() => statusEl.innerHTML = '', 4000);
+
+  } catch(e) {
+    console.error('Import error:', e);
+    statusEl.innerHTML = '<div class="import-error">' + e.message + '</div>';
+    setTimeout(() => statusEl.innerHTML = '', 4000);
+  }
+}
+
+// Legacy alias for product URL fetch - now handled by fetchUrlForSection
+async function fetchUrlForProduct(productIndex, url, sec) {
+  const statusEl = document.getElementById('url-fetch-status-' + productIndex);
+  const fetchBtn = document.querySelector('[data-fetch-url="' + productIndex + '"]');
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent);font-family:var(--font-mono)">Fetching page…</span>';
+  if (fetchBtn) { fetchBtn.disabled = true; fetchBtn.textContent = 'Fetching…'; }
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section: 'url_product', url: url, fetchUrl: true })
+    });
+    if (!response.ok) throw new Error('Error ' + response.status);
+    const text = await response.text();
+    const extracted = JSON.parse(text);
+    const item = currentBrand.s3.items[productIndex];
+    if (!item) return;
+    if (extracted.name && !item.name) item.name = extracted.name;
+    if (extracted.desc) item.desc = item.desc ? item.desc + String.fromCharCode(10,10) + extracted.desc : extracted.desc;
+    if (extracted.category) item.category = extracted.category;
+    if (extracted.price && !item.price) item.price = extracted.price;
+    if (extracted.features && extracted.features.length) item.features = [...(item.features||[]), ...extracted.features].slice(0,5);
+    triggerSave(); refreshPanel(sec); updateCompleteness('s3');
+    if (statusEl) statusEl.innerHTML = '<span style="color:var(--success)">✓ Info imported</span>';
+    setTimeout(() => { if (statusEl) statusEl.innerHTML = ''; }, 3000);
+  } catch(e) {
+    if (statusEl) statusEl.innerHTML = '<span style="color:var(--danger)">' + e.message + '</span>';
+    setTimeout(() => { if (statusEl) statusEl.innerHTML = ''; }, 4000);
+  } finally {
+    if (fetchBtn) { fetchBtn.disabled = false; fetchBtn.innerHTML = 'Fetch info'; }
+  }
+}
+
+async function fetchUrlForSection(secId, url) {
+  const statusEl = document.getElementById('import-status-' + secId);
+  if (!statusEl) return;
+
+  if (!url || !url.startsWith('http')) {
+    statusEl.innerHTML = '<div class="import-error">Please enter a valid URL starting with http.</div>';
+    setTimeout(() => statusEl.innerHTML = '', 3000);
+    return;
+  }
+
+  statusEl.innerHTML = '<div class="import-loading"><div class="import-spinner"></div>Fetching URL…</div>';
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section: secId, url: url, fetchUrl: true })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Error ' + response.status);
     }
 
     const text = await response.text();
     let extracted;
     try { extracted = JSON.parse(text); } catch(e) { throw new Error('Could not parse response'); }
 
-    // Merge extracted fields into this specific product item
-    const item = currentBrand.s3.items[productIndex];
-    if (!item) return;
+    mergeIntoSection(secId, extracted);
 
-    if (extracted.name && !item.name) item.name = extracted.name;
-    if (extracted.desc) item.desc = item.desc ? item.desc + '\n\n' + extracted.desc : extracted.desc;
-    if (extracted.category) item.category = extracted.category;
-    if (extracted.price && !item.price) item.price = extracted.price;
-    if (extracted.features && extracted.features.length) {
-      item.features = [...(item.features||[]), ...extracted.features].slice(0, 5);
-    }
+    if (!currentBrand[secId]) currentBrand[secId] = {};
+    currentBrand[secId]._importedFile = url;
 
     triggerSave();
-    refreshPanel(sec);
-    updateCompleteness('s3');
+    const sec = SECTIONS.find(function(s) { return s.id === secId; });
+    if (sec) refreshPanel(sec);
+    updateCompleteness(secId);
 
-    if (statusEl) statusEl.innerHTML = '<span style="color:var(--success)">✓ Info imported from page</span>';
-    setTimeout(() => { if (statusEl) statusEl.innerHTML = ''; }, 3000);
+    statusEl.innerHTML = '<div class="import-success">✓ Content fetched from URL</div>';
+    setTimeout(() => statusEl.innerHTML = '', 4000);
 
   } catch(e) {
     console.error('URL fetch error:', e);
-    if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">${e.message}</span>`;
-    setTimeout(() => { if (statusEl) statusEl.innerHTML = ''; }, 4000);
-  } finally {
-    if (fetchBtn) { fetchBtn.disabled = false; fetchBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Fetch info'; }
+    statusEl.innerHTML = '<div class="import-error">' + e.message + '</div>';
+    setTimeout(() => statusEl.innerHTML = '', 4000);
   }
 }
 
@@ -800,18 +859,37 @@ async function loadBrands() {
       <h3>${esc(core.name || 'Untitled')}</h3>
       <p>${esc(core.tagline || core.industry || 'No tagline yet')}</p>
       <div class="card-actions">
+        <button class="btn-icon btn-icon-dupe" data-dupe="${b.id}" title="Duplicate brand" style="font-size:11px">⧉</button>
         <button class="btn-icon" data-del="${b.id}" title="Delete brand">✕</button>
       </div>`;
     card.addEventListener('click', e => {
       if (e.target.closest('[data-del]')) return;
       openBrand(b);
     });
+    card.querySelector('[data-dup]').addEventListener('click', e => {
+      e.stopPropagation();
+      duplicateBrand(b);
+    });
     card.querySelector('[data-del]').addEventListener('click', e => {
       e.stopPropagation();
       confirmDelete(b.id, core.name);
     });
+    card.querySelector('[data-dupe]').addEventListener('click', e => {
+      e.stopPropagation();
+      duplicateBrand(b);
+    });
     grid.appendChild(card);
   });
+}
+
+async function duplicateBrand(brandRecord) {
+  var newData = JSON.parse(JSON.stringify(brandRecord));
+  newData.core = newData.core || {};
+  newData.core.name = 'Copy of ' + (newData.core.name || 'Untitled');
+  newData.core.logo = '';
+  var {data, error} = await sb.from('brands').insert({data: newData}).select().single();
+  if (error) { alert('Could not duplicate brand.'); return; }
+  loadBrands();
 }
 
 let pendingDeleteId = null;
@@ -863,13 +941,16 @@ document.getElementById('new-brand-name-input').addEventListener('keydown', e =>
 
 function newBrandData(name) {
   return {
-    core:{ name:name||'', tagline:'', logo:'', founded:'', industry:'', overview:'' },
+    core:{ name:name||'', tagline:'', logo:'', founded:'', industry:'', overview:'', businessType:'', businessModel:'', companySize:'', market:'' },
     s1:{ purpose:'', values:[], proposition:'', mission:'', vision:'' },
-    s2:{ toneDesc:'', toneWords:[], primaryFont:'', secondaryFont:'', fontNotes:'', colours:[], dos:'', donts:'', notes:'' },
+    s2:{ toneDesc:'', toneWords:[], primaryFont:'', secondaryFont:'', fontNotes:'', colours:[], dos:'', donts:'', notes:'', heroStatement:'', elevatorPitch:'', keyMessages:'', taglineVariants:'', neverSay:'' },
     s3:{ items:[] },
-    s4:{ competitors:[], differences:[], positioning:'' },
-    s5:{ revenue:'', margin:'', funding:'', milestones:'', targets:'', notes:'' },
-    s6:{ personas:[], summary:'' }
+    s4:{ competitors:[] },
+    s5:{ dealValue:'', salesCycle:'', conversionGoal:'', decisionMakers:'', objections:'', process:'' },
+    s6:{ personas:[], summary:'' },
+    s7:{ testimonials:[], caseStudies:[], keyStats:[], awards:'', reviews:'' },
+    s8:{ platforms:[], seoKeywords:'', contentPillars:'', postingFrequency:'', paidChannels:'' },
+    s10:{ conversionGoal:'', salesCycle:'', dealValue:'', decisionMakers:'', objections:'', process:'' }
   };
 }
 
@@ -993,11 +1074,14 @@ function completeness(secId) {
   const fieldMap = {
     core:['name','tagline','logo','founded','industry','overview'],
     s1:['purpose','values','proposition','mission','vision'],
-    s2:['toneDesc','toneWords','primaryFont','colours','dos'],
+    s2:['toneDesc','toneWords','primaryFont','colours','dos','keyMessages'],
     s3:['items'],
-    s4:['competitors','differences','positioning'],
-    s5:['revenue','margin','funding','milestones','targets'],
-    s6:['personas','summary']
+    s4:['competitors'],
+    s5:['dealValue','salesCycle','conversionGoal','objections'],
+    s6:['personas','summary'],
+    s7:['testimonials','keyStats'],
+    s8:['platforms','seoKeywords','contentPillars'],
+    s10:['conversionGoal','salesCycle','objections']
   };
   const fields = fieldMap[secId] || [];
   const total = fields.length;
@@ -1042,14 +1126,22 @@ function buildPanelHTML(sec) {
     <div class="import-bar">
       <label class="btn-import" for="import-file-${sec.id}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Import from file
+        Import file
       </label>
-      <input class="import-file-input" type="file" id="import-file-${sec.id}" accept=".md,.txt,.markdown" data-import-section="${sec.id}">
-      <button class="btn-section-export" data-section-export-md="${sec.id}">↓ Export section for AI</button>
-      <button class="btn-section-export" data-section-export-pdf="${sec.id}">↓ Export section for PDF</button>
+      <input class="import-file-input" type="file" id="import-file-${sec.id}" accept=".md,.txt,.markdown,.pdf,application/pdf" data-import-section="${sec.id}">
+      <button class="btn-section-export" data-section-export-md="${sec.id}">↓ Export section to AI</button>
+      <button class="btn-section-export" data-section-export-pdf="${sec.id}">↓ Export section to PDF</button>
+      <div class="import-bar-row2">
+        <input type="text" class="url-import-input" id="url-import-${sec.id}" placeholder="Or paste a URL to fetch from…">
+        <button class="btn-import" data-fetch-section-url="${sec.id}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Fetch URL
+        </button>
+      </div>
+      ${(currentBrand[sec.id] && currentBrand[sec.id]._importedFile) ? '<div class="import-filename">Last imported: ' + esc(currentBrand[sec.id]._importedFile) + '</div>' : ''}
       <span id="import-status-${sec.id}"></span>
     </div>`;
-  const builders = {core:buildCoreForm,s1:buildS1Form,s2:buildS2Form,s3:buildS3Form,s4:buildS4Form,s5:buildS5Form,s6:buildS6Form};
+  const builders = {core:buildCoreForm,s1:buildS1Form,s2:buildS2Form,s3:buildS3Form,s4:buildS4Form,s6:buildS6Form,s7:buildS7Form,s8:buildS8Form,s10:buildS10Form};
   return header + (builders[sec.id] ? builders[sec.id]() : '');
 }
 
@@ -1070,6 +1162,51 @@ function buildCoreForm() {
         ${d.logo ? `<img src="${d.logo}" alt="Logo">` : '<span class="upload-hint">Click to upload logo image</span>'}
       </label>
       <input type="file" id="logo-file-input" accept="image/*" style="display:none">
+    </div>
+    <div class="divider"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Business Type</label>
+        <select data-field="core.businessType" id="core-business-type">
+          <option value="">Select…</option>
+          <option value="B2B" ${d.businessType==='B2B'?'selected':''}>B2B — Business to Business</option>
+          <option value="B2C" ${d.businessType==='B2C'?'selected':''}>B2C — Business to Consumer</option>
+          <option value="Both" ${d.businessType==='Both'?'selected':''}>Both B2B and B2C</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Business Model</label>
+        <select data-field="core.businessModel">
+          <option value="">Select…</option>
+          <option value="SaaS" ${d.businessModel==='SaaS'?'selected':''}>SaaS / Software</option>
+          <option value="Service" ${d.businessModel==='Service'?'selected':''}>Service / Agency</option>
+          <option value="E-commerce" ${d.businessModel==='E-commerce'?'selected':''}>E-commerce</option>
+          <option value="Marketplace" ${d.businessModel==='Marketplace'?'selected':''}>Marketplace</option>
+          <option value="Retail" ${d.businessModel==='Retail'?'selected':''}>Retail</option>
+          <option value="Other" ${d.businessModel==='Other'?'selected':''}>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Company Size</label>
+        <select data-field="core.companySize">
+          <option value="">Select…</option>
+          <option value="Solo" ${d.companySize==='Solo'?'selected':''}>Solo / Freelance</option>
+          <option value="Startup" ${d.companySize==='Startup'?'selected':''}>Startup (2–20)</option>
+          <option value="SME" ${d.companySize==='SME'?'selected':''}>SME (20–200)</option>
+          <option value="Enterprise" ${d.companySize==='Enterprise'?'selected':''}>Enterprise (200+)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Geographic Market</label>
+        <select data-field="core.market">
+          <option value="">Select…</option>
+          <option value="Local" ${d.market==='Local'?'selected':''}>Local</option>
+          <option value="National" ${d.market==='National'?'selected':''}>National</option>
+          <option value="International" ${d.market==='International'?'selected':''}>International</option>
+        </select>
+      </div>
     </div>
     <div class="form-group"><label>Brand Overview</label><textarea data-field="core.overview" placeholder="A brief description of the brand…" style="min-height:140px">${esc(d.overview)}</textarea></div>`;
 }
@@ -1143,7 +1280,13 @@ function buildS2Form() {
     <div class="form-row">
       <div class="form-group"><label>Brand Do's</label><textarea data-field="s2.dos" style="min-height:80px">${esc(d.dos)}</textarea></div>\n      <div class="form-group"><label>Brand Don'ts</label><textarea data-field="s2.donts" style="min-height:80px">${esc(d.donts)}</textarea></div>
     </div>
-    <div class="form-group"><label>Additional Notes</label><textarea data-field="s2.notes">${esc(d.notes)}</textarea></div>`;
+    <div class="form-group"><label>Additional Notes</label><textarea data-field="s2.notes">${esc(d.notes)}</textarea></div>
+    <div class="divider"></div>
+    <div class="form-group"><label>Hero Statement</label><input type="text" data-field="s2.heroStatement" value="${esc(d.heroStatement)}" placeholder="The single most powerful claim this brand makes"></div>
+    <div class="form-group"><label>Elevator Pitch</label><textarea data-field="s2.elevatorPitch" placeholder="How would you describe this brand in 30 seconds?" style="min-height:80px">${esc(d.elevatorPitch)}</textarea></div>
+    <div class="form-group"><label>Key Messages (one per line)</label><textarea data-field="s2.keyMessages" placeholder="The core messages the brand consistently communicates…" style="min-height:100px">${esc(d.keyMessages)}</textarea></div>
+    <div class="form-group"><label>Tagline Variations</label><textarea data-field="s2.taglineVariants" placeholder="Alternative straplines or campaign lines…" style="min-height:70px">${esc(d.taglineVariants)}</textarea></div>
+    <div class="form-group"><label>What to Never Say</label><textarea data-field="s2.neverSay" placeholder="Language, claims or topics this brand should always avoid…" style="min-height:80px">${esc(d.neverSay)}</textarea></div>`;
 }
 
 function buildS3Form() {
@@ -1192,40 +1335,12 @@ function buildS3Form() {
 }
 
 function buildS4Form() {
-  const d = currentBrand.s4 || {};
-  const comps = d.competitors || [];
-  const diffs = d.differences || [];
-  const compsHTML = comps.map((c,i) => `
-    <div class="repeatable-item">
-      <div class="item-header"><span class="item-number">Competitor ${i+1}</span><button class="btn-remove" data-remove-competitor="${i}">×</button></div>
-      <div class="form-row">
-        <div class="form-group"><label>Name</label><input type="text" data-competitors="${i}.name" value="${esc(c.name)}" placeholder="Competitor name"></div>
-        <div class="form-group"><label>Brief Description</label><input type="text" data-competitors="${i}.desc" value="${esc(c.desc)}" placeholder="Who are they?"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Strengths</label><textarea data-competitors="${i}.strengths" style="min-height:60px">${esc(c.strengths)}</textarea></div>
-        <div class="form-group"><label>Weaknesses</label><textarea data-competitors="${i}.weaknesses" style="min-height:60px">${esc(c.weaknesses)}</textarea></div>
-      </div>
-    </div>`).join('');
-  const diffsHTML = diffs.map((d2,i) => `
-    <div class="repeatable-item">
-      <div class="item-header"><span class="item-number">Point ${i+1}</span><button class="btn-remove" data-remove-diff="${i}">×</button></div>
-      <div class="form-group"><textarea data-differences="${i}.text" style="min-height:60px">${esc(d2.text)}</textarea></div>
-    </div>`).join('');
-  return `
-    <div class="form-group">
-      <label>Competitors (up to 8)</label>
-      <div class="repeatable-list" id="competitors-list">${compsHTML}</div>
-      ${comps.length < 8 ? `<button class="btn-add" id="btn-add-competitor">+ Add competitor</button>` : ''}
-    </div>
-    <div class="divider"></div>
-    <div class="form-group">
-      <label>Points of Difference (up to 6)</label>
-      <div class="repeatable-list" id="diffs-list">${diffsHTML}</div>
-      ${diffs.length < 6 ? `<button class="btn-add" id="btn-add-diff">+ Add point of difference</button>` : ''}
-    </div>
-    <div class="divider"></div>
-    <div class="form-group"><label>Market Positioning Summary</label><textarea data-field="s4.positioning" style="min-height:100px">${esc(d.positioning)}</textarea></div>`;
+  var d = currentBrand.s4 || {};
+  var comps = d.competitors || [];
+  var compsHTML = comps.map(function(c,i) {
+    return '<div class="repeatable-item"><div class="item-header"><span class="item-number">Competitor ' + (i+1) + '</span><button class="btn-remove" data-remove-competitor="' + i + '">x</button></div><div class="form-row"><div class="form-group"><label>Name</label><input type="text" data-competitors="' + i + '.name" value="' + esc(c.name) + '" placeholder="Competitor name"></div><div class="form-group"><label>Brief Description (optional)</label><input type="text" data-competitors="' + i + '.desc" value="' + esc(c.desc) + '" placeholder="Who are they?"></div></div></div>';
+  }).join('');
+  return '<div class="form-group"><label>Competitors (up to 8)</label><div class="repeatable-list" id="competitors-list">' + compsHTML + '</div>' + (comps.length < 8 ? '<button class="btn-add" id="btn-add-competitor">+ Add competitor</button>' : '') + '</div>';
 }
 
 function buildS5Form() {
@@ -1268,19 +1383,89 @@ function buildS6Form() {
     <div class="form-group"><label>Overall Audience Summary</label><textarea data-field="s6.summary" style="min-height:120px">${esc(d.summary)}</textarea></div>`;
 }
 
+function buildS7Form() {
+  var d = currentBrand.s7 || {};
+  var bt = currentBrand.core && currentBrand.core.businessType ? currentBrand.core.businessType : '';
+  var testimonials = d.testimonials || [];
+  var caseStudies = d.caseStudies || [];
+  var keyStats = d.keyStats || [];
+
+  var statsHTML = keyStats.map(function(s,i) {
+    return '<div class="repeatable-item"><div class="item-header"><span class="item-number">Stat ' + (i+1) + '</span><button class="btn-remove" data-remove-stat="' + i + '">x</button></div><div class="form-row"><div class="form-group"><label>Stat</label><input type="text" data-keystats="' + i + '.value" value="' + esc(s.value) + '" placeholder="e.g. 500+ clients"></div><div class="form-group"><label>Context</label><input type="text" data-keystats="' + i + '.context" value="' + esc(s.context) + '" placeholder="e.g. across 12 industries"></div></div></div>';
+  }).join('');
+
+  var testimonialsHTML = testimonials.map(function(t,i) {
+    return '<div class="repeatable-item"><div class="item-header"><span class="item-number">Testimonial ' + (i+1) + '</span><button class="btn-remove" data-remove-testimonial="' + i + '">x</button></div><div class="form-group"><label>Quote</label><textarea data-testimonials="' + i + '.quote" style="min-height:70px">' + esc(t.quote) + '</textarea></div><div class="form-row"><div class="form-group"><label>Name</label><input type="text" data-testimonials="' + i + '.name" value="' + esc(t.name) + '" placeholder="e.g. Sarah Jones"></div><div class="form-group"><label>Company / Role</label><input type="text" data-testimonials="' + i + '.company" value="' + esc(t.company) + '" placeholder="e.g. CEO, Acme Ltd"></div></div><div class="form-group"><label>Result (optional)</label><input type="text" data-testimonials="' + i + '.result" value="' + esc(t.result) + '" placeholder="e.g. 3x revenue in 6 months"></div></div>';
+  }).join('');
+
+  var caseHTML = caseStudies.map(function(c,i) {
+    return '<div class="repeatable-item"><div class="item-header"><span class="item-number">Case Study ' + (i+1) + '</span><button class="btn-remove" data-remove-case="' + i + '">x</button></div><div class="form-row"><div class="form-group"><label>Client</label><input type="text" data-cases="' + i + '.client" value="' + esc(c.client) + '" placeholder="Client name"></div><div class="form-group"><label>Industry</label><input type="text" data-cases="' + i + '.industry" value="' + esc(c.industry) + '" placeholder="e.g. Healthcare"></div></div><div class="form-group"><label>Problem</label><input type="text" data-cases="' + i + '.problem" value="' + esc(c.problem) + '" placeholder="What challenge did they face?"></div><div class="form-group"><label>Result</label><input type="text" data-cases="' + i + '.result" value="' + esc(c.result) + '" placeholder="What was the measurable outcome?"></div></div>';
+  }).join('');
+
+  var b2bSection = bt === 'B2C' ? '' : ('<div class="form-group"><label>Testimonials (up to 5)</label><div class="repeatable-list" id="testimonials-list">' + testimonialsHTML + '</div>' + (testimonials.length < 5 ? '<button class="btn-add" id="btn-add-testimonial">+ Add testimonial</button>' : '') + '</div><div class="divider"></div><div class="form-group"><label>Case Studies (up to 3)</label><div class="repeatable-list" id="cases-list">' + caseHTML + '</div>' + (caseStudies.length < 3 ? '<button class="btn-add" id="btn-add-case">+ Add case study</button>' : '') + '</div><div class="divider"></div>');
+
+  var b2cSection = bt === 'B2B' ? '' : '<div class="form-group"><label>Reviews Summary</label><textarea data-field="s7.reviews" placeholder="e.g. 4.8 stars on Trustpilot from 2,400 reviews. Common themes: fast delivery, great value…" style="min-height:80px">' + esc(d.reviews) + '</textarea></div><div class="divider"></div>';
+
+  return b2bSection + b2cSection + '<div class="form-group"><label>Key Stats (up to 5)</label><div class="repeatable-list" id="stats-list">' + statsHTML + '</div>' + (keyStats.length < 5 ? '<button class="btn-add" id="btn-add-stat">+ Add stat</button>' : '') + '</div><div class="form-group"><label>Awards &amp; Accreditations</label><textarea data-field="s7.awards" placeholder="e.g. ISO 9001 certified, Winner of Marketing Week Award 2024…">' + esc(d.awards) + '</textarea></div>';
+}
+
+function buildS8Form() {
+  var d = currentBrand.s8 || {};
+  var platforms = d.platforms || [];
+  var platformOptions = ['Instagram','LinkedIn','Facebook','X (Twitter)','TikTok','YouTube','Pinterest','Google Ads','Meta Ads','Email','SEO / Organic','Podcast','PR / Press'];
+  var platformsHTML = platformOptions.map(function(p) {
+    var checked = platforms.indexOf(p) > -1 ? 'checked' : '';
+    return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);text-transform:none;letter-spacing:0;cursor:pointer;margin-bottom:8px"><input type="checkbox" data-platform="' + p + '" ' + checked + ' style="width:16px;height:16px;accent-color:var(--accent);flex-shrink:0"> ' + p + '</label>';
+  }).join('');
+
+  return '<div class="form-group"><label>Active Channels &amp; Platforms</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin-top:8px">' + platformsHTML + '</div></div><div class="divider"></div><div class="form-group"><label>SEO Focus Keywords</label><textarea data-field="s8.seoKeywords" placeholder="List the main keywords and phrases this brand wants to rank for…" style="min-height:80px">' + esc(d.seoKeywords) + '</textarea></div><div class="form-group"><label>Content Pillars</label><textarea data-field="s8.contentPillars" placeholder="The main themes and topics the brand creates content around…" style="min-height:80px">' + esc(d.contentPillars) + '</textarea></div><div class="form-row"><div class="form-group"><label>Posting Frequency</label><input type="text" data-field="s8.postingFrequency" value="' + esc(d.postingFrequency) + '" placeholder="e.g. Daily on Instagram, weekly newsletter"></div><div class="form-group"><label>Paid Advertising Channels</label><input type="text" data-field="s8.paidChannels" value="' + esc(d.paidChannels) + '" placeholder="e.g. Google Ads, Meta, LinkedIn"></div></div>';
+}
+
+function buildS9Form() {
+  var d = currentBrand.s9 || {};
+  return '<div class="form-group"><label>Hero Statement</label><input type="text" data-field="s9.heroStatement" value="' + esc(d.heroStatement) + '" placeholder="The single most powerful thing this brand says — the big claim"></div><div class="form-group"><label>Elevator Pitch</label><textarea data-field="s9.elevatorPitch" placeholder="How would you describe this brand in 30 seconds?" style="min-height:80px">' + esc(d.elevatorPitch) + '</textarea></div><div class="form-group"><label>Key Messages (3–5 things the brand always says)</label><textarea data-field="s9.keyMessages" placeholder="List the core messages — one per line…" style="min-height:120px">' + esc(d.keyMessages) + '</textarea></div><div class="form-group"><label>Tagline Variations</label><textarea data-field="s9.taglineVariants" placeholder="Alternative straplines or campaign lines…" style="min-height:70px">' + esc(d.taglineVariants) + '</textarea></div><div class="divider"></div><div class="form-group"><label>What to Never Say (Messaging Red Lines)</label><textarea data-field="s9.neverSay" placeholder="Language, claims or topics this brand should always avoid…" style="min-height:80px">' + esc(d.neverSay) + '</textarea></div>';
+}
+
+function buildS10Form() {
+  var d = currentBrand.s10 || {};
+  return '<div class="form-row"><div class="form-group"><label>Primary Conversion Goal</label><select data-field="s10.conversionGoal"><option value="">Select...</option><option value="Book a demo" ' + (d.conversionGoal==='Book a demo'?'selected':'') + '>Book a demo</option><option value="Free trial" ' + (d.conversionGoal==='Free trial'?'selected':'') + '>Free trial</option><option value="Contact form" ' + (d.conversionGoal==='Contact form'?'selected':'') + '>Contact form</option><option value="Phone call" ' + (d.conversionGoal==='Phone call'?'selected':'') + '>Phone call</option><option value="Download" ' + (d.conversionGoal==='Download'?'selected':'') + '>Download / Lead magnet</option><option value="Purchase" ' + (d.conversionGoal==='Purchase'?'selected':'') + '>Direct purchase</option></select></div><div class="form-group"><label>Typical Sales Cycle</label><select data-field="s10.salesCycle"><option value="">Select...</option><option value="Same day" ' + (d.salesCycle==='Same day'?'selected':'') + '>Same day</option><option value="1-2 weeks" ' + (d.salesCycle==='1-2 weeks'?'selected':'') + '>1-2 weeks</option><option value="1-3 months" ' + (d.salesCycle==='1-3 months'?'selected':'') + '>1-3 months</option><option value="3-6 months" ' + (d.salesCycle==='3-6 months'?'selected':'') + '>3-6 months</option><option value="6-12 months" ' + (d.salesCycle==='6-12 months'?'selected':'') + '>6-12 months</option><option value="12+ months" ' + (d.salesCycle==='12+ months'?'selected':'') + '>12+ months</option></select></div></div><div class="form-row"><div class="form-group"><label>Average Deal / Contract Value</label><input type="text" data-field="s10.dealValue" value="' + esc(d.dealValue) + '" placeholder="e.g. £5,000/yr, £50k one-off"></div><div class="form-group"><label>Key Decision Makers</label><input type="text" data-field="s10.decisionMakers" value="' + esc(d.decisionMakers) + '" placeholder="e.g. Marketing Director, CFO"></div></div><div class="form-group"><label>Main Objections to Overcome</label><textarea data-field="s10.objections" placeholder="What do prospects typically push back on? e.g. price, trust, switching cost..." style="min-height:80px">' + esc(d.objections) + '</textarea></div><div class="form-group"><label>Sales Process Notes</label><textarea data-field="s10.process" placeholder="How does a deal typically progress? e.g. inbound lead, demo, proposal, legal, sign..." style="min-height:80px">' + esc(d.process) + '</textarea></div>';
+}
+
 // ════════════════════════════════════════════════════════════
 // PANEL BEHAVIOURS
 // ════════════════════════════════════════════════════════════
 function initPanelBehaviours(panel, sec) {
   panel.addEventListener('input', e => {
     const field = e.target.dataset.field;
-    if (field) { setNestedField(currentBrand, field, e.target.value); triggerSave(); updateCompleteness(sec.id); if (field.startsWith('core.')) updateSidebarMeta(); }
+    if (field) {
+      setNestedField(currentBrand, field, e.target.value);
+      triggerSave();
+      updateCompleteness(sec.id);
+      if (field.startsWith('core.')) updateSidebarMeta();
+      // Refresh Social Proof section when business type changes so conditional fields update
+      if (field === 'core.businessType') {
+        var s7sec = SECTIONS.find(function(s){ return s.id === 's7'; });
+        if (s7sec) refreshPanel(s7sec);
+      }
+    }
     handleArrayInput(e, sec);
   });
   panel.addEventListener('change', e => {
     const field = e.target.dataset.field;
     if (field) { setNestedField(currentBrand, field, e.target.value); triggerSave(); }
     handleArrayInput(e, sec);
+    // Platform checkboxes for S8
+    var platKey = e.target.dataset.platform;
+    if (platKey !== undefined) {
+      if (!currentBrand.s8) currentBrand.s8 = {};
+      if (!currentBrand.s8.platforms) currentBrand.s8.platforms = [];
+      if (e.target.checked) {
+        if (currentBrand.s8.platforms.indexOf(platKey) === -1) currentBrand.s8.platforms.push(platKey);
+      } else {
+        currentBrand.s8.platforms = currentBrand.s8.platforms.filter(function(p){ return p !== platKey; });
+      }
+      triggerSave(); updateCompleteness('s8');
+    }
     const pi = e.target.dataset.colourPicker;
     if (pi !== undefined) {
       const hex = e.target.value;
@@ -1298,8 +1483,11 @@ function initPanelBehaviours(panel, sec) {
       'btn-add-colour': () => { currentBrand.s2.colours.push({name:'',hex:'#000000',role:''}); refresh(); },
       'btn-add-product': () => { currentBrand.s3.items.push({name:'',category:'product',desc:'',features:[],price:'',url:''}); refresh(); },
       'btn-add-competitor': () => { currentBrand.s4.competitors.push({name:'',desc:'',strengths:'',weaknesses:''}); refresh(); },
-      'btn-add-diff': () => { currentBrand.s4.differences.push({text:''}); refresh(); },
-      'btn-add-persona': () => { currentBrand.s6.personas.push({name:'',age:'',location:'',needs:'',motivations:'',channels:''}); refresh(); }
+
+      'btn-add-persona': () => { currentBrand.s6.personas.push({name:'',age:'',location:'',needs:'',motivations:'',channels:''}); refresh(); },
+      'btn-add-testimonial': () => { if(!currentBrand.s7.testimonials)currentBrand.s7.testimonials=[]; currentBrand.s7.testimonials.push({quote:'',name:'',company:'',result:''}); refresh(); },
+      'btn-add-case': () => { if(!currentBrand.s7.caseStudies)currentBrand.s7.caseStudies=[]; currentBrand.s7.caseStudies.push({client:'',industry:'',problem:'',result:''}); refresh(); },
+      'btn-add-stat': () => { if(!currentBrand.s7.keyStats)currentBrand.s7.keyStats=[]; currentBrand.s7.keyStats.push({value:'',context:''}); refresh(); }
     };
     for (const [id, fn] of Object.entries(actions)) {
       if (e.target.id === id) { fn(); triggerSave(); return; }
@@ -1309,14 +1497,27 @@ function initPanelBehaviours(panel, sec) {
       ['data-remove-colour', (i) => currentBrand.s2.colours.splice(i,1)],
       ['data-remove-product', (i) => currentBrand.s3.items.splice(i,1)],
       ['data-remove-competitor', (i) => currentBrand.s4.competitors.splice(i,1)],
-      ['data-remove-diff', (i) => currentBrand.s4.differences.splice(i,1)],
+
       ['data-remove-persona', (i) => currentBrand.s6.personas.splice(i,1)],
-      ['data-remove-tone', (i) => currentBrand.s2.toneWords.splice(i,1)]
+      ['data-remove-tone', (i) => currentBrand.s2.toneWords.splice(i,1)],
+      ['data-remove-testimonial', (i) => currentBrand.s7.testimonials.splice(i,1)],
+      ['data-remove-case', (i) => currentBrand.s7.caseStudies.splice(i,1)],
+      ['data-remove-stat', (i) => currentBrand.s7.keyStats.splice(i,1)]
     ];
     for (const [attr, fn] of removeMap) {
       const el = e.target.closest(`[${attr}]`);
       if (el) { fn(parseInt(el.getAttribute(attr))); refresh(); triggerSave(); return; }
     }
+    // URL fetch per section
+    const fetchSectionUrl = e.target.closest('[data-fetch-section-url]');
+    if (fetchSectionUrl) {
+      const sid = fetchSectionUrl.dataset.fetchSectionUrl;
+      const urlInput = document.getElementById('url-import-' + sid);
+      const url = urlInput ? urlInput.value.trim() : '';
+      fetchUrlForSection(sid, url);
+      return;
+    }
+
     // Section export buttons
     const secExportMd = e.target.closest('[data-section-export-md]');
     if (secExportMd) {
@@ -1372,13 +1573,19 @@ function handleArrayInput(e, sec) {
     ['data-values', (parts) => { if(!currentBrand.s1.values[parts[0]])currentBrand.s1.values[parts[0]]={};currentBrand.s1.values[parts[0]][parts[1]]=e.target.value; updateCompleteness('s1'); }],
     ['data-colours', (parts) => { if(!currentBrand.s2.colours[parts[0]])currentBrand.s2.colours[parts[0]]={};currentBrand.s2.colours[parts[0]][parts[1]]=e.target.value; updateCompleteness('s2'); }],
     ['data-competitors', (parts) => { if(!currentBrand.s4.competitors[parts[0]])currentBrand.s4.competitors[parts[0]]={};currentBrand.s4.competitors[parts[0]][parts[1]]=e.target.value; updateCompleteness('s4'); }],
-    ['data-differences', (parts) => { if(!currentBrand.s4.differences[parts[0]])currentBrand.s4.differences[parts[0]]={};currentBrand.s4.differences[parts[0]][parts[1]]=e.target.value; updateCompleteness('s4'); }],
+
     ['data-personas', (parts) => { if(!currentBrand.s6.personas[parts[0]])currentBrand.s6.personas[parts[0]]={};currentBrand.s6.personas[parts[0]][parts[1]]=e.target.value; updateCompleteness('s6'); }],
   ];
   for (const [attr, fn] of maps) {
     const val = e.target.dataset[attr.replace('data-','')];
     if (val) { fn(val.split('.')); triggerSave(); return; }
   }
+  var tkKey = e.target.dataset.testimonials;
+  if (tkKey) { var pts=tkKey.split('.'); if(!currentBrand.s7.testimonials[pts[0]])currentBrand.s7.testimonials[pts[0]]={};currentBrand.s7.testimonials[pts[0]][pts[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
+  var csKey = e.target.dataset.cases;
+  if (csKey) { var pcs=csKey.split('.'); if(!currentBrand.s7.caseStudies[pcs[0]])currentBrand.s7.caseStudies[pcs[0]]={};currentBrand.s7.caseStudies[pcs[0]][pcs[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
+  var stKey = e.target.dataset.keystats;
+  if (stKey) { var pst=stKey.split('.'); if(!currentBrand.s7.keyStats[pst[0]])currentBrand.s7.keyStats[pst[0]]={};currentBrand.s7.keyStats[pst[0]][pst[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
   const prodKey = e.target.dataset.products;
   if (prodKey) {
     const parts = prodKey.split('.');
@@ -1423,7 +1630,7 @@ document.addEventListener('change', e => {
     reader.readAsDataURL(file);
   }
 
-  // AI import file inputs
+  // AI import file inputs (markdown, txt, pdf)
   const secId = e.target.dataset.importSection;
   if (secId && e.target.files?.[0]) {
     importMarkdownForSection(secId, e.target.files[0]);
@@ -1480,12 +1687,10 @@ function renderPresentation() {
 
   const s4=b.s4||{};
   const comps=(s4.competitors||[]).filter(c=>c.name);
-  const diffs=(s4.differences||[]).filter(d=>d.text);
-  if(comps.length||diffs.length||s4.positioning){
+  if(comps.length){
     html += presentSection('s4','Competition',`
       ${comps.length?`<div class="present-field"><div class="present-field-label">Competitors</div><div class="present-grid-2">${comps.map(c=>`<div class="present-card"><h4>${esc(c.name)}</h4>${c.desc?`<p>${esc(c.desc)}</p>`:''} ${c.strengths?`<p style="margin-top:8px"><strong style="font-size:11px;color:#888">Strengths:</strong><br>${esc(c.strengths)}</p>`:''} ${c.weaknesses?`<p style="margin-top:4px"><strong style="font-size:11px;color:#888">Weaknesses:</strong><br>${esc(c.weaknesses)}</p>`:''}</div>`).join('')}</div></div>`:''}
-      ${diffs.length?`<div class="present-field"><div class="present-field-label">Points of Difference</div>${diffs.map((d,i)=>`<div class="present-card" style="margin-bottom:8px"><p><strong>${i+1}.</strong> ${esc(d.text)}</p></div>`).join('')}</div>`:''}
-      ${pf('Market Positioning',s4.positioning)}`);}
+`);}
 
   const s5=b.s5||{};
   if(s5.revenue||s5.margin||s5.funding||s5.milestones||s5.targets){
@@ -1657,10 +1862,7 @@ function exportSectionPDF(secId) {
   } else if(secId === 's4') {
     var s4=b.s4||{};
     var comps=(s4.competitors||[]).filter(function(c){return c.name;});
-    if(comps.length){fLabel('Competitors');comps.forEach(function(c){fVal('• '+c.name+(c.desc?' — '+c.desc:''));if(c.strengths)fVal('  Strengths: '+c.strengths);if(c.weaknesses)fVal('  Weaknesses: '+c.weaknesses);});}
-    var diffs=(s4.differences||[]).filter(function(d){return d.text;});
-    if(diffs.length){fLabel('Points of Difference');diffs.forEach(function(d,i){fVal((i+1)+'. '+d.text);});}
-    if(s4.positioning){fLabel('Market Positioning');fVal(s4.positioning);}
+    if(comps.length){fLabel('Key Competitors');fVal(comps.map(function(c){return c.name;}).join(', '));}
   } else if(secId === 's5') {
     var s5=b.s5||{};
     if(s5.revenue){fLabel('Revenue');fVal(s5.revenue);}
@@ -1698,12 +1900,14 @@ function exportSectionPDF(secId) {
 // ════════════════════════════════════════════════════════════
 // EXPORT: MARKDOWN
 // ════════════════════════════════════════════════════════════
+document.getElementById('btn-export-section-md').addEventListener('click', () => exportSectionMarkdown(activeSection));
+document.getElementById('btn-export-section-pdf').addEventListener('click', () => exportSectionPDF(activeSection));
 document.getElementById('btn-export-md').addEventListener('click', exportMarkdown);
 
 function exportMarkdown() {
   const b = currentBrand;
   const dateStr = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
-  let md = '# Brand Profile: ' + (b.core?.name || 'Untitled') + '\n\n';
+  let md = '# Organisation Profile: ' + (b.core?.name || 'Untitled') + '\n\n';
   md += '*Exported from Brand Hub — ' + dateStr + '*\n\n';
   md += brandToMarkdown(b);
   const blob = new Blob([md], {type: 'text/markdown'});
@@ -1722,8 +1926,8 @@ function brandToMarkdown(b) {
   var NL = '\n';
   var md = '';
   var c = b.core || {};
-  md += '# Brand Profile: ' + (c.name || 'Untitled') + NL + NL;
-  md += '## Brand Identity' + NL + NL;
+  md += '# Organisation Profile: ' + (c.name || 'Untitled') + NL + NL;
+  md += '## Organisation Info' + NL + NL;
   if(c.name) md += '**Brand Name:** ' + c.name + NL + NL;
   if(c.tagline) md += '**Tagline:** ' + c.tagline + NL + NL;
   if(c.founded) md += '**Founded:** ' + c.founded + NL + NL;
@@ -1778,33 +1982,19 @@ function brandToMarkdown(b) {
   }
   var s4 = b.s4 || {};
   var comps = (s4.competitors || []).filter(function(c){return c.name;});
-  var diffs = (s4.differences || []).filter(function(d){return d.text;});
-  if(comps.length || diffs.length || s4.positioning) {
-    md += '---' + NL + NL + '## Competition & Points of Difference' + NL + NL;
-    if(comps.length) {
-      md += '### Competitors' + NL + NL;
-      comps.forEach(function(c) {
-        md += '**' + c.name + '**' + (c.desc ? ': ' + c.desc : '') + NL;
-        if(c.strengths) md += '- Strengths: ' + c.strengths + NL;
-        if(c.weaknesses) md += '- Weaknesses: ' + c.weaknesses + NL;
-        md += NL;
-      });
-    }
-    if(diffs.length) {
-      md += '### Points of Difference' + NL + NL;
-      diffs.forEach(function(d,i){ md += (i+1) + '. ' + d.text + NL; });
-      md += NL;
-    }
-    if(s4.positioning) md += '**Market Positioning:**' + NL + s4.positioning + NL + NL;
+  if(comps.length) {
+    md += '---' + NL + NL + '## Competition' + NL + NL;
+    md += '**Key Competitors:** ' + comps.map(function(c){return c.name;}).join(', ') + NL + NL;
   }
   var s5 = b.s5 || {};
-  if(s5.revenue || s5.margin || s5.funding || s5.milestones || s5.targets) {
-    md += '---' + NL + NL + '## Financials' + NL + NL;
-    if(s5.revenue) md += '**Revenue:** ' + s5.revenue + NL + NL;
-    if(s5.margin) md += '**Profit Margin:** ' + s5.margin + NL + NL;
-    if(s5.funding) md += '**Funding Stage:** ' + s5.funding + NL + NL;
-    if(s5.milestones) md += '**Key Milestones:**' + NL + s5.milestones + NL + NL;
-    if(s5.targets) md += '**Growth Targets:**' + NL + s5.targets + NL + NL;
+  if(s5.dealValue || s5.salesCycle || s5.conversionGoal || s5.objections || s5.decisionMakers || s5.process) {
+    md += '---' + NL + NL + '## Sales Process' + NL + NL;
+    if(s5.dealValue) md += '**Typical Deal Value:** ' + s5.dealValue + NL + NL;
+    if(s5.salesCycle) md += '**Sales Cycle:** ' + s5.salesCycle + NL + NL;
+    if(s5.conversionGoal) md += '**Primary Conversion Goal:** ' + s5.conversionGoal + NL + NL;
+    if(s5.decisionMakers) md += '**Decision Makers:** ' + s5.decisionMakers + NL + NL;
+    if(s5.objections) md += '**Main Objections:**' + NL + s5.objections + NL + NL;
+    if(s5.process) md += '**Sales Process Notes:**' + NL + s5.process + NL + NL;
   }
   var s6 = b.s6 || {};
   var pers = (s6.personas || []).filter(function(p){return p.name;});
@@ -1819,6 +2009,46 @@ function brandToMarkdown(b) {
       if(p.motivations) md += '**Motivations:** ' + p.motivations + NL + NL;
       if(p.channels) md += '**Channels:** ' + p.channels + NL + NL;
     });
+  }
+  var s7 = b.s7 || {};
+  var testimonials = (s7.testimonials || []).filter(function(t){ return t.quote; });
+  var cases = (s7.caseStudies || []).filter(function(c){ return c.client; });
+  var stats = (s7.keyStats || []).filter(function(s){ return s.value; });
+  if(testimonials.length || cases.length || stats.length || s7.awards || s7.reviews) {
+    md += '---' + NL + NL + '## Social Proof' + NL + NL;
+    if(stats.length) { md += '**Key Stats:**' + NL; stats.forEach(function(s){ md += '- ' + s.value + (s.context ? ' — ' + s.context : '') + NL; }); md += NL; }
+    if(s7.reviews) md += '**Reviews:**' + NL + s7.reviews + NL + NL;
+    if(testimonials.length) { md += '**Testimonials:**' + NL; testimonials.forEach(function(t){ md += '> "' + t.quote + '"' + NL + '> — ' + t.name + (t.company ? ', ' + t.company : '') + (t.result ? ' (' + t.result + ')' : '') + NL + NL; }); }
+    if(cases.length) { md += '**Case Studies:**' + NL; cases.forEach(function(c){ md += '**' + c.client + '**' + (c.industry ? ' (' + c.industry + ')' : '') + NL + (c.problem ? 'Problem: ' + c.problem + NL : '') + (c.result ? 'Result: ' + c.result + NL : '') + NL; }); }
+    if(s7.awards) md += '**Awards & Accreditations:**' + NL + s7.awards + NL + NL;
+  }
+  var s8 = b.s8 || {};
+  if((s8.platforms && s8.platforms.length) || s8.seoKeywords || s8.contentPillars) {
+    md += '---' + NL + NL + '## Channels & Keywords' + NL + NL;
+    if(s8.platforms && s8.platforms.length) md += '**Active Channels:** ' + s8.platforms.join(', ') + NL + NL;
+    if(s8.seoKeywords) md += '**SEO Keywords:**' + NL + s8.seoKeywords + NL + NL;
+    if(s8.contentPillars) md += '**Content Pillars:**' + NL + s8.contentPillars + NL + NL;
+    if(s8.postingFrequency) md += '**Posting Frequency:** ' + s8.postingFrequency + NL + NL;
+    if(s8.paidChannels) md += '**Paid Channels:** ' + s8.paidChannels + NL + NL;
+  }
+  var s2voice = b.s2 || {};
+  if(s2voice.heroStatement || s2voice.elevatorPitch || s2voice.keyMessages || s2voice.neverSay) {
+    md += '---' + NL + NL + '## Brand Voice & Messaging' + NL + NL;
+    if(s2voice.heroStatement) md += '**Hero Statement:** ' + s2voice.heroStatement + NL + NL;
+    if(s2voice.elevatorPitch) md += '**Elevator Pitch:**' + NL + s2voice.elevatorPitch + NL + NL;
+    if(s2voice.keyMessages) md += '**Key Messages:**' + NL + s2voice.keyMessages + NL + NL;
+    if(s2voice.taglineVariants) md += '**Tagline Variations:**' + NL + s2voice.taglineVariants + NL + NL;
+    if(s2voice.neverSay) md += '**Never Say:**' + NL + s2voice.neverSay + NL + NL;
+  }
+  var s10 = b.s10 || {};
+  if(s10.conversionGoal || s10.salesCycle || s10.dealValue || s10.objections) {
+    md += '---' + NL + NL + '## Sales Process' + NL + NL;
+    if(s10.conversionGoal) md += '**Primary Conversion Goal:** ' + s10.conversionGoal + NL + NL;
+    if(s10.salesCycle) md += '**Typical Sales Cycle:** ' + s10.salesCycle + NL + NL;
+    if(s10.dealValue) md += '**Average Deal Value:** ' + s10.dealValue + NL + NL;
+    if(s10.decisionMakers) md += '**Key Decision Makers:** ' + s10.decisionMakers + NL + NL;
+    if(s10.objections) md += '**Main Objections:**' + NL + s10.objections + NL + NL;
+    if(s10.process) md += '**Sales Process:**' + NL + s10.process + NL + NL;
   }
   return md;
 }
@@ -1887,12 +2117,9 @@ function exportPDF() {
 
   const s4=b.s4||{};
   const c4=(s4.competitors||[]).filter(c=>c.name);
-  const d4=(s4.differences||[]).filter(d=>d.text);
-  if(c4.length||d4.length||s4.positioning){
+  if(c4.length){
     secTitle('Competition','s4');
     if(c4.length){fLabel('Competitors');c4.forEach(c=>{checkPage(14);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);doc.text(c.name,margin,y);y+=5;if(c.desc){const dl=doc.splitTextToSize(c.desc,contentW);doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(80,80,80);doc.text(dl,margin,y);y+=dl.length*4.5;}if(c.strengths){doc.setFontSize(8.5);doc.setTextColor(100,150,110);doc.text(`+ ${c.strengths}`,margin+4,y);y+=5;}if(c.weaknesses){doc.setFontSize(8.5);doc.setTextColor(180,100,80);doc.text(`− ${c.weaknesses}`,margin+4,y);y+=5;}y+=4;});}
-    if(d4.length){fLabel('Points of Difference');d4.forEach((d,i)=>{checkPage(8);const dl=doc.splitTextToSize(`${i+1}. ${d.text}`,contentW-4);doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(50,45,40);doc.text(dl,margin,y);y+=dl.length*5+3;});}
-    if(s4.positioning){fLabel('Market Positioning');fVal(s4.positioning);}
   }
 
   const s5=b.s5||{};
