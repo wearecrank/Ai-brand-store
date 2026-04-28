@@ -1539,12 +1539,19 @@ function initPanelBehaviours(panel, sec) {
     for (const [id, fn] of Object.entries(actions)) {
       if (e.target.id === id) { fn(); triggerSave(); return; }
     }
+    // Check feature remove FIRST before product — feature button sits inside product container
+    // so closest('[data-remove-product]') would bubble up and match the parent incorrectly
+    const remFeatEarly = e.target.closest('[data-remove-feature]');
+    if (remFeatEarly) {
+      const [pi,fi] = remFeatEarly.dataset.removeFeature.split('.').map(Number);
+      currentBrand.s3.items[pi].features.splice(fi,1);
+      refresh(); triggerSave(); return;
+    }
     const removeMap = [
       ['data-remove-value', (i) => currentBrand.s1.values.splice(i,1)],
       ['data-remove-colour', (i) => currentBrand.s2.colours.splice(i,1)],
       ['data-remove-product', (i) => currentBrand.s3.items.splice(i,1)],
       ['data-remove-competitor', (i) => currentBrand.s4.competitors.splice(i,1)],
-
       ['data-remove-persona', (i) => currentBrand.s6.personas.splice(i,1)],
       ['data-remove-tone', (i) => currentBrand.s2.toneWords.splice(i,1)],
       ['data-remove-testimonial', (i) => currentBrand.s7.testimonials.splice(i,1)],
@@ -1593,12 +1600,6 @@ function initPanelBehaviours(panel, sec) {
       const pi = parseInt(addFeat.dataset.addFeature);
       if (!currentBrand.s3.items[pi].features) currentBrand.s3.items[pi].features = [];
       currentBrand.s3.items[pi].features.push('');
-      refresh(); triggerSave(); return;
-    }
-    const remFeat = e.target.closest('[data-remove-feature]');
-    if (remFeat) {
-      const [pi,fi] = remFeat.dataset.removeFeature.split('.').map(Number);
-      currentBrand.s3.items[pi].features.splice(fi,1);
       refresh(); triggerSave(); return;
     }
   });
