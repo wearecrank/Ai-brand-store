@@ -106,6 +106,24 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .url-import-input:focus{border-color:var(--accent-border)}
 .url-import-input::placeholder{color:var(--text-dim)}
 .import-filename{font-size:11px;color:var(--text-dim);font-style:italic;margin-top:2px;width:100%}
+.card-completion{position:absolute;bottom:12px;left:16px;right:48px;display:flex;align-items:center;gap:8px}
+.card-completion-bar{flex:1;height:3px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.card-completion-fill{height:100%;border-radius:2px;background:var(--accent);transition:width 0.4s ease}
+.card-completion-pct{font-size:10px;color:var(--text-dim);font-family:var(--font-mono);white-space:nowrap}
+.card-last-edited{font-size:10px;color:var(--text-dim);margin-top:4px}
+.extraction-summary{font-size:11px;color:var(--accent);margin-top:6px;width:100%;font-style:normal}
+.undo-bar{display:none;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);margin-top:8px;font-size:12px;color:var(--text-muted)}
+.undo-bar.visible{display:flex}
+.btn-undo{background:none;border:none;color:var(--accent);font-family:var(--font-body);font-size:12px;cursor:pointer;padding:0;text-decoration:underline}
+.section-notes-field{width:100%;margin-top:16px;padding-top:16px;border-top:1px solid var(--card-border)}
+.copy-md-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-body);transition:all var(--transition)}
+.copy-md-btn:hover{color:var(--accent);border-color:var(--accent-border)}
+.brand-filter{background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:13px;padding:8px 12px;outline:none;width:100%;max-width:960px;margin-bottom:12px;transition:border-color var(--transition)}
+.brand-filter:focus{border-color:var(--accent-border)}
+.brand-filter::placeholder{color:var(--text-dim)}
+.completeness-suggest{background:var(--surface);border:1px solid var(--accent-border);border-radius:var(--radius-sm);padding:10px 14px;margin:12px 0;font-size:12px;color:var(--text-muted);display:none}
+.completeness-suggest.visible{display:block}
+.completeness-suggest strong{color:var(--accent);display:block;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:1px}
 .btn-import{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);white-space:nowrap}
 .btn-import:hover{background:var(--accent);color:#0f0f0f}
 .btn-import svg{width:14px;height:14px;flex-shrink:0}
@@ -142,7 +160,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
   .present-cover-info h1{font-size:32px}
   .present-grid-2{grid-template-columns:1fr}
 }
-.sidebar-top{padding:10px 16px 10px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0}
+.sidebar-top{padding:10px 16px 10px 56px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0}
 .sidebar-brand-name{font-family:var(--font-display);font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
 .sidebar-brand-tagline{font-size:11px;color:var(--text-dim);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sidebar-logo-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -159,7 +177,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .nav-item .nav-label-text{font-size:13px;color:var(--text-muted);flex:1;letter-spacing:0;padding:0;text-transform:none;font-weight:400}
 .nav-item.active .nav-label-text{color:var(--text);font-weight:500}
 .nav-progress{font-size:10px;color:var(--text-dim);font-family:var(--font-mono)}
-.sidebar-bottom{padding:8px 8px 16px;border-top:1px solid var(--sidebar-border);display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.sidebar-bottom{padding:8px 8px 24px;border-top:1px solid var(--sidebar-border);display:flex;flex-direction:column;gap:6px;flex-shrink:0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 12px;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);border:none;white-space:nowrap}
 .btn-primary{background:var(--accent);color:#0f0f0f}
 .btn-primary:hover{background:#d4b87a}
@@ -288,7 +306,15 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
 ::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px}
 .hidden{display:none!important}
 .divider{height:1px;background:var(--card-border);margin:24px 0}
-</style>
+
+@media print {
+  .sidebar, .section-panels .import-bar, .btn, .btn-remove, .btn-add,
+  .completeness-badge, .save-indicator, #hamburger-btn { display: none !important; }
+  .app-layout { display: block; }
+  .main-content { padding: 0; }
+  .section-panel { break-inside: avoid; margin-bottom: 24px; }
+  body { background: white; color: black; }
+}</style>
 </head>
 <body>
 
@@ -340,6 +366,7 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
     <h1>Your Brands</h1>
     <p>Select a brand to open, or create a new one</p>
   </div>
+  <input type="text" class="brand-filter" id="brand-filter" placeholder="Search brands…">
   <div class="brands-grid" id="brands-grid">
     <div class="loading-state">Loading brands…</div>
   </div>
@@ -368,11 +395,15 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
       <button class="sidebar-home-btn" id="btn-back-home">← All brands</button>
     </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
-    <div class="sidebar-bottom">
+    <div id="completeness-suggest" class="completeness-suggest" style="margin:0 8px 4px"></div>
+  <div class="sidebar-bottom">
       <button class="btn btn-secondary btn-full" id="btn-export-section-md">↓ Export section to AI</button>
       <button class="btn btn-secondary btn-full" id="btn-export-section-pdf">↓ Export section to PDF</button>
-      <button class="btn btn-secondary btn-full" id="btn-export-md">↓ Export all to AI</button>
-      <button class="btn btn-secondary btn-full" id="btn-export-pdf">↓ Export all to PDF</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-secondary btn-full" id="btn-export-md" style="flex:1">↓ Export all to AI</button>
+        <button class="copy-md-btn" id="btn-copy-md" title="Copy to clipboard">⎘</button>
+      </div>
+      <button class="btn btn-secondary btn-full" id="btn-export-pdf">↓ Export as PowerPoint</button>
       <button class="btn btn-primary btn-full" id="btn-present">▶ Present</button>
     </div>
   </aside>
@@ -390,7 +421,8 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
     <span class="brand-label" id="present-brand-label">Brand Name</span>
     <div style="display:flex;gap:8px">
       <button class="btn btn-secondary" id="btn-back-edit">← Back to Edit</button>
-      <button class="btn btn-secondary" id="btn-present-export-pdf">↓ Export PDF</button>
+      <button class="btn btn-secondary" id="btn-share-link">⎘ Copy link</button>
+      <button class="btn btn-secondary" id="btn-present-export-pdf">↓ Export as PowerPoint</button>
     </div>
   </div>
   <div class="present-body" id="present-body"></div>
@@ -625,20 +657,22 @@ async function importMarkdownForSection(secId, file) {
       requestBody = { section: secId, content: text, filename: file.name };
     }
 
+    const controller2 = new AbortController();
+    const timeout2 = setTimeout(() => controller2.abort(), 30000);
+
     const response = await aiQueue.add(async function() {
       return fetch(WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        signal: controller2.signal
       });
     });
 
-    if (response.status === 429) {
-      throw new Error('Daily AI limit reached — resets at midnight UTC.');
-    }
+    clearTimeout(timeout2);
+
     if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.message || 'Error ' + response.status);
+      throw new Error(await getErrorMessage(response));
     }
 
     let text2 = await response.text();
@@ -646,19 +680,39 @@ async function importMarkdownForSection(secId, file) {
     let extracted;
     try { extracted = JSON.parse(text2); } catch(e) { throw new Error('Could not parse response: ' + text2.slice(0,100)); }
 
+    // Save undo snapshot before merging
+    lastImportSnapshot = { secId, data: JSON.parse(JSON.stringify(currentBrand[secId] || {})) };
+
+    const beforeKeys = Object.keys(currentBrand[secId] || {}).filter(k => {
+      const v = (currentBrand[secId] || {})[k];
+      return Array.isArray(v) ? v.length > 0 : (v && v.toString().trim());
+    });
+
     mergeIntoSection(secId, extracted);
 
     // Save filename only — not the file contents
     if (!currentBrand[secId]) currentBrand[secId] = {};
     currentBrand[secId]._importedFile = file.name;
 
+    // Build extraction summary
+    const afterKeys = Object.keys(extracted).filter(k => {
+      const v = extracted[k];
+      return Array.isArray(v) ? v.length > 0 : (v && v.toString().trim());
+    });
+    const newFields = afterKeys.filter(k => !beforeKeys.includes(k));
+    const summaryMsg = newFields.length > 0
+      ? 'Added: ' + newFields.map(k => k.replace(/([A-Z])/g,' $1').toLowerCase()).join(', ')
+      : 'No new fields found — data may already be filled in';
+
     triggerSave();
     const sec = SECTIONS.find(function(s) { return s.id === secId; });
     if (sec) refreshPanel(sec);
     updateCompleteness(secId);
+    showUndoBar(secId);
 
-    statusEl.innerHTML = '<div class="import-success">✓ Imported from ' + file.name + '</div>';
-    setTimeout(() => statusEl.innerHTML = '', 4000);
+    statusEl.innerHTML = '<div class="import-success">✓ Imported from ' + file.name + '</div>' +
+      '<div class="extraction-summary">' + summaryMsg + '</div>';
+    setTimeout(() => statusEl.innerHTML = '', 6000);
 
   } catch(e) {
     console.error('Import error:', e);
@@ -701,6 +755,74 @@ async function fetchUrlForProduct(productIndex, url, sec) {
   }
 }
 
+// ── UNDO LAST IMPORT ──
+function showUndoBar(secId) {
+  // Remove any existing undo bar
+  document.querySelectorAll('.undo-bar').forEach(el => el.remove());
+  const panel = document.querySelector('.section-panel.active');
+  if (!panel) return;
+  const bar = document.createElement('div');
+  bar.className = 'undo-bar visible';
+  bar.innerHTML = '<span>Last import applied</span><button class="btn-undo" id="btn-undo-import">Undo</button>';
+  panel.insertBefore(bar, panel.firstChild);
+  bar.querySelector('#btn-undo-import').addEventListener('click', () => {
+    if (!lastImportSnapshot) return;
+    currentBrand[lastImportSnapshot.secId] = lastImportSnapshot.data;
+    lastImportSnapshot = null;
+    bar.remove();
+    triggerSave();
+    const sec = SECTIONS.find(s => s.id === lastImportSnapshot?.secId);
+    const activeId = document.querySelector('.nav-item.active')?.dataset.sec;
+    const activeSec = SECTIONS.find(s => s.id === activeId);
+    if (activeSec) refreshPanel(activeSec);
+  });
+  // Auto-hide after 30 seconds
+  setTimeout(() => bar.remove(), 30000);
+}
+
+// ── COPY MARKDOWN TO CLIPBOARD ──
+async function copyMarkdownToClipboard() {
+  const b = currentBrand;
+  const dateStr = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+  const NL = String.fromCharCode(10);
+  let md = '# Organisation Profile: ' + (b.core?.name || 'Untitled') + NL + NL;
+  md += '*Exported from Brand Hub — ' + dateStr + '*' + NL + NL;
+  md += brandToMarkdown(b);
+  try {
+    await navigator.clipboard.writeText(md);
+    const btn = document.getElementById('btn-copy-md');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '⎘ Copy for AI', 2000); }
+  } catch(e) {
+    alert('Could not copy to clipboard. Try the Export button instead.');
+  }
+}
+
+// ── BRAND COMPLETENESS SUGGESTION (single AI call per brand open) ──
+async function suggestNextStep(b) {
+  const el = document.getElementById('completeness-suggest');
+  if (!el) return;
+  const emptySections = SECTIONS.filter(s => {
+    const d = b[s.id];
+    if (!d) return true;
+    return Object.entries(d).every(([k,v]) => k.startsWith('_') || (Array.isArray(v)?v.length===0:!v||!v.toString().trim()));
+  });
+  if (emptySections.length === 0) {
+    el.innerHTML = '<strong>Looking good!</strong> All sections are complete.';
+  } else {
+    el.innerHTML = '<strong>Next to fill in</strong> ' + emptySections.slice(0,3).map(s => s.label).join(', ');
+  }
+  el.classList.add('visible');
+}
+
+async function getErrorMessage(response) {
+  try {
+    const body = await response.json();
+    return body.message || ('Error ' + response.status);
+  } catch(e) {
+    return 'Error ' + response.status;
+  }
+}
+
 async function fetchUrlForSection(secId, url) {
   const statusEl = document.getElementById('import-status-' + secId);
   if (!statusEl) return;
@@ -714,20 +836,23 @@ async function fetchUrlForSection(secId, url) {
   statusEl.innerHTML = '<div class="import-loading"><div class="import-spinner"></div>Fetching URL…</div>';
 
   try {
+    // 30 second timeout — prevents hanging forever on rate limits
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
     const response = await aiQueue.add(async function() {
       return fetch(WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: secId, url: url, fetchUrl: true })
+        body: JSON.stringify({ section: secId, url: url, fetchUrl: true }),
+        signal: controller.signal
       });
     });
 
-    if (response.status === 429) {
-      throw new Error('Daily AI limit reached — resets at midnight UTC. To reset now, delete today’s spend key in Cloudflare KV.');
-    }
+    clearTimeout(timeout);
+
     if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.message || 'Error ' + response.status);
+      throw new Error(await getErrorMessage(response));
     }
 
     let text = await response.text();
@@ -735,23 +860,45 @@ async function fetchUrlForSection(secId, url) {
     let extracted;
     try { extracted = JSON.parse(text); } catch(e) { throw new Error('Could not parse response: ' + text.slice(0,100)); }
 
+    // Save undo snapshot
+    lastImportSnapshot = { secId, data: JSON.parse(JSON.stringify(currentBrand[secId] || {})) };
+
+    const beforeKeys2 = Object.keys(currentBrand[secId] || {}).filter(k => {
+      const v = (currentBrand[secId] || {})[k];
+      return Array.isArray(v) ? v.length > 0 : (v && v.toString().trim());
+    });
+
     mergeIntoSection(secId, extracted);
 
     if (!currentBrand[secId]) currentBrand[secId] = {};
     currentBrand[secId]._importedFile = url;
 
-    triggerSave();
-    const sec = SECTIONS.find(function(s) { return s.id === secId; });
-    if (sec) refreshPanel(sec);
-    updateCompleteness(secId);
+    const afterKeys2 = Object.keys(extracted).filter(k => {
+      const v = extracted[k];
+      return Array.isArray(v) ? v.length > 0 : (v && v.toString().trim());
+    });
+    const newFields2 = afterKeys2.filter(k => !beforeKeys2.includes(k));
+    const summaryMsg2 = newFields2.length > 0
+      ? 'Added: ' + newFields2.map(k => k.replace(/([A-Z])/g,' $1').toLowerCase()).join(', ')
+      : 'No new fields found — try a different page';
 
-    statusEl.innerHTML = '<div class="import-success">✓ Content fetched from URL</div>';
-    setTimeout(() => statusEl.innerHTML = '', 4000);
+    triggerSave();
+    const sec2 = SECTIONS.find(function(s) { return s.id === secId; });
+    if (sec2) refreshPanel(sec2);
+    updateCompleteness(secId);
+    showUndoBar(secId);
+
+    statusEl.innerHTML = '<div class="import-success">✓ Fetched from URL</div>' +
+      '<div class="extraction-summary">' + summaryMsg2 + '</div>';
+    setTimeout(() => statusEl.innerHTML = '', 6000);
 
   } catch(e) {
     console.error('URL fetch error:', e);
-    statusEl.innerHTML = '<div class="import-error">' + e.message + '</div>';
-    setTimeout(() => statusEl.innerHTML = '', 6000);
+    var msg = e.name === 'AbortError'
+      ? 'Request timed out — the page may be too slow or rate limiting is active. Wait 60 seconds and try again.'
+      : e.message;
+    statusEl.innerHTML = '<div class="import-error">' + msg + '</div>';
+    setTimeout(() => statusEl.innerHTML = '', 8000);
   }
 }
 
@@ -813,6 +960,14 @@ document.querySelectorAll('.pin-key').forEach(btn => {
   });
 });
 
+// ── Cmd+S / Ctrl+S global save shortcut ──
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault();
+    if (currentBrand) { triggerSave(); }
+  }
+});
+
 document.getElementById('login-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') attemptLogin();
 });
@@ -850,6 +1005,16 @@ async function attemptLogin() {
   document.getElementById('user-pill-name').textContent = data.name;
   showScreen('screen-selector');
   loadBrands();
+  // Check for share link hash
+  const hash = window.location.hash;
+  if (hash.startsWith('#present=')) {
+    const brandId = hash.replace('#present=','');
+    if (brandId) {
+      sb.from('brands').select('*').eq('id', brandId).single().then(({data}) => {
+        if (data) { openBrand(data); renderPresentation(); }
+      });
+    }
+  }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -905,10 +1070,37 @@ async function loadBrands() {
     const card = document.createElement('div');
     card.className = 'brand-card';
     const logoHTML = core.logo ? `<img src="${core.logo}">` : (core.name || '?')[0].toUpperCase();
+    // Calculate overall completion
+    const secIds = ['core','s1','s2','s3','s4','s6','s7','s8','s10'];
+    const fieldMap2 = {
+      core:['name','tagline','overview','businessType'],
+      s1:['purpose','values','proposition'],
+      s2:['toneDesc','colours','primaryFont'],
+      s3:['items'], s4:['competitors'], s6:['personas','summary'],
+      s7:['testimonials','keyStats'], s8:['platforms','seoKeywords'],
+      s10:['conversionGoal','salesCycle']
+    };
+    let filled = 0, total = 0;
+    secIds.forEach(sid => {
+      const fields = fieldMap2[sid] || [];
+      const d = brandData[sid] || {};
+      fields.forEach(f => {
+        total++;
+        const v = d[f];
+        if (Array.isArray(v) ? v.length > 0 : (v && v.toString().trim())) filled++;
+      });
+    });
+    const pct = total > 0 ? Math.round((filled/total)*100) : 0;
+    const lastEdited = b.updated_at ? timeAgo(b.updated_at) : '';
     card.innerHTML = `
       <div class="brand-logo-thumb">${logoHTML}</div>
       <h3>${esc(core.name || 'Untitled')}</h3>
       <p>${esc(core.tagline || core.industry || 'No tagline yet')}</p>
+      ${lastEdited ? `<div class="card-last-edited">${lastEdited}</div>` : ''}
+      <div class="card-completion" style="margin-top:10px">
+        <div class="card-completion-bar"><div class="card-completion-fill" style="width:${pct}%"></div></div>
+        <span class="card-completion-pct">${pct}%</span>
+      </div>
       <div class="card-actions">
         <button class="btn-icon btn-icon-dupe" data-dupe="${b.id}" title="Duplicate brand" style="font-size:11px">⧉</button>
         <button class="btn-icon" data-del="${b.id}" title="Delete brand">✕</button>
@@ -929,6 +1121,33 @@ async function loadBrands() {
   });
 }
 
+// ── FILTER BRANDS ──
+document.addEventListener('DOMContentLoaded', () => {
+  const filterEl = document.getElementById('brand-filter');
+  if (filterEl) {
+    filterEl.addEventListener('input', () => {
+      const q = filterEl.value.toLowerCase().trim();
+      document.querySelectorAll('.brand-card').forEach(card => {
+        const name = card.querySelector('h3')?.textContent.toLowerCase() || '';
+        const tag = card.querySelector('p')?.textContent.toLowerCase() || '';
+        card.style.display = (!q || name.includes(q) || tag.includes(q)) ? '' : 'none';
+      });
+    });
+  }
+});
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff/60000);
+  const hours = Math.floor(diff/3600000);
+  const days = Math.floor(diff/86400000);
+  if (mins < 2) return 'Just now';
+  if (mins < 60) return mins + ' mins ago';
+  if (hours < 24) return hours + ' hour' + (hours>1?'s':'') + ' ago';
+  if (days < 7) return days + ' day' + (days>1?'s':'') + ' ago';
+  return new Date(dateStr).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+
 async function duplicateBrand(brandRecord) {
   var newData = JSON.parse(JSON.stringify(brandRecord));
   newData.core = newData.core || {};
@@ -940,6 +1159,7 @@ async function duplicateBrand(brandRecord) {
 }
 
 let pendingDeleteId = null;
+let lastImportSnapshot = null; // For undo last import
 
 function confirmDelete(id, name) {
   pendingDeleteId = id;
@@ -1188,6 +1408,9 @@ function buildPanelHTML(sec) {
       ${(currentBrand[sec.id] && currentBrand[sec.id]._importedFile) ? '<div class="import-filename">Last imported: ' + esc(currentBrand[sec.id]._importedFile) + '</div>' : ''}
       <span id="import-status-${sec.id}"></span>
     </div>`;
+  // Section notes
+  var sectionNotes = (currentBrand[sec.id] && currentBrand[sec.id]._notes) || '';
+  html += '<div class="section-notes-field"><label style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Section Notes</label><textarea id="section-notes-' + sec.id + '" placeholder="Internal notes for this section — not included in exports…" style="min-height:60px;font-size:12px;color:var(--text-muted);background:var(--surface);border:1px dashed var(--card-border)">' + esc(sectionNotes) + '</textarea></div>';
   const builders = {core:buildCoreForm,s1:buildS1Form,s2:buildS2Form,s3:buildS3Form,s4:buildS4Form,s6:buildS6Form,s7:buildS7Form,s8:buildS8Form,s10:buildS10Form};
   return header + (builders[sec.id] ? builders[sec.id]() : '');
 }
@@ -1484,6 +1707,14 @@ function buildS10Form() {
 function initPanelBehaviours(panel, sec) {
   panel.addEventListener('input', e => {
     const field = e.target.dataset.field;
+    // Section notes
+    if (e.target.id && e.target.id.startsWith('section-notes-')) {
+      const noteSecId = e.target.id.replace('section-notes-','');
+      if (!currentBrand[noteSecId]) currentBrand[noteSecId] = {};
+      currentBrand[noteSecId]._notes = e.target.value;
+      triggerSave();
+      return;
+    }
     if (field) {
       setNestedField(currentBrand, field, e.target.value);
       triggerSave();
@@ -1692,6 +1923,15 @@ document.addEventListener('change', e => {
 document.getElementById('btn-present').addEventListener('click', renderPresentation);
 document.getElementById('btn-back-edit').addEventListener('click', () => showScreen('screen-app'));
 document.getElementById('btn-present-export-pdf').addEventListener('click', exportPPTX);
+document.getElementById('btn-share-link').addEventListener('click', () => {
+  // Build a shareable URL with brand ID as hash — presentation mode
+  const url = window.location.href.split('#')[0] + '#present=' + (currentBrand._id || '');
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('btn-share-link');
+    btn.textContent = '✓ Link copied!';
+    setTimeout(() => btn.textContent = '⎘ Copy link', 2000);
+  }).catch(() => alert('Could not copy link. Copy the URL from your browser address bar.'));
+});
 
 function renderPresentation() {
   const b = currentBrand;
@@ -1951,6 +2191,7 @@ function exportSectionPDF(secId) {
 document.getElementById('btn-export-section-md').addEventListener('click', () => exportSectionMarkdown(activeSection));
 document.getElementById('btn-export-section-pdf').addEventListener('click', () => exportSectionPDF(activeSection));
 document.getElementById('btn-export-md').addEventListener('click', exportMarkdown);
+document.getElementById('btn-copy-md').addEventListener('click', copyMarkdownToClipboard);
 
 function exportMarkdown() {
   const b = currentBrand;
