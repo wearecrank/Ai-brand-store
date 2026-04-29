@@ -2030,7 +2030,7 @@ document.addEventListener('change', e => {
 // ════════════════════════════════════════════════════════════
 // handled by sidebar delegated listener
 document.getElementById('btn-back-edit').addEventListener('click', () => showScreen('screen-app'));
-document.getElementById('btn-present-export-pdf').addEventListener('click', exportPPTX);
+document.getElementById('btn-present-export-pdf').addEventListener('click', function(){ exportPPTX().catch(function(err){ alert('PowerPoint export failed: ' + err.message); }); });
 document.getElementById('btn-share-link').addEventListener('click', () => {
   // Build a shareable URL with brand ID as hash — presentation mode
   const url = window.location.href.split('#')[0] + '#present=' + (currentBrand._id || '');
@@ -2316,7 +2316,7 @@ document.getElementById('main-sidebar').addEventListener('click', function(e) {
       copyMarkdownToClipboard();
       break;
     case 'btn-export-pdf':
-      exportPPTX();
+      exportPPTX().catch(function(err){ console.error('PPTX error:', err); alert('PowerPoint export failed: ' + err.message); });
       break;
     case 'btn-present':
       renderPresentation();
@@ -2886,7 +2886,12 @@ async function exportPPTX() {
   }
 
   // Download
-  pres.writeFile({ fileName: brandName.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'_brand_review.pptx' });
+  try {
+    await pres.writeFile({ fileName: brandName.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'_brand_review.pptx' });
+  } catch(err) {
+    console.error('writeFile error:', err);
+    alert('Could not save PowerPoint: ' + err.message);
+  }
 }
 
 // ════════════════════════════════════════════════════════════
