@@ -2028,7 +2028,7 @@ document.addEventListener('change', e => {
 // ════════════════════════════════════════════════════════════
 // PRESENTATION MODE
 // ════════════════════════════════════════════════════════════
-document.getElementById('btn-present').addEventListener('click', renderPresentation);
+// handled by sidebar delegated listener
 document.getElementById('btn-back-edit').addEventListener('click', () => showScreen('screen-app'));
 document.getElementById('btn-present-export-pdf').addEventListener('click', exportPPTX);
 document.getElementById('btn-share-link').addEventListener('click', () => {
@@ -2296,16 +2296,31 @@ function exportSectionPDF(secId) {
 // ════════════════════════════════════════════════════════════
 // EXPORT: MARKDOWN
 // ════════════════════════════════════════════════════════════
-document.getElementById('btn-export-section-md').addEventListener('click', () => {
-  try { exportSectionMarkdown(activeSection); } catch(e) { console.error('exportSectionMarkdown error:', e); alert('Export failed: ' + e.message); }
+// Use a single delegated listener on the sidebar to avoid duplicate binding issues
+document.getElementById('main-sidebar').addEventListener('click', function(e) {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  switch(btn.id) {
+    case 'btn-export-section-md':
+      try { exportSectionMarkdown(activeSection); } catch(err) { alert('Export failed: ' + err.message); }
+      break;
+    case 'btn-export-section-pdf':
+      try { exportSectionPDF(activeSection); } catch(err) { alert('Export failed: ' + err.message); }
+      break;
+    case 'btn-export-md':
+      try { exportMarkdown(); } catch(err) { alert('Export failed: ' + err.message); }
+      break;
+    case 'btn-copy-md':
+      copyMarkdownToClipboard();
+      break;
+    case 'btn-export-pdf':
+      exportPPTX();
+      break;
+    case 'btn-present':
+      renderPresentation();
+      break;
+  }
 });
-document.getElementById('btn-export-section-pdf').addEventListener('click', () => {
-  try { exportSectionPDF(activeSection); } catch(e) { console.error('exportSectionPDF error:', e); alert('Export failed: ' + e.message); }
-});
-document.getElementById('btn-export-md').addEventListener('click', () => {
-  try { exportMarkdown(); } catch(e) { console.error('exportMarkdown error:', e); alert('Export failed: ' + e.message); }
-});
-document.getElementById('btn-copy-md').addEventListener('click', copyMarkdownToClipboard);
 
 function exportMarkdown() {
   const b = currentBrand;
@@ -2459,7 +2474,7 @@ function brandToMarkdown(b) {
 // ════════════════════════════════════════════════════════════
 // EXPORT: PPTX (browser-side PptxGenJS)
 // ════════════════════════════════════════════════════════════
-document.getElementById('btn-export-pdf').addEventListener('click', exportPPTX);
+// handled by sidebar delegated listener
 
 async function exportPPTX() {
   if (!window.PptxGenJS) { alert('Presentation library loading — please try again in a moment.'); return; }
