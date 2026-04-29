@@ -106,11 +106,11 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .url-import-input:focus{border-color:var(--accent-border)}
 .url-import-input::placeholder{color:var(--text-dim)}
 .import-filename{font-size:11px;color:var(--text-dim);font-style:italic;margin-top:2px;width:100%}
-.card-completion{position:absolute;bottom:12px;left:16px;right:48px;display:flex;align-items:center;gap:8px}
+.card-completion{position:absolute;bottom:12px;left:16px;right:48px;display:flex;align-items:center;gap:8px;pointer-events:none}
 .card-completion-bar{flex:1;height:3px;background:var(--surface2);border-radius:2px;overflow:hidden}
 .card-completion-fill{height:100%;border-radius:2px;background:var(--accent);transition:width 0.4s ease}
 .card-completion-pct{font-size:10px;color:var(--text-dim);font-family:var(--font-mono);white-space:nowrap}
-.card-last-edited{font-size:10px;color:var(--text-dim);margin-top:4px}
+.card-last-edited{font-size:10px;color:var(--text-dim);margin-top:4px;pointer-events:none}
 .extraction-summary{font-size:11px;color:var(--accent);margin-top:6px;width:100%;font-style:normal}
 .undo-bar{display:none;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);margin-top:8px;font-size:12px;color:var(--text-muted)}
 .undo-bar.visible{display:flex}
@@ -1061,7 +1061,7 @@ async function loadBrands() {
   grid.innerHTML = '<div class="loading-state">Loading brands…</div>';
 
   const { data, error } = await sb.from('brands').select('*').order('created_at', { ascending: true });
-  if (error) { grid.innerHTML = '<div class="loading-state">Error loading brands.</div>'; return; }
+  if (error) { console.error('Load brands error:', error); grid.innerHTML = '<div class="loading-state">Error loading brands: ' + error.message + '</div>'; return; }
 
   grid.innerHTML = '';
   (data || []).forEach(b => {
@@ -1232,6 +1232,7 @@ function openBrand(record) {
   showScreen('screen-app');
   navigateTo('core');
   updateSidebarMeta();
+  suggestNextStep(currentBrand);
 }
 
 function updateSidebarMeta() {
