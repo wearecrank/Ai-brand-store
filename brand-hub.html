@@ -2158,8 +2158,10 @@ function exportSectionMarkdown(secId) {
   var a = document.createElement('a');
   a.href = url;
   a.download = (brandName + '_' + sectionName).replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.md';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2325,16 +2327,18 @@ document.getElementById('main-sidebar').addEventListener('click', function(e) {
 function exportMarkdown() {
   const b = currentBrand;
   const dateStr = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
-  let md = '# Organisation Profile: ' + (b.core?.name || 'Untitled') + '\n\n';
-  md += '*Exported from Brand Hub — ' + dateStr + '*\n\n';
+  let md = '# Organisation Profile: ' + (b.core?.name || 'Untitled') + String.fromCharCode(10,10);
+  md += '*Exported from Brand Hub — ' + dateStr + '*' + String.fromCharCode(10,10);
   md += brandToMarkdown(b);
   const blob = new Blob([md], {type: 'text/markdown'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = (b.core?.name || 'brand').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_brand_profile.md';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // ════════════════════════════════════════════════════════════
