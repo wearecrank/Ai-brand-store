@@ -2512,11 +2512,20 @@ async function exportPPTX() {
     return '0F0F0F';
   }
 
-  // Sanitise text for PptxGenJS — removes problematic characters
+  
+
+  // Sanitise text for PptxGenJS - no regex to avoid browser compatibility issues
   function st(val, maxLen) {
     if (!val) return '';
-    var s = val.toString().replace(/[ -]/g, ' ').trim();
-    return maxLen ? s.slice(0, maxLen) : s;
+    var str = val.toString();
+    var result = '';
+    for (var ci = 0; ci < str.length; ci++) {
+      var code = str.charCodeAt(ci);
+      if (code > 31 && code !== 127) result += str[ci];
+      else result += ' ';
+    }
+    result = result.trim();
+    return maxLen ? result.slice(0, maxLen) : result;
   }
 
   var BRAND_PRIMARY = getBrandPrimary();
