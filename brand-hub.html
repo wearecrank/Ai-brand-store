@@ -1012,21 +1012,34 @@ function updatePinDots() {
   }
 }
 
-document.querySelectorAll('.pin-key').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const d = btn.dataset.digit;
-    if (d === 'clear') {
-      pinEntry = pinEntry.slice(0, -1);
-      updatePinDots();
-    } else if (d === 'enter') {
-      attemptLogin();
-    } else if (pinEntry.length < 4) {
-      pinEntry += d;
-      updatePinDots();
-      if (pinEntry.length === 4) attemptLogin();
+function initPinPad() {
+  document.querySelectorAll('.pin-key').forEach(function(btn) {
+    // Use both click and touchend for mobile reliability
+    function handlePinPress(e) {
+      e.preventDefault();
+      var d = btn.dataset.digit;
+      if (d === 'clear') {
+        pinEntry = pinEntry.slice(0, -1);
+        updatePinDots();
+      } else if (d === 'enter') {
+        attemptLogin();
+      } else if (pinEntry.length < 4) {
+        pinEntry += d;
+        updatePinDots();
+        if (pinEntry.length === 4) attemptLogin();
+      }
     }
+    btn.addEventListener('click', handlePinPress);
+    btn.addEventListener('touchend', handlePinPress);
   });
-});
+}
+
+// Run immediately and also on DOMContentLoaded as fallback
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPinPad);
+} else {
+  initPinPad();
+}
 
 // ── Cmd+S / Ctrl+S global save shortcut ──
 document.addEventListener('keydown', e => {
