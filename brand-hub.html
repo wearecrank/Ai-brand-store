@@ -2296,9 +2296,15 @@ function exportSectionPDF(secId) {
 // ════════════════════════════════════════════════════════════
 // EXPORT: MARKDOWN
 // ════════════════════════════════════════════════════════════
-document.getElementById('btn-export-section-md').addEventListener('click', () => exportSectionMarkdown(activeSection));
-document.getElementById('btn-export-section-pdf').addEventListener('click', () => exportSectionPDF(activeSection));
-document.getElementById('btn-export-md').addEventListener('click', exportMarkdown);
+document.getElementById('btn-export-section-md').addEventListener('click', () => {
+  try { exportSectionMarkdown(activeSection); } catch(e) { console.error('exportSectionMarkdown error:', e); alert('Export failed: ' + e.message); }
+});
+document.getElementById('btn-export-section-pdf').addEventListener('click', () => {
+  try { exportSectionPDF(activeSection); } catch(e) { console.error('exportSectionPDF error:', e); alert('Export failed: ' + e.message); }
+});
+document.getElementById('btn-export-md').addEventListener('click', () => {
+  try { exportMarkdown(); } catch(e) { console.error('exportMarkdown error:', e); alert('Export failed: ' + e.message); }
+});
 document.getElementById('btn-copy-md').addEventListener('click', copyMarkdownToClipboard);
 
 function exportMarkdown() {
@@ -2449,11 +2455,6 @@ function brandToMarkdown(b) {
   }
   return md;
 }
-
-// ════════════════════════════════════════════════════════════
-// EXPORT: PDF
-// ════════════════════════════════════════════════════════════
-document.getElementById('btn-export-pdf').addEventListener('click', exportPPTX);
 
 // ════════════════════════════════════════════════════════════
 // EXPORT: PPTX (browser-side PptxGenJS)
