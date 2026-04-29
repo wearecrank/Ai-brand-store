@@ -772,7 +772,7 @@ function showUndoBar(secId) {
     bar.remove();
     triggerSave();
     const sec = SECTIONS.find(s => s.id === lastImportSnapshot?.secId);
-    const activeId = document.querySelector('.nav-item.active')?.dataset.sec;
+    const activeId = document.querySelector('.nav-item.active')?.dataset.section;
     const activeSec = SECTIONS.find(s => s.id === activeId);
     if (activeSec) refreshPanel(activeSec);
   });
@@ -1610,7 +1610,7 @@ function buildS4Form() {
   var compsHTML = comps.map(function(c,i) {
     return '<div class="repeatable-item"><div class="item-header"><span class="item-number">Competitor ' + (i+1) + '</span><button class="btn-remove" data-remove-competitor="' + i + '">x</button></div><div class="form-row"><div class="form-group"><label>Name</label><input type="text" data-competitors="' + i + '.name" value="' + esc(c.name) + '" placeholder="Competitor name"></div><div class="form-group"><label>Brief Description (optional)</label><input type="text" data-competitors="' + i + '.desc" value="' + esc(c.desc) + '" placeholder="Who are they?"></div></div></div>';
   }).join('');
-  return '<div class="form-group"><label>Competitors (up to 8)</label><div class="repeatable-list" id="competitors-list">' + compsHTML + '</div>' + (comps.length < 8 ? '<button class="btn-add" id="btn-add-competitor">+ Add competitor</button>' : '') + '</div>';
+  return '<div style="background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--text-dim)">💡 <strong style="color:var(--text-muted)">Tip:</strong> Add competitors manually below, or import a comparison document. URL fetch works best on G2, Capterra or review pages — not competitor websites directly.</div><div class="form-group"><label>Competitors (up to 8)</label><div class="repeatable-list" id="competitors-list">' + compsHTML + '</div>' + (comps.length < 8 ? '<button class="btn-add" id="btn-add-competitor">+ Add competitor</button>' : '') + '</div>';
 }
 
 function buildS5Form() {
