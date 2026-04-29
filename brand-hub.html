@@ -85,7 +85,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .loading-state{text-align:center;color:var(--text-muted);font-size:14px;padding:40px}
 
 /* ── HAMBURGER (always fixed, never a flex child) ── */
-.hamburger{display:flex;position:fixed;top:8px;left:8px;z-index:400;width:36px;height:36px;border-radius:var(--radius-sm);background:#161616;border:1px solid var(--sidebar-border);cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:border-color var(--transition)}
+.hamburger{display:flex;position:fixed;top:8px;left:8px;z-index:400;width:40px;height:40px;border-radius:var(--radius-sm);background:var(--sidebar-bg);border:none;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:all var(--transition)}
 .hamburger:hover{border-color:var(--accent-border)}
 .hamburger span{display:block;width:16px;height:2px;background:var(--text-muted);border-radius:2px}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:250;backdrop-filter:blur(2px)}
