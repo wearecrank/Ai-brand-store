@@ -814,6 +814,69 @@ async function suggestNextStep(b) {
   el.classList.add('visible');
 }
 
+async function fetchCompetitorInfo(index, url, sec) {
+  const statusEl = document.getElementById('comp-fetch-status-' + index);
+  if (!statusEl) return;
+
+  if (!url || !url.startsWith('http')) {
+    statusEl.textContent = 'Please enter a URL first.';
+    setTimeout(() => statusEl.textContent = '', 3000);
+    return;
+  }
+
+  statusEl.innerHTML = '<span style="color:var(--accent)">Fetching…</span>';
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    const response = await aiQueue.add(async function() {
+      return fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section: 's4', url: url, fetchUrl: true }),
+        signal: controller.signal
+      });
+    });
+
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      throw new Error(await getErrorMessage(response));
+    }
+
+    let text = await response.text();
+    text = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    const extracted = JSON.parse(text);
+
+    // extracted.competitors is an array with one entry - merge into this specific competitor slot
+    if (extracted.competitors && extracted.competitors.length > 0) {
+      const fetched = extracted.competitors[0];
+      if (!currentBrand.s4.competitors[index]) currentBrand.s4.competitors[index] = {};
+      if (fetched.name && !currentBrand.s4.competitors[index].name) {
+        currentBrand.s4.competitors[index].name = fetched.name;
+      }
+      if (fetched.desc) {
+        currentBrand.s4.competitors[index].desc = fetched.desc;
+      }
+      triggerSave();
+      refreshPanel(sec);
+      updateCompleteness('s4');
+      statusEl.innerHTML = '<span style="color:var(--success)">✓ Done</span>';
+    } else {
+      statusEl.textContent = 'Could not extract info — try their homepage or about page.';
+    }
+    setTimeout(() => statusEl.textContent = '', 5000);
+
+  } catch(e) {
+    const msg = e.name === 'AbortError'
+      ? 'Timed out — site may be blocking requests.'
+      : e.message;
+    statusEl.textContent = msg;
+    setTimeout(() => statusEl.textContent = '', 6000);
+  }
+}
+
 async function getErrorMessage(response) {
   try {
     const body = await response.json();
@@ -888,8 +951,13 @@ async function fetchUrlForSection(secId, url) {
     updateCompleteness(secId);
     showUndoBar(secId);
 
-    statusEl.innerHTML = '<div class="import-success">✓ Fetched from URL</div>' +
-      '<div class="extraction-summary">' + summaryMsg2 + '</div>';
+    const totalExtracted2 = Object.values(extracted).filter(v => Array.isArray(v) ? v.length > 0 : (v && v.toString().trim())).length;
+    if (totalExtracted2 === 0) {
+      statusEl.innerHTML = '<div class="import-error">No relevant data found on this page — try a different URL or add manually.</div>';
+    } else {
+      statusEl.innerHTML = '<div class="import-success">✓ Fetched from URL</div>' +
+        '<div class="extraction-summary">' + summaryMsg2 + '</div>';
+    }
     setTimeout(() => statusEl.innerHTML = '', 6000);
 
   } catch(e) {
@@ -1608,9 +1676,25 @@ function buildS4Form() {
   var d = currentBrand.s4 || {};
   var comps = d.competitors || [];
   var compsHTML = comps.map(function(c,i) {
-    return '<div class="repeatable-item"><div class="item-header"><span class="item-number">Competitor ' + (i+1) + '</span><button class="btn-remove" data-remove-competitor="' + i + '">x</button></div><div class="form-row"><div class="form-group"><label>Name</label><input type="text" data-competitors="' + i + '.name" value="' + esc(c.name) + '" placeholder="Competitor name"></div><div class="form-group"><label>Brief Description (optional)</label><input type="text" data-competitors="' + i + '.desc" value="' + esc(c.desc) + '" placeholder="Who are they?"></div></div></div>';
+    return '<div class="repeatable-item">' +
+      '<div class="item-header"><span class="item-number">Competitor ' + (i+1) + '</span><button class="btn-remove" data-remove-competitor="' + i + '">x</button></div>' +
+      '<div class="form-row">' +
+        '<div class="form-group"><label>Name</label><input type="text" data-competitors="' + i + '.name" value="' + esc(c.name) + '" placeholder="e.g. Salesforce"></div>' +
+        '<div class="form-group"><label>Website URL</label><input type="text" data-competitors="' + i + '.url" value="' + esc(c.url||'') + '" placeholder="https://..."></div>' +
+      '</div>' +
+      '<div class="form-group"><label>Description</label><textarea data-competitors="' + i + '.desc" placeholder="What do they do and who do they serve?" style="min-height:60px">' + esc(c.desc) + '</textarea></div>' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">' +
+        '<button class="btn-import" style="font-size:11px;padding:5px 12px" data-fetch-competitor="' + i + '">⟳ Fetch from website</button>' +
+        '<span class="comp-fetch-status" id="comp-fetch-status-' + i + '" style="font-size:11px;color:var(--text-dim)"></span>' +
+      '</div>' +
+    '</div>';
   }).join('');
-  return '<div style="background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--text-dim)">💡 <strong style="color:var(--text-muted)">Tip:</strong> Add competitors manually below, or import a comparison document. URL fetch works best on G2, Capterra or review pages — not competitor websites directly.</div><div class="form-group"><label>Competitors (up to 8)</label><div class="repeatable-list" id="competitors-list">' + compsHTML + '</div>' + (comps.length < 8 ? '<button class="btn-add" id="btn-add-competitor">+ Add competitor</button>' : '') + '</div>';
+
+  return '<div class="form-group"><label>Competitors (up to 8)</label>' +
+    '<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Add each competitor, paste their website URL and click Fetch to auto-populate their name and description.</div>' +
+    '<div class="repeatable-list" id="competitors-list">' + compsHTML + '</div>' +
+    (comps.length < 8 ? '<button class="btn-add" id="btn-add-competitor">+ Add competitor</button>' : '') +
+    '</div>';
 }
 
 function buildS5Form() {
@@ -1760,7 +1844,7 @@ function initPanelBehaviours(panel, sec) {
       'btn-add-value': () => { currentBrand.s1.values.push({name:'',desc:''}); refresh(); },
       'btn-add-colour': () => { currentBrand.s2.colours.push({name:'',hex:'#000000',role:''}); refresh(); },
       'btn-add-product': () => { currentBrand.s3.items.push({name:'',category:'product',desc:'',features:[],price:'',url:''}); refresh(); },
-      'btn-add-competitor': () => { currentBrand.s4.competitors.push({name:'',desc:'',strengths:'',weaknesses:''}); refresh(); },
+      'btn-add-competitor': () => { currentBrand.s4.competitors.push({name:'',url:'',desc:''}); refresh(); },
 
       'btn-add-persona': () => { currentBrand.s6.personas.push({name:'',age:'',location:'',needs:'',motivations:'',channels:''}); refresh(); },
       'btn-add-testimonial': () => { if(!currentBrand.s7.testimonials)currentBrand.s7.testimonials=[]; currentBrand.s7.testimonials.push({quote:'',name:'',company:'',result:''}); refresh(); },
@@ -1793,6 +1877,16 @@ function initPanelBehaviours(panel, sec) {
       const el = e.target.closest(`[${attr}]`);
       if (el) { fn(parseInt(el.getAttribute(attr))); refresh(); triggerSave(); return; }
     }
+    // Fetch competitor from their website
+    const fetchComp = e.target.closest('[data-fetch-competitor]');
+    if (fetchComp) {
+      const ci = parseInt(fetchComp.dataset.fetchCompetitor);
+      const comp = currentBrand.s4.competitors[ci] || {};
+      const compUrl = comp.url || '';
+      fetchCompetitorInfo(ci, compUrl, sec);
+      return;
+    }
+
     // URL fetch per section
     const fetchSectionUrl = e.target.closest('[data-fetch-section-url]');
     if (fetchSectionUrl) {
@@ -1859,8 +1953,22 @@ function handleArrayInput(e, sec) {
     const val = e.target.dataset[attr.replace('data-','')];
     if (val) { fn(val.split('.')); triggerSave(); return; }
   }
+  var compKey = e.target.dataset.competitors;
+  if (compKey && !compKey.endsWith('.url')) {
+    var pco = compKey.split('.');
+    if (!currentBrand.s4.competitors[pco[0]]) currentBrand.s4.competitors[pco[0]] = {};
+    currentBrand.s4.competitors[pco[0]][pco[1]] = e.target.value;
+    triggerSave(); updateCompleteness('s4');
+  }
   var tkKey = e.target.dataset.testimonials;
   if (tkKey) { var pts=tkKey.split('.'); if(!currentBrand.s7.testimonials[pts[0]])currentBrand.s7.testimonials[pts[0]]={};currentBrand.s7.testimonials[pts[0]][pts[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
+  // Competitor URL field
+  if (e.target.dataset.competitors && e.target.dataset.competitors.endsWith('.url')) {
+    var pcu = e.target.dataset.competitors.split('.');
+    if (!currentBrand.s4.competitors[pcu[0]]) currentBrand.s4.competitors[pcu[0]] = {};
+    currentBrand.s4.competitors[pcu[0]].url = e.target.value;
+    triggerSave();
+  }
   var csKey = e.target.dataset.cases;
   if (csKey) { var pcs=csKey.split('.'); if(!currentBrand.s7.caseStudies[pcs[0]])currentBrand.s7.caseStudies[pcs[0]]={};currentBrand.s7.caseStudies[pcs[0]][pcs[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
   var stKey = e.target.dataset.keystats;
