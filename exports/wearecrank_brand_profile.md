@@ -41,37 +41,54 @@ Providing your levers for growth
 
 ## Brand Guidelines
 
-**Typography:** Primary: Lato | Single font family throughout. Weight contrast between Lato Thin, Regular, and Bold does all visual work. Slide titles use Lato Light for a refined, elegant feel. Section labels are 13pt white Lato Bold. Body text uses Lato Regular ~9pt with bold reserved for emphasis only. Avoid introducing a second font when re-skinning.
+**Tone of Voice:**
+Sharp yet blunt - focused and direct, cutting through noise with straightforward guidance. No-nonsense approach that combines data-driven insights with practical clarity.
+
+Sharp yet blunt - focused and direct without unnecessary jargon. Confident, evidence-based, and pragmatic. No-nonsense approach that prioritizes clarity and commercial impact over industry buzzwords.
+
+Sharp yet blunt - straightforward and direct without jargon, focused on evidence and measurable outcomes rather than hype or vanity metrics
+
+**Key Words:** Data-driven, Direct, No-bullshit, Results-focused, Pragmatic, Data-driven, Straightforward, Results-focused, Pragmatic, Evidence-backed, Data-driven, No-nonsense, Results-focused, Transparent, Direct
+
+**Typography:** Primary: Lato | Secondary: Lato | Single font family throughout. Weight contrast between Lato Thin, Regular, and Bold does all visual work. Slide titles use Lato Light for a refined, elegant feel. Section labels are 13pt white Lato Bold. Body text uses Lato Regular ~9pt with bold reserved for emphasis only. Avoid introducing a second font when re-skinning.
 
 Single font family throughout. Weight contrast between Lato Thin, Regular, and Bold does all visual work. Slide titles use Lato Light for a refined, elegant feel against the dark background. Section labels are 13pt white Lato Bold. Body text uses Lato Regular ~9pt with bold reserved for emphasis only. Avoid introducing a second font when re-skinning.
 
+Single font family throughout. Weight contrast (Light, Regular, Bold) does the visual work — no secondary typeface. Titles use Lato Light, body copy uses Lato Regular, emphasis uses Lato Bold.
+
+Single font family throughout. Weight contrast (Light, Regular, Bold) does the visual work — no secondary typeface. Titles use Lato Light, body copy uses Lato Regular, emphasis uses Lato Bold.
+
+Single font family throughout. Weight contrast (Light, Regular, Bold) does the visual work — no secondary typeface. Titles use Lato Light, body copy uses Lato Regular, emphasis uses Lato Bold.
+
 **Colour Palette:**
-- Dark Navy (#19252F) - Primary slide background — used on all slides as the slide background property, also used for header area and footer strip
-- Sky Blue (#53AEEF) - Accent objects, boxes, funnel steps, section dividers, arrow/divider accents, general info containers
-- Lime Green (#85C515) - Accent objects, boxes, numbered items, roadmap circles, AFTER header bar, high score badges, positive outcome circles
-- Amber Yellow (#FDBD17) - Accent objects, boxes, section dividers, roadmap circles, mid-range score badges, caution/neutral state
-- Signal Red (#D51F29) - Accent objects, boxes, flow blocks, alert/priority items, BEFORE header bar, low score badges, negative/alert state
-- White (#FFFFFF) - All body text on dark backgrounds, content panel backgrounds — must be fully opaque, strip any alpha modifiers
-- Teal/Cyan (chart only) (#00BCD4) - Chart bars, funnel chart segments
-- Light Green (data) (#A8D44C) - Lighter bubble variant on performance/data slides
-- Dark Navy (#19252F) - Primary slide background — used on all slides as the slide background property, also header bar and footer strip
-- Sky Blue (#53AEEF) - Accent objects, boxes, funnel steps, section dividers, arrow/divider accents, general info containers
-- Lime Green (#85C515) - Accent objects, boxes, numbered items, roadmap circles, AFTER header bar, high score badges, positive outcome circles
-- Amber Yellow (#FDBD17) - Accent objects, boxes, section dividers, roadmap circles, mid-range score badges, caution/neutral state
-- Signal Red (#D51F29) - Accent objects, boxes, flow blocks, alert/priority items, BEFORE header bar, low score badges, negative/down state
-- White (#FFFFFF) - All body text on dark backgrounds, content panel backgrounds — must be fully opaque with no alpha modifier
-- Teal/Cyan (chart only) (#00BCD4) - Chart bars, funnel chart segments
-- Light Green (data) (#A8D44C) - Lighter bubble variant on performance/data slides
+- Dark Navy (#19252F) - Primary background, header bars, footer
+- Sky Blue (#53AEEF) - Accent boxes, info containers, section dividers
+- Lime Green (#85C515) - Positive state, success indicators, "after" bars
+- Amber Yellow (#FDBD17) - Mid-range indicators, caution state
+- Signal Red (#D51F29) - Negative state, alerts, "before" bars
+- White (#FFFFFF) - Body text, content panel backgrounds
 
 **Brand Dos:**
 Set slide background to #19252F as a proper slide background property, not a shape fill. Use Lato Light for slide titles. Use Lato Bold at 13pt white for section labels. Maintain red/amber/green colour-state logic consistently (red=negative, amber=caution, green=positive, blue=neutral informational). Keep all content panel white fills fully opaque. Align section label, main title, and icon bar to the same left edge (29pt). Use sharp right-angle corners on all cards and panels. Move logo to top-right on dense slides to avoid overlap.
 
 Set the slide background to #19252F as a proper slide background property, not a shape fill. Use Lato Light for slide titles. Keep section labels at 13pt white Lato Bold. Share the same 29pt left edge for section label, main title, and icon bar. Remove internal left padding from text boxes so text renders flush. Keep white panel fills fully opaque by stripping any alpha modifiers. Set rounded corners to none — all cards use sharp right-angle corners. Maintain red/amber/green colour-state logic consistently. Move the logo to the top-right on dense slides to avoid overlap. Leave a 6–8pt gap between white content panels and the footer strip.
 
+Focus on measurable outcomes and revenue impact. Use data to inform and validate marketing actions. Run systematic testing to lower acquisition costs and increase conversion rates. Prioritize highest-impact opportunities. Provide clear, actionable tasks backed by evidence.
+
+Focus on measurable outcomes and ROI. Use data to inform all decisions. Test systematically. Prioritize commercial impact. Be clear and direct in communication. Show evidence for all claims. Build long-term growth strategies. Adjust campaigns based on performance data.
+
+Focus on measurable outcomes and ROI. Use data to inform all marketing actions. Prioritize high-impact opportunities. Test systematically. Communicate clear, actionable recommendations. Measure quality leads and profitable revenue. Provide straightforward guidance without acronyms.
+
 **Brand Donts:**
 Do not use a shape fill instead of the slide background property for the dark navy background. Do not use a second typeface. Do not use Lato Regular or Bold for slide titles — use Lato Light. Do not colour section labels in an accent colour — they must be white. Do not assign red to a positive result or green to a negative one. Do not leave alpha/transparency modifiers on white panel fills. Do not use rounded corners on cards. Do not use gradients or images behind content.
 
 Do not use a full-width shape fill as a substitute for the slide background property — it creates a visible seam. Do not use Lato Regular or Bold for slide titles. Do not assign the accent colour to section labels. Do not use red for a positive result or green for a negative one. Do not introduce a second typeface when re-skinning. Do not use semi-transparent or alpha-modified white fills — they render as nearly invisible after a colour re-skin. Do not use gradients or background images behind content. Do not use rounded corners on cards or panels. Do not allow the logo to be overlapped by content panels.
+
+Chase vanity metrics or impressions. Use automated, set-and-forget approaches. Rely on gut feel without data. Make recommendations without evidence. Focus on sessions and clicks over quality leads and profitable revenue.
+
+Chase vanity metrics like impressions and sessions. Use one-size-fits-all approaches. Set and forget campaigns. Rely on gut feel over data. Use acronyms without explanation. Make claims without evidence. Prioritize clicks over conversions. Automate without understanding audience dynamics.
+
+Chase vanity metrics like impressions or clicks. Use automated set-and-forget approaches. Make decisions based on gut feel alone. Provide vague reports without actionable tasks. Focus on hype over ROI.
 
 ---
 
@@ -267,4 +284,47 @@ Landing pages, SEO content, ad creative, video scripts, B2B marketing production
 Monthly briefing cycle with continuous production
 
 **Paid Channels:** LinkedIn, Meta, Google
+
+---
+
+## Brand Voice & Messaging
+
+**Hero Statement:** We chase positive outcomes, not vanity metrics — measurable growth through data-driven strategies.
+
+Cut through the noise and focus only on the levers that drive profitable growth.
+
+Most agencies chase impressions. We chase positive outcomes.
+
+**Elevator Pitch:**
+Crank is a digital marketing agency that combines data science with creative testing to drive measurable business growth. We work across B2B, B2C ecommerce, and WhatsApp marketing, focusing on pipeline value and ROI rather than impressions.
+
+We're a data-driven digital marketing agency that cuts through vanity metrics to focus on what actually matters: measurable growth, revenue, and ROI. We build multi-channel campaigns and strategies across B2B, B2C, and eCommerce that deliver real results, not empty impressions.
+
+We're a data-driven digital marketing agency that cuts through the noise to focus on the levers that drive profitable growth. We combine data science with creative testing across B2B, B2C ecommerce, and WhatsApp marketing to deliver measurable results—not vanity metrics.
+
+**Key Messages:**
+Great marketing is measured in revenue growth and ROI, not impressions,We combine data science with creative testing to prioritize actions that actually grow revenue,No vanity metrics — just measurable growth,Multi-channel campaigns engineered for conversion, not clicks,Never automated — human-led optimization based on data,Clear actions backed by evidence, not just reports
+
+Great marketing is measured in pipeline value, revenue growth, and ROI, not impressions
+Most agencies chase impressions; we chase positive outcomes
+Every recommendation is backed by evidence
+Data-led insights are greater than gut feel
+Outcome obsessed focus on quality leads and profitable revenue
+No bullshit, just straightforward guidance
+Clear actions you can implement immediately
+Focused on commercial impact over vanity metrics
+
+Great marketing is measured in revenue growth and ROI, not impressions
+We prioritize profitable growth over vanity metrics
+Every recommendation is backed by evidence
+Data-led insights inform all marketing actions
+No one-size-fits-all approach—customized to your business
+Quick wins paired with long-term growth strategy
+
+**Never Say:**
+Don't use acronyms without explanation. Don't make claims without data backing. Don't prioritize impressions over revenue impact.
+
+Vanity metrics, impressions as success measures, one-size-fits-all solutions, set and forget approaches, acronyms without explanation
+
+Vanity metrics, impressions, automated solutions, set and forget, gut feel decisions
 
