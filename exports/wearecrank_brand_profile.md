@@ -1,6 +1,6 @@
 # Organisation Profile: Wearecrank
 
-*Exported from Brand Hub — 30 April 2026*
+*Exported from Brand Hub — 1 May 2026*
 
 # Organisation Profile: Wearecrank
 
