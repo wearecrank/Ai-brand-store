@@ -2573,448 +2573,502 @@ function brandToMarkdown(b) {
 async function exportPPTX() {
   if (!window.PptxGenJS) { alert('Presentation library loading — please try again in a moment.'); return; }
 
-  // Show loading state on the button
-  const pptxBtn = document.getElementById('btn-export-pdf');
-  const origText = pptxBtn ? pptxBtn.textContent : '';
+  var pptxBtn = document.getElementById('btn-export-pdf');
+  var origText = pptxBtn ? pptxBtn.textContent : '';
   if (pptxBtn) { pptxBtn.textContent = 'Building…'; pptxBtn.disabled = true; }
 
-  const b = currentBrand;
-  const core = b.core || {};
-  const brandName = core.name || 'Brand';
+  var b = currentBrand;
+  var core = b.core || {};
+  var brandName = core.name || 'Brand';
+  var s1 = b.s1 || {};
+  var s2data = b.s2 || {};
+  var s3data = b.s3 || {};
+  var s4data = b.s4 || {};
+  var s6data = b.s6 || {};
+  var s7data = b.s7 || {};
+  var s8data = b.s8 || {};
+  var s10data = b.s10 || {};
 
-  function getBrandPrimary() {
-    var cols = (b.s2 && b.s2.colours) || [];
-    var primary = cols.find(function(c){ return c.role && c.role.toLowerCase().includes('primary'); });
-    if (primary && primary.hex) return primary.hex.replace('#','');
-    return '0F0F0F';
-  }
-
-  // Build a palette from actual brand colours for use in cards/charts
-  // Falls back to Crank brand colours if the brand has fewer than 4 colours
-  function getBrandPalette() {
-    var cols = ((b.s2 && b.s2.colours) || []).filter(function(c){ return c.hex; });
-    var hexes = cols.map(function(c){ return c.hex.replace('#',''); });
-    var crankDefaults = ['19252F','53AEEF','85C515','FDBD17'];
-    while (hexes.length < 4) { hexes.push(crankDefaults[hexes.length % crankDefaults.length]); }
-    return hexes;
-  }
-  var BRAND_PALETTE = getBrandPalette();
-
-  // Sanitise text for PptxGenJS - no regex to avoid browser compatibility issues
+  // ── Sanitise text
   function st(val, maxLen) {
     if (!val) return '';
     var str = val.toString();
     var result = '';
     for (var ci = 0; ci < str.length; ci++) {
       var code = str.charCodeAt(ci);
-      if (code > 31 && code !== 127) result += str[ci];
-      else result += ' ';
+      if (code > 31 && code !== 127) result += str[ci]; else result += ' ';
     }
     result = result.trim();
     return maxLen ? result.slice(0, maxLen) : result;
   }
 
-  var BRAND_PRIMARY = getBrandPrimary();
-  var DARK_BG = '0D0D0D';
-  var LIGHT_BG = 'F7F6F4';
-  var WHITE = 'FFFFFF';
-  var ACCENT = 'C8A96E';
-  var TEXT_DARK = '1A1A1A';
-  var TEXT_MID = '6B6560';
-  var TEXT_LIGHT = 'A8A39E';
-  var SW = 13.3;
-  var SH = 7.5;
-  var M = 0.5;
+  // ── Pull brand colours from data, fall back to sensible defaults
+  function getBrandColours() {
+    var cols = (s2data.colours || []).filter(function(c) { return c.hex; });
+    var primary = cols.find(function(c) { return c.role && c.role.toLowerCase().includes('primary'); });
+    var accent  = cols.find(function(c) { return c.role && (c.role.toLowerCase().includes('accent') || c.role.toLowerCase().includes('secondary')); });
+    var p = primary ? primary.hex.replace('#','') : '00006B';
+    var a = accent  ? accent.hex.replace('#','')  : 'FF79FF';
+    // Derive a muted version of accent for backgrounds
+    return { primary: p, accent: a };
+  }
+
+  var BC = getBrandColours();
+  var NAVY   = BC.primary;
+  var PINK   = BC.accent;
+  var BLACK  = '00001E';
+  var WHITE  = 'FFFFFF';
+  var OFFWHITE = 'F8F8F8';
+  var LGREY  = 'F3F4F6';
+  var GREY   = '9CA3AF';
+  var DKGREY = '374151';
+  var MPINK  = 'E2B3E4';  // muted card fill — fixed, not brand-derived
+
+  var SW = 10;
+  var SH = 5.625;
 
   var pres = new PptxGenJS();
-  pres.layout = 'LAYOUT_WIDE';
+  pres.layout = 'LAYOUT_16x9';
   pres.title = brandName + ' — Brand Review';
   pres.author = 'Brand Hub';
 
-  function addSlideHeader(slide, label) {
-    slide.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:SW, h:0.08, fill:{color:ACCENT}, line:{color:ACCENT} });
-    slide.addText(label.toUpperCase(), { x:M, y:0.18, w:8, h:0.3, fontSize:8, color:TEXT_LIGHT, charSpacing:3, fontFace:'Arial', bold:false, margin:0 });
-    slide.addShape(pres.shapes.RECTANGLE, { x:0, y:SH-0.35, w:SW, h:0.35, fill:{color:DARK_BG}, line:{color:DARK_BG} });
-    slide.addText(brandName, { x:M, y:SH-0.28, w:6, h:0.2, fontSize:7.5, color:'888888', fontFace:'Arial', margin:0 });
-    slide.addText('Brand Hub  ·  Confidential', { x:SW-4, y:SH-0.28, w:3.5, h:0.2, fontSize:7.5, color:'888888', fontFace:'Arial', align:'right', margin:0 });
+  // ── Shared helpers
+  function footer(s) {
+    s.addShape(pres.shapes.RECTANGLE, { x:0, y:5.33, w:SW, h:0.295, fill:{color:'0A0A0A'}, line:{color:'0A0A0A'} });
+    s.addText(brandName + '  |  Brand Review  |  ' + new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'}), { x:0.4, y:5.34, w:7, h:0.24, fontSize:7.5, color:'555555', fontFace:'Arial', align:'left', valign:'middle', margin:0 });
+    s.addText('Crank', { x:8.8, y:5.34, w:0.9, h:0.24, fontSize:7.5, color:PINK, fontFace:'Arial', bold:true, align:'right', valign:'middle', margin:0 });
   }
 
-  function sectionTitle(slide, title, x, y, w, col) {
-    var c = col || ACCENT;
-    slide.addShape(pres.shapes.RECTANGLE, { x:x, y:y, w:0.05, h:0.35, fill:{color:c}, line:{color:c} });
-    slide.addText(title, { x:x+0.12, y:y, w:w-0.12, h:0.35, fontSize:14, bold:true, color:TEXT_DARK, fontFace:'Arial', valign:'middle', margin:0 });
+  function sectionLabel(s, label) {
+    s.addText(label, { x:0.5, y:0.22, w:9, h:0.22, fontSize:7.5, color:PINK, fontFace:'Arial', bold:true, charSpacing:3, align:'left', margin:0 });
   }
 
-  function card(slide, x, y, w, h, title, subtitle, body, accentCol) {
-    var col = accentCol || ACCENT;
-    slide.addShape(pres.shapes.RECTANGLE, { x:x, y:y, w:w, h:h, fill:{color:WHITE}, shadow:{type:'outer',color:'000000',blur:8,offset:2,angle:135,opacity:0.08} });
-    slide.addShape(pres.shapes.RECTANGLE, { x:x, y:y, w:0.05, h:h, fill:{color:col}, line:{color:col} });
-    var ty = y+0.18;
-    if(title){ slide.addText(title, { x:x+0.15, y:ty, w:w-0.25, h:0.25, fontSize:11, bold:true, color:TEXT_DARK, fontFace:'Arial', margin:0 }); ty+=0.28; }
-    if(subtitle){ slide.addText(subtitle, { x:x+0.15, y:ty, w:w-0.25, h:0.2, fontSize:8.5, color:TEXT_LIGHT, fontFace:'Arial', margin:0 }); ty+=0.22; }
-    if(body){ slide.addText(body, { x:x+0.15, y:ty, w:w-0.25, h:h-(ty-y)-0.12, fontSize:9, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' }); }
+  function slideTitle(s, title, sub) {
+    s.addText(title, { x:0.5, y:0.5, w:9, h:0.58, fontSize:26, color:'111111', fontFace:'Arial', bold:true, align:'left', margin:0 });
+    if (sub) { s.addText(sub, { x:0.5, y:1.1, w:9, h:0.28, fontSize:11, color:GREY, fontFace:'Arial', align:'left', margin:0 }); }
+    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.4, w:9.05, h:0.025, fill:{color:MPINK}, line:{color:MPINK} });
   }
 
-  function statCard(slide, x, y, w, h, value, label, col) {
-    var c = col || ACCENT;
-    slide.addShape(pres.shapes.RECTANGLE, { x:x, y:y, w:w, h:h, fill:{color:c}, shadow:{type:'outer',color:'000000',blur:6,offset:2,angle:135,opacity:0.12} });
-    slide.addText(value, { x:x+0.1, y:y+0.12, w:w-0.2, h:h*0.58, fontSize:20, bold:true, color:WHITE, fontFace:'Arial', valign:'middle', align:'center', margin:0 });
-    slide.addText(label.toUpperCase(), { x:x+0.08, y:y+h*0.65, w:w-0.16, h:h*0.32, fontSize:7, color:WHITE, charSpacing:0.5, fontFace:'Arial', align:'center', margin:0, valign:'top' });
+  function darkCard(s, x, y, w, h, accentColor) {
+    s.addShape(pres.shapes.RECTANGLE, { x:x, y:y, w:w, h:h, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+    s.addShape(pres.shapes.RECTANGLE, { x:x, y:y, w:0.06, h:h, fill:{color:accentColor||NAVY}, line:{color:accentColor||NAVY} });
   }
 
-  // ── COVER ──
+  // ── SLIDE 1: COVER ──────────────────────────────────────────
   var cover = pres.addSlide();
-  cover.background = { color: DARK_BG };
-  cover.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.5, h:SH, fill:{color:ACCENT}, line:{color:ACCENT} });
+  cover.background = { color: NAVY };
 
-  var logoY = 1.6;
+  // Right accent panel
+  cover.addShape(pres.shapes.RECTANGLE, { x:7.5, y:0, w:2.5, h:SH, fill:{color:PINK}, line:{color:PINK} });
+
+  // Brand name / logo
+  var logoY = 0.55;
   if (core.logo) {
-    try {
-      var logoData = core.logo;
-      cover.addImage({ data:logoData, x:0.85, y:0.9, w:2.5, h:1.2, sizing:{type:'contain',w:2.5,h:1.2} });
-      logoY = 2.3;
-    } catch(e) {}
+    try { cover.addImage({ data:core.logo, x:0.55, y:0.5, w:2.2, h:1.0, sizing:{type:'contain',w:2.2,h:1.0} }); logoY = 1.65; } catch(e) {}
   }
+  cover.addText(brandName, { x:0.5, y:logoY, w:6.7, h:1.8, fontSize:60, bold:true, color:WHITE, fontFace:'Arial', margin:0 });
+  if (core.tagline) { cover.addText(st(core.tagline), { x:0.55, y:logoY+1.85, w:6.7, h:0.38, fontSize:13, color:MPINK, fontFace:'Arial', italic:true, margin:0 }); }
+  cover.addText('Brand Hub  ·  Confidential  ·  ' + new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'}), { x:0.55, y:3.15, w:6.7, h:0.28, fontSize:10, color:MPINK, fontFace:'Arial', margin:0 });
 
-  cover.addText(brandName, { x:0.85, y:logoY, w:9, h:1.4, fontSize:54, bold:true, color:WHITE, fontFace:'Arial', margin:0 });
-  if(core.tagline){ cover.addText(core.tagline, { x:0.85, y:logoY+1.5, w:9, h:0.6, fontSize:16, color:'B0A898', fontFace:'Arial', italic:true, margin:0 }); }
+  // Stats on pink panel — build from what's filled in
+  var coverStats = [
+    (s1.values && s1.values.filter(function(v){return v.name;}).length) ? [String(s1.values.filter(function(v){return v.name;}).length), 'Core values'] : null,
+    (s6data.personas && s6data.personas.filter(function(p){return p.name;}).length) ? [String(s6data.personas.filter(function(p){return p.name;}).length), 'Audience profiles'] : null,
+    (s3data.items && s3data.items.filter(function(p){return p.name;}).length) ? [String(s3data.items.filter(function(p){return p.name;}).length), 'Products & services'] : null,
+    (s7data.testimonials && s7data.testimonials.filter(function(t){return t.quote;}).length) ? [String(s7data.testimonials.filter(function(t){return t.quote;}).length), 'Testimonials'] : null,
+  ].filter(Boolean).slice(0,3);
 
-  var metaItems = [core.industry, core.businessType, core.companySize, core.market, core.founded?'Est. '+core.founded:null].filter(Boolean);
-  var mx = 0.85;
-  var pillY = logoY + 2.3;
-  metaItems.forEach(function(m) {
-    var approxW = Math.max(m.length*0.09+0.3, 0.8);
-    cover.addShape(pres.shapes.RECTANGLE, { x:mx, y:pillY, w:approxW, h:0.28, fill:{color:'2A2A2A'}, line:{color:'3A3A3A'} });
-    cover.addText(m, { x:mx+0.1, y:pillY+0.04, w:approxW-0.15, h:0.22, fontSize:8.5, color:'999999', fontFace:'Arial', margin:0 });
-    mx += approxW+0.15;
+  coverStats.forEach(function(st2, i) {
+    var y = 0.75 + i * 1.4;
+    cover.addText(st2[0], { x:7.6, y:y, w:2.3, h:0.7, fontSize:44, color:WHITE, fontFace:'Arial', bold:true, align:'center', margin:0 });
+    cover.addText(st2[1], { x:7.6, y:y+0.68, w:2.3, h:0.35, fontSize:9, color:'F0E0FF', fontFace:'Arial', align:'center', margin:0 });
   });
 
-  cover.addText('BRAND REVIEW', { x:SW-4, y:SH-1.2, w:3.5, h:0.3, fontSize:9, color:ACCENT, charSpacing:4, fontFace:'Arial', align:'right', margin:0 });
-  cover.addText(new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}), { x:SW-4, y:SH-0.85, w:3.5, h:0.25, fontSize:9, color:'666666', fontFace:'Arial', align:'right', margin:0 });
+  cover.addText('Prepared by Crank  ·  wearecrank.com', { x:0.5, y:5.22, w:6.7, h:0.22, fontSize:8, color:'6B67B0', fontFace:'Arial', align:'left', margin:0 });
 
-  // ── ORG OVERVIEW ──
+  // ── SLIDE 2: ORG OVERVIEW ───────────────────────────────────
   if (core.overview || core.businessType) {
-    var s2 = pres.addSlide();
-    s2.background = { color: WHITE };
-    addSlideHeader(s2, 'Organisation Overview');
-    sectionTitle(s2, 'About '+brandName, M, 0.6, 8);
-    if(core.overview){ s2.addText(core.overview, { x:M, y:1.1, w:7.8, h:2.8, fontSize:11, color:TEXT_MID, fontFace:'Arial', valign:'top', margin:0 }); }
-    var facts = [core.industry&&{label:'Industry',value:core.industry},core.businessType&&{label:'Business Type',value:core.businessType},core.businessModel&&{label:'Model',value:core.businessModel},core.companySize&&{label:'Size',value:core.companySize},core.market&&{label:'Market',value:core.market},core.founded&&{label:'Founded',value:core.founded}].filter(Boolean);
-    facts.slice(0,5).forEach(function(f,i) {
-      var fy = 0.6+i*0.72;
-      s2.addShape(pres.shapes.RECTANGLE, { x:9.0, y:fy, w:3.8, h:0.6, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      s2.addText(f.label.toUpperCase(), { x:9.15, y:fy+0.06, w:3.5, h:0.18, fontSize:7, color:TEXT_LIGHT, charSpacing:1, fontFace:'Arial', margin:0 });
-      s2.addText(f.value, { x:9.15, y:fy+0.26, w:3.5, h:0.22, fontSize:11, bold:true, color:TEXT_DARK, fontFace:'Arial', margin:0 });
+    var sl2 = pres.addSlide();
+    sl2.background = { color: WHITE };
+    sl2.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.07, h:SH, fill:{color:PINK}, line:{color:PINK} });
+    sectionLabel(sl2, 'ORGANISATION OVERVIEW');
+    slideTitle(sl2, 'About ' + brandName, st(core.tagline, 80) || null);
+
+    if (core.overview) {
+      sl2.addText('About ' + brandName, { x:0.5, y:1.58, w:4.5, h:0.28, fontSize:10, color:NAVY, fontFace:'Arial', bold:true, margin:0 });
+      sl2.addText(st(core.overview, 400), { x:0.5, y:1.9, w:4.5, h:1.6, fontSize:10.5, color:DKGREY, fontFace:'Arial', align:'left', margin:0 });
+    }
+
+    var facts = [
+      core.industry    && { label:'Industry',      value:core.industry },
+      core.businessType && { label:'Business Type', value:core.businessType },
+      core.businessModel && { label:'Model',        value:core.businessModel },
+      core.market      && { label:'Market',         value:core.market },
+      core.companySize && { label:'Size',           value:core.companySize },
+      core.founded     && { label:'Founded',        value:core.founded },
+    ].filter(Boolean);
+
+    facts.slice(0,4).forEach(function(f, i) {
+      var x = 5.4, y = 1.55 + i * 0.82;
+      sl2.addShape(pres.shapes.RECTANGLE, { x:x, y:y, w:4.1, h:0.68, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+      sl2.addShape(pres.shapes.RECTANGLE, { x:x, y:y, w:0.06, h:0.68, fill:{color:NAVY}, line:{color:NAVY} });
+      sl2.addText(f.label.toUpperCase(), { x:x+0.2, y:y+0.07, w:3.7, h:0.18, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      sl2.addText(st(f.value), { x:x+0.2, y:y+0.3, w:3.7, h:0.28, fontSize:13, color:NAVY, fontFace:'Arial', bold:true, margin:0 });
     });
+
+    footer(sl2);
   }
 
-  // ── PURPOSE & VALUES ──
-  var s1 = b.s1 || {};
-  if (s1.purpose || (s1.values&&s1.values.length) || s1.proposition) {
+  // ── SLIDE 3: PURPOSE & VALUES ───────────────────────────────
+  var vals = (s1.values || []).filter(function(v) { return v.name; });
+  if (s1.purpose || s1.proposition || vals.length) {
     var sl3 = pres.addSlide();
     sl3.background = { color: WHITE };
-    addSlideHeader(sl3, 'Purpose & Values');
-    sectionTitle(sl3, 'Why We Exist', M, 0.6, 6);
-    if(s1.purpose){ sl3.addText(st(s1.purpose), { x:M, y:1.05, w:5.8, h:0.8, fontSize:12, color:TEXT_MID, fontFace:'Arial', italic:true, margin:0, valign:'top' }); }
-    if(s1.proposition){
-      sl3.addShape(pres.shapes.RECTANGLE, { x:M, y:1.95, w:5.8, h:0.8, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      sl3.addText('VALUE PROPOSITION', { x:M+0.15, y:2.0, w:5.5, h:0.2, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      sl3.addText(st(s1.proposition), { x:M+0.15, y:2.22, w:5.5, h:0.5, fontSize:10, color:TEXT_DARK, fontFace:'Arial', margin:0 });
+    sectionLabel(sl3, 'PURPOSE & VALUES');
+    slideTitle(sl3, 'Why We Exist');
+
+    // Hero statement
+    var heroText = s1.heroStatement || s2data.heroStatement || s1.purpose || '';
+    if (heroText) {
+      sl3.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.55, w:9.05, h:0.88, fill:{color:NAVY}, line:{color:NAVY} });
+      sl3.addText(st(heroText, 100), { x:0.5, y:1.55, w:9.05, h:0.88, fontSize:22, color:WHITE, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
     }
-    var vals = (s1.values||[]).filter(function(v){return v.name;});
-    if(vals.length) {
-      sectionTitle(sl3, 'Core Values', 6.8, 0.6, 6);
-      var vColors = BRAND_PALETTE;
-      vals.slice(0,6).forEach(function(v,i) {
-        var col2 = i%2; var row = Math.floor(i/2);
-        var cx = 6.8+col2*3.07; var cy = 1.05+row*1.17;
-        card(sl3, cx, cy, 2.95, 1.05, v.name, null, v.desc||'', vColors[i%vColors.length]);
-      });
+
+    if (s1.proposition) {
+      sl3.addText('VALUE PROPOSITION', { x:0.5, y:2.56, w:9, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      sl3.addText(st(s1.proposition, 300), { x:0.5, y:2.8, w:9, h:0.5, fontSize:11, color:DKGREY, fontFace:'Arial', margin:0 });
     }
+
+    var valColors = [PINK, NAVY, GREY, PINK, NAVY];
+    vals.slice(0,3).forEach(function(v, i) {
+      var x = 0.5 + i * 3.12;
+      sl3.addShape(pres.shapes.RECTANGLE, { x:x, y:3.45, w:2.98, h:1.55, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+      sl3.addShape(pres.shapes.RECTANGLE, { x:x, y:3.45, w:2.98, h:0.06, fill:{color:i===0?PINK:i===1?NAVY:GREY}, line:{color:NAVY} });
+      sl3.addText(st(v.name), { x:x+0.18, y:3.57, w:2.65, h:0.3, fontSize:13, color:NAVY, fontFace:'Arial', bold:true, margin:0 });
+      sl3.addText(st(v.desc || '', 160), { x:x+0.18, y:3.92, w:2.65, h:0.95, fontSize:9.5, color:DKGREY, fontFace:'Arial', margin:0 });
+    });
+
+    footer(sl3);
   }
 
-  // ── BRAND GUIDELINES ──
-  var s2data = b.s2 || {};
-  var bCols2 = (s2data.colours||[]).filter(function(c){return c.name||c.hex;});
-  if(s2data.toneDesc||bCols2.length||s2data.primaryFont||s2data.heroStatement) {
+  // ── SLIDE 4: BRAND GUIDELINES ───────────────────────────────
+  var bCols = (s2data.colours || []).filter(function(c) { return c.name || c.hex; });
+  if (s2data.toneDesc || bCols.length || s2data.primaryFont || s2data.heroStatement) {
     var sl4 = pres.addSlide();
     sl4.background = { color: WHITE };
-    addSlideHeader(sl4, 'Brand Guidelines');
-    sectionTitle(sl4, 'Brand Voice & Messaging', M, 0.6, 6);
-    var ly = 1.05;
-    if(s2data.heroStatement) {
-      sl4.addShape(pres.shapes.RECTANGLE, { x:M, y:ly, w:5.8, h:0.85, fill:{color:DARK_BG} });
-      sl4.addText('HERO STATEMENT', { x:M+0.15, y:ly+0.1, w:5.5, h:0.18, fontSize:7, color:ACCENT, charSpacing:2, fontFace:'Arial', margin:0 });
-      sl4.addText(st(s2data.heroStatement), { x:M+0.15, y:ly+0.3, w:5.5, h:0.45, fontSize:11, color:WHITE, fontFace:'Arial', bold:true, margin:0 });
-      ly += 0.98;
+    sectionLabel(sl4, 'BRAND GUIDELINES');
+    slideTitle(sl4, 'Brand Voice & Visual Identity');
+
+    // Left: tone
+    if (s2data.toneDesc) {
+      sl4.addText('TONE OF VOICE', { x:0.5, y:1.58, w:4.5, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      sl4.addText(st(s2data.toneDesc, 280), { x:0.5, y:1.82, w:4.5, h:0.88, fontSize:10.5, color:DKGREY, fontFace:'Arial', margin:0 });
     }
-    if(s2data.toneDesc) {
-      sl4.addText('TONE OF VOICE', { x:M, y:ly+0.1, w:5.8, h:0.18, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      sl4.addText(st(s2data.toneDesc), { x:M, y:ly+0.3, w:5.8, h:1.0, fontSize:10, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' });
-      ly += 1.4;
-    }
-    if(s2data.toneWords&&s2data.toneWords.length) {
-      sl4.addText('KEY WORDS', { x:M, y:ly, w:5.8, h:0.18, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      var wx = M; var wy = ly+0.22;
-      s2data.toneWords.forEach(function(w) {
-        var ww = Math.max(w.length*0.1+0.3, 0.7);
-        sl4.addShape(pres.shapes.RECTANGLE, { x:wx, y:wy, w:ww, h:0.3, fill:{color:LIGHT_BG}, line:{color:'E0DDD8'} });
-        sl4.addText(w, { x:wx+0.1, y:wy+0.06, w:ww-0.15, h:0.2, fontSize:9, color:TEXT_DARK, fontFace:'Arial', margin:0 });
-        wx += ww+0.1;
+
+    if (s2data.toneWords && s2data.toneWords.length) {
+      sl4.addText('KEY WORDS', { x:0.5, y:2.82, w:4.5, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      s2data.toneWords.slice(0,6).forEach(function(w, i) {
+        var col2 = i % 3, row = Math.floor(i / 3);
+        var kx = 0.5 + col2 * 1.55, ky = 3.06 + row * 0.44;
+        sl4.addShape(pres.shapes.RECTANGLE, { x:kx, y:ky, w:1.42, h:0.34, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+        sl4.addText(st(w), { x:kx, y:ky, w:1.42, h:0.34, fontSize:9, color:NAVY, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
       });
     }
-    sectionTitle(sl4, 'Typography & Colour', 6.8, 0.6, 6);
-    if(s2data.primaryFont||s2data.secondaryFont) {
-      sl4.addShape(pres.shapes.RECTANGLE, { x:6.8, y:1.05, w:6.0, h:0.65, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      sl4.addText('TYPOGRAPHY', { x:6.95, y:1.1, w:5.7, h:0.18, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      var fontStr = [s2data.primaryFont&&('Primary: '+s2data.primaryFont), s2data.secondaryFont&&('Secondary: '+s2data.secondaryFont)].filter(Boolean).join('   |   ');
-      sl4.addText(st(fontStr), { x:6.95, y:1.3, w:5.7, h:0.28, fontSize:11, bold:true, color:TEXT_DARK, fontFace:'Arial', margin:0 });
+
+    if (s2data.primaryFont || s2data.secondaryFont) {
+      var fontStr = [s2data.primaryFont && ('Primary: ' + s2data.primaryFont), s2data.secondaryFont && ('Secondary: ' + s2data.secondaryFont)].filter(Boolean).join('  ·  ');
+      sl4.addText('TYPOGRAPHY', { x:0.5, y:3.66, w:4.5, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      sl4.addText(st(fontStr), { x:0.5, y:3.9, w:4.5, h:0.26, fontSize:10, color:DKGREY, fontFace:'Arial', margin:0 });
     }
-    if(bCols2.length) {
-      sl4.addText('COLOUR PALETTE', { x:6.8, y:1.85, w:6.0, h:0.2, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      var swW=1.15, swH=1.9, swGap=0.12;
-      bCols2.slice(0,5).forEach(function(c,i) {
-        var sx=6.8+i*(swW+swGap); var sy=2.1;
-        var hex=(c.hex||'#CCCCCC').replace('#','');
-        sl4.addShape(pres.shapes.RECTANGLE, { x:sx, y:sy, w:swW, h:swH*0.65, fill:{color:hex}, line:{color:'E0DDD8'} });
-        sl4.addShape(pres.shapes.RECTANGLE, { x:sx, y:sy+swH*0.65, w:swW, h:swH*0.35, fill:{color:LIGHT_BG}, line:{color:'E0DDD8'} });
-        sl4.addText(c.name||'', { x:sx+0.05, y:sy+swH*0.65+0.05, w:swW-0.1, h:0.22, fontSize:7.5, bold:true, color:TEXT_DARK, fontFace:'Arial', margin:0 });
-        sl4.addText('#'+hex, { x:sx+0.05, y:sy+swH*0.65+0.3, w:swW-0.1, h:0.18, fontSize:7, color:TEXT_LIGHT, fontFace:'Arial', margin:0 });
-        if(c.role){ sl4.addText(c.role, { x:sx+0.05, y:sy+swH*0.65+0.5, w:swW-0.1, h:0.16, fontSize:6.5, color:TEXT_LIGHT, fontFace:'Arial', margin:0 }); }
-      });
-    }
-    if(s2data.dos||s2data.donts) {
-      var doY = 4.1;
-      var contentW = SW-M*2;
-      var halfW2 = (contentW-0.18)/2;
-      if(s2data.dos) {
-        sl4.addShape(pres.shapes.RECTANGLE, { x:M, y:doY, w:halfW2, h:1.0, fill:{color:'EBFAF0'}, line:{color:'C8EDD6'} });
-        sl4.addText("DO'S", { x:M+0.12, y:doY+0.1, w:halfW2-0.2, h:0.22, fontSize:8, color:'328050', bold:true, charSpacing:1, fontFace:'Arial', margin:0 });
-        sl4.addText(s2data.dos, { x:M+0.12, y:doY+0.35, w:halfW2-0.2, h:0.58, fontSize:8.5, color:'224A32', fontFace:'Arial', margin:0, valign:'top' });
-      }
-      if(s2data.donts) {
-        var dx2 = M+halfW2+0.18;
-        sl4.addShape(pres.shapes.RECTANGLE, { x:dx2, y:doY, w:halfW2, h:1.0, fill:{color:'FAECEA'}, line:{color:'EEC8C4'} });
-        sl4.addText("DON'TS", { x:dx2+0.12, y:doY+0.1, w:halfW2-0.2, h:0.22, fontSize:8, color:'A03228', bold:true, charSpacing:1, fontFace:'Arial', margin:0 });
-        sl4.addText(s2data.donts, { x:dx2+0.12, y:doY+0.35, w:halfW2-0.2, h:0.58, fontSize:8.5, color:'6A2220', fontFace:'Arial', margin:0, valign:'top' });
-      }
-    }
+
+    // Right: colour swatches
+    sl4.addText('COLOUR PALETTE', { x:5.4, y:1.58, w:4.1, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+    bCols.slice(0,5).forEach(function(c, i) {
+      var hex = (c.hex || '#CCCCCC').replace('#','');
+      var isLight = parseInt(hex,16) > 0xAAAAAA;
+      var col2 = i % 2, row = Math.floor(i / 2);
+      var w2 = i === 4 ? 4.1 : 1.95;
+      var x2 = i === 4 ? 5.4 : 5.4 + col2 * 2.1;
+      var y2 = 1.84 + row * 0.75;
+      sl4.addShape(pres.shapes.RECTANGLE, { x:x2, y:y2, w:w2, h:0.62, fill:{color:hex}, line: hex.toUpperCase()==='FCFCFC'||hex.toUpperCase()==='FFFFFF' ? {color:'D1D5DB'} : {color:hex} });
+      sl4.addText(st(c.name), { x:x2+0.1, y:y2+0.06, w:w2-0.15, h:0.22, fontSize:9, color:isLight?'111111':WHITE, fontFace:'Arial', bold:true, margin:0 });
+      sl4.addText('#'+hex+(c.role?'  ·  '+c.role:''), { x:x2+0.1, y:y2+0.34, w:w2-0.15, h:0.2, fontSize:7.5, color:isLight?'555555':'AAAACC', fontFace:'Arial', margin:0 });
+    });
+
+    footer(sl4);
   }
 
-  // ── PRODUCTS ──
-  var prods = ((b.s3&&b.s3.items)||[]).filter(function(p){return p.name;});
-  if(prods.length) {
+  // ── SLIDE 5: PRODUCTS & SERVICES ────────────────────────────
+  var prods = (s3data.items || []).filter(function(p) { return p.name; });
+  if (prods.length) {
     var sl5 = pres.addSlide();
     sl5.background = { color: WHITE };
-    addSlideHeader(sl5, 'Products & Services');
-    sectionTitle(sl5, 'What We Offer', M, 0.6, 12);
+    sectionLabel(sl5, 'PRODUCTS & SERVICES');
+    slideTitle(sl5, 'What We Offer');
+
     var pCols = Math.min(prods.length, 3);
-    var pCardW = (SW-M*2-(pCols-1)*0.2)/pCols;
-    var pColors = BRAND_PALETTE;
-    prods.slice(0,6).forEach(function(p,i) {
-      var col2=i%pCols; var row=Math.floor(i/pCols);
-      var cx=M+col2*(pCardW+0.2); var cy=1.1+row*2.9; var acCol=pColors[i%pColors.length];
-      sl5.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:pCardW, h:2.6, fill:{color:WHITE}, shadow:{type:'outer',color:'000000',blur:8,offset:2,angle:135,opacity:0.08} });
-      sl5.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:pCardW, h:0.08, fill:{color:acCol}, line:{color:acCol} });
-      sl5.addText((p.category||'SERVICE').toUpperCase(), { x:cx+0.15, y:cy+0.15, w:pCardW-0.3, h:0.18, fontSize:7, color:acCol, charSpacing:2, fontFace:'Arial', margin:0 });
-      sl5.addText(p.name, { x:cx+0.15, y:cy+0.35, w:pCardW-0.3, h:0.35, fontSize:13, bold:true, color:TEXT_DARK, fontFace:'Arial', margin:0 });
-      if(p.desc){ sl5.addText(p.desc.slice(0,180), { x:cx+0.15, y:cy+0.75, w:pCardW-0.3, h:1.0, fontSize:9, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' }); }
-      var feats=(p.features||[]).filter(Boolean).slice(0,3);
-      if(feats.length) {
-        var featItems = feats.map(function(f,fi){ return { text:f, options:{bullet:true, breakLine:fi<feats.length-1, fontSize:8, color:TEXT_MID, fontFace:'Arial'} }; });
-        sl5.addText(featItems, { x:cx+0.15, y:cy+1.85, w:pCardW-0.3, h:0.65, margin:0, valign:'top' });
-      }
-      if(p.price){ sl5.addText('Pricing: '+p.price, { x:cx+0.15, y:cy+2.4, w:pCardW-0.3, h:0.18, fontSize:8, color:ACCENT, fontFace:'Arial', bold:true, margin:0 }); }
+    var pCardW = (9.05 - (pCols - 1) * 0.14) / pCols;
+    var badgeCols = [NAVY, '6D28D9', '0369A1', NAVY, '6D28D9', '0369A1'];
+
+    prods.slice(0,6).forEach(function(p, i) {
+      var col2 = i % pCols, row = Math.floor(i / pCols);
+      var cx = 0.5 + col2 * (pCardW + 0.14);
+      var cy = 1.55 + row * 1.9;
+      var h = 1.72;
+
+      sl5.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:pCardW, h:h, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+      sl5.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:pCardW, h:0.06, fill:{color:i<3?NAVY:PINK}, line:{color:NAVY} });
+
+      var badgeCol = badgeCols[i % badgeCols.length];
+      sl5.addShape(pres.shapes.RECTANGLE, { x:cx+0.15, y:cy+0.14, w:0.82, h:0.22, fill:{color:badgeCol}, line:{color:badgeCol} });
+      sl5.addText((p.category||'SERVICE').toUpperCase(), { x:cx+0.15, y:cy+0.14, w:0.82, h:0.22, fontSize:6.5, color:WHITE, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
+
+      sl5.addText(st(p.name), { x:cx+0.15, y:cy+0.44, w:pCardW-0.3, h:0.34, fontSize:11.5, color:NAVY, fontFace:'Arial', bold:true, margin:0 });
+      sl5.addText(st(p.desc||'',180), { x:cx+0.15, y:cy+0.82, w:pCardW-0.3, h:0.82, fontSize:9, color:DKGREY, fontFace:'Arial', margin:0 });
     });
+
+    footer(sl5);
   }
 
-  // ── TARGET AUDIENCE ──
-  var s6 = b.s6 || {};
-  var personas = (s6.personas||[]).filter(function(p){return p.name;});
-  if(s6.summary||personas.length) {
+  // ── SLIDE 6: TARGET AUDIENCE ─────────────────────────────────
+  var personas = (s6data.personas || []).filter(function(p) { return p.name; });
+  if (s6data.summary || personas.length) {
     var sl6 = pres.addSlide();
     sl6.background = { color: WHITE };
-    addSlideHeader(sl6, 'Target Audience');
-    sectionTitle(sl6, 'Who We Are Talking To', M, 0.6, 12);
-    if(s6.summary){ sl6.addText(s6.summary.slice(0,250), { x:M, y:1.05, w:SW-M*2, h:0.7, fontSize:10.5, color:TEXT_MID, fontFace:'Arial', italic:true, margin:0 }); }
-    var pCols2=Math.min(personas.length,4);
-    var pCardW2=(SW-M*2-(pCols2-1)*0.18)/pCols2;
-    var pColors2=BRAND_PALETTE;
-    var startY2 = s6.summary ? 1.85 : 1.1;
-    personas.slice(0,4).forEach(function(p,i) {
-      var cx=M+i*(pCardW2+0.18); var cy=startY2; var acCol=pColors2[i%pColors2.length];
-      var pH = 4.8-(startY2-1.1);
-      sl6.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:pCardW2, h:pH, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      sl6.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:pCardW2, h:0.55, fill:{color:acCol}, line:{color:acCol} });
-      sl6.addText(st(p.name), { x:cx+0.12, y:cy+0.1, w:pCardW2-0.2, h:0.38, fontSize:11, bold:true, color:WHITE, fontFace:'Arial', margin:0, valign:'middle' });
-      var py2=cy+0.68;
-      if(p.age||p.location){ sl6.addText([p.age,p.location].filter(Boolean).join('  ·  '), { x:cx+0.12, y:py2, w:pCardW2-0.2, h:0.22, fontSize:8, color:TEXT_LIGHT, fontFace:'Arial', margin:0 }); py2+=0.28; }
-      if(p.needs){ sl6.addText('NEEDS', { x:cx+0.12, y:py2, w:pCardW2-0.2, h:0.18, fontSize:6.5, color:TEXT_LIGHT, charSpacing:1.5, fontFace:'Arial', margin:0 }); sl6.addText(st(p.needs,120), { x:cx+0.12, y:py2+0.18, w:pCardW2-0.2, h:0.9, fontSize:8.5, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' }); py2+=1.15; }
-      if(p.motivations){ sl6.addText('MOTIVATIONS', { x:cx+0.12, y:py2, w:pCardW2-0.2, h:0.18, fontSize:6.5, color:TEXT_LIGHT, charSpacing:1.5, fontFace:'Arial', margin:0 }); sl6.addText(st(p.motivations,120), { x:cx+0.12, y:py2+0.18, w:pCardW2-0.2, h:0.9, fontSize:8.5, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' }); py2+=1.15; }
-      if(p.channels){ sl6.addText('CHANNELS', { x:cx+0.12, y:py2, w:pCardW2-0.2, h:0.18, fontSize:6.5, color:TEXT_LIGHT, charSpacing:1.5, fontFace:'Arial', margin:0 }); sl6.addText(st(p.channels,120), { x:cx+0.12, y:py2+0.18, w:pCardW2-0.2, h:0.4, fontSize:8.5, color:TEXT_MID, fontFace:'Arial', margin:0 }); }
+    sectionLabel(sl6, 'TARGET AUDIENCE');
+    slideTitle(sl6, 'Who We Are Talking To', s6data.summary ? st(s6data.summary, 100) : null);
+
+    var pCols2 = Math.min(personas.length, 2);
+    var pCardW2 = (9.05 - (pCols2 - 1) * 0.2) / pCols2;
+    var accentCols2 = [NAVY, PINK, GREY, NAVY];
+
+    personas.slice(0,4).forEach(function(p, i) {
+      var col2 = i % 2, row = Math.floor(i / 2);
+      var cx = 0.5 + col2 * (pCardW2 + 0.2);
+      var cy = 1.55 + row * 1.88;
+      var w = pCardW2, h = 1.78;
+
+      sl6.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:w, h:h, fill:{color:WHITE}, line:{color:'D1D5DB'} });
+      sl6.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:w, h:0.06, fill:{color:accentCols2[i%accentCols2.length]}, line:{color:NAVY} });
+
+      sl6.addText(st(p.name, 40), { x:cx+0.2, y:cy+0.1, w:w-0.4, h:0.28, fontSize:11, color:NAVY, fontFace:'Arial', bold:true, margin:0 });
+
+      [['NEEDS', p.needs], ['MOTIVATIONS', p.motivations], ['CHANNELS', p.channels]].forEach(function(row2, ri) {
+        if (!row2[1]) return;
+        var ry = cy + 0.44 + ri * 0.42;
+        sl6.addText(row2[0], { x:cx+0.2, y:ry, w:w-0.4, h:0.16, fontSize:6, color:GREY, fontFace:'Arial', bold:true, charSpacing:1, margin:0 });
+        sl6.addText(st(row2[1], 90), { x:cx+0.2, y:ry+0.17, w:w-0.4, h:0.22, fontSize:7.5, color:DKGREY, fontFace:'Arial', margin:0 });
+      });
     });
+
+        footer(sl6);
   }
 
-  // ── SOCIAL PROOF ──
-  var s7 = b.s7 || {};
-  var testi = (s7.testimonials||[]).filter(function(t){return t.quote;});
-  var stats = (s7.keyStats||[]).filter(function(s){return s.value;});
-  var cases = (s7.caseStudies||[]).filter(function(c){return c.client;});
-  if(testi.length||cases.length||stats.length||s7.reviews) {
+  // ── SLIDE 7: SOCIAL PROOF ────────────────────────────────────
+  var testi = (s7data.testimonials || []).filter(function(t) { return t.quote; });
+  var keyStats = (s7data.keyStats || []).filter(function(s) { return s.value; });
+  var cases = (s7data.caseStudies || []).filter(function(c) { return c.client; });
+
+  if (testi.length || keyStats.length || cases.length) {
     var sl7 = pres.addSlide();
     sl7.background = { color: WHITE };
-    addSlideHeader(sl7, 'Social Proof');
-    sectionTitle(sl7, 'What We Have Achieved', M, 0.6, 12);
-    if(stats.length) {
-      var stCols=Math.min(stats.length,4);
-      var stW=(SW-M*2-(stCols-1)*0.15)/stCols;
-      var stColors=BRAND_PALETTE;
-      stats.slice(0,4).forEach(function(s,i){ statCard(sl7, M+i*(stW+0.15), 1.05, stW, 1.1, s.value, s.context||'Key stat', stColors[i%stColors.length]); });
+    sectionLabel(sl7, 'SOCIAL PROOF');
+    slideTitle(sl7, 'What We Have Achieved');
+
+    var statCols2 = [NAVY, PINK, '6B7280', NAVY];
+    if (keyStats.length) {
+      var sNum = Math.min(keyStats.length, 3);
+      var sW = (9.05 - (sNum - 1) * 0.14) / sNum;
+      keyStats.slice(0,3).forEach(function(st3, i) {
+        var x = 0.5 + i * (sW + 0.14);
+        sl7.addShape(pres.shapes.RECTANGLE, { x:x, y:1.55, w:sW, h:1.12, fill:{color:NAVY}, line:{color:NAVY} });
+        sl7.addShape(pres.shapes.RECTANGLE, { x:x, y:1.55, w:sW, h:0.06, fill:{color:PINK}, line:{color:PINK} });
+        var statVal = st(st3.value, 20);
+        var statFontSize = statVal.length > 10 ? 18 : statVal.length > 6 ? 24 : 34;
+        sl7.addText(statVal, { x:x, y:1.58, w:sW, h:0.75, fontSize:statFontSize, color:PINK, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
+        var ctxText = st(st3.context||'Key stat', 60).toUpperCase();
+        sl7.addText(ctxText, { x:x+0.1, y:2.35, w:sW-0.2, h:0.26, fontSize:6.5, color:MPINK, fontFace:'Arial', bold:true, align:'center', charSpacing:1, margin:0 });
+      });
     }
-    var testiY = stats.length ? 2.35 : 1.05;
-    testi.slice(0,2).forEach(function(t,i) {
-      var tx=M+i*((SW-M*2)/2+0.12); var tw=(SW-M*2)/2-0.06;
-      var qLines=Math.ceil(t.quote.length/60); var cardH=Math.min(2.2, qLines*0.52+0.8);
-      sl7.addShape(pres.shapes.RECTANGLE, { x:tx, y:testiY, w:tw, h:cardH, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      sl7.addShape(pres.shapes.RECTANGLE, { x:tx, y:testiY, w:0.06, h:cardH, fill:{color:ACCENT}, line:{color:ACCENT} });
-      sl7.addText('“'+t.quote.slice(0,200)+'”', { x:tx+0.18, y:testiY+0.18, w:tw-0.28, h:cardH-0.5, fontSize:10, color:TEXT_DARK, fontFace:'Arial', italic:true, margin:0, valign:'top' });
-      var attr=[t.name,t.company].filter(Boolean).join(', ');
-      sl7.addText((attr?'— '+attr:'')+(t.result?'  ·  '+t.result:''), { x:tx+0.18, y:testiY+cardH-0.28, w:tw-0.28, h:0.22, fontSize:8.5, color:TEXT_LIGHT, fontFace:'Arial', bold:true, margin:0 });
+
+    var testiY = keyStats.length ? 2.9 : 1.55;
+    var testiH = keyStats.length ? 2.3 : 3.6;
+    testi.slice(0,2).forEach(function(t, i) {
+      var tx = 0.5 + i * 4.8, tw = 4.45;
+      sl7.addShape(pres.shapes.RECTANGLE, { x:tx, y:testiY, w:tw, h:testiH, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+      sl7.addText('\u201C', { x:tx+0.15, y:testiY-0.04, w:0.5, h:0.5, fontSize:38, color:PINK, fontFace:'Arial', bold:true, align:'left', margin:0 });
+      var quoteText = st(t.quote, 220);
+      var quoteFontSize = quoteText.length > 160 ? 8.5 : 9.5;
+      sl7.addText(quoteText, { x:tx+0.2, y:testiY+0.32, w:tw-0.35, h:testiH-0.7, fontSize:quoteFontSize, color:DKGREY, fontFace:'Arial', italic:true, margin:0 });
+      sl7.addShape(pres.shapes.RECTANGLE, { x:tx+0.2, y:testiY+testiH-0.55, w:tw-0.35, h:0.02, fill:{color:PINK}, line:{color:PINK} });
+      var attr = [t.name, t.company].filter(Boolean).join('  ·  ');
+      sl7.addText(st(attr, 60), { x:tx+0.2, y:testiY+testiH-0.48, w:tw-0.35, h:0.3, fontSize:8.5, color:NAVY, fontFace:'Arial', bold:true, margin:0 });
     });
-    if(cases.length) {
-      var csY = testiY+(testi.length?2.4:0);
-      if(csY < SH-1.5) {
-        sectionTitle(sl7, 'Case Studies', M, csY, 12);
-        cases.slice(0,3).forEach(function(c,i) {
-          var cx=M+i*((SW-M*2)/3+0.1); var cw=(SW-M*2)/3-0.07;
-          card(sl7, cx, csY+0.45, cw, 1.4, c.client, c.industry||null, (c.problem?'Challenge: '+c.problem.slice(0,80)+String.fromCharCode(10):'')+(c.result?'Result: '+c.result.slice(0,80):''), '6AAA7E');
-        });
-      }
-    }
+
+    footer(sl7);
   }
 
-  // ── CHANNELS ──
-  var s8 = b.s8 || {};
-  if((s8.platforms&&s8.platforms.length)||s8.seoKeywords||s8.contentPillars) {
+  // ── SLIDE 8: CHANNELS & KEYWORDS ─────────────────────────────
+  if ((s8data.platforms && s8data.platforms.length) || s8data.seoKeywords || s8data.contentPillars) {
     var sl8 = pres.addSlide();
     sl8.background = { color: WHITE };
-    addSlideHeader(sl8, 'Channels & Keywords');
-    sectionTitle(sl8, 'Where We Show Up', M, 0.6, 12);
-    if(s8.platforms&&s8.platforms.length) {
-      sl8.addText('ACTIVE CHANNELS', { x:M, y:1.05, w:6, h:0.2, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      var px2=M; var pillRow=0; var pillRowY=1.3;
-      s8.platforms.forEach(function(p) {
-        var pw=Math.max(p.length*0.1+0.4,1.0);
-        if(px2+pw > SW-M) { px2=M; pillRow++; pillRowY=1.3+pillRow*0.42; }
-        sl8.addShape(pres.shapes.RECTANGLE, { x:px2, y:pillRowY, w:pw, h:0.32, fill:{color:'1A1A1A'}, line:{color:'333333'} });
-        sl8.addText(p, { x:px2+0.12, y:pillRowY+0.07, w:pw-0.18, h:0.2, fontSize:9, color:WHITE, fontFace:'Arial', margin:0 });
-        px2 += pw+0.12;
+    sectionLabel(sl8, 'CHANNELS & KEYWORDS');
+    slideTitle(sl8, 'Where We Show Up');
+
+    if (s8data.platforms && s8data.platforms.length) {
+      sl8.addText('ACTIVE CHANNELS', { x:0.5, y:1.58, w:4.5, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      s8data.platforms.slice(0,5).forEach(function(p, i) {
+        var px2 = 0.5 + i * 1.58;
+        sl8.addShape(pres.shapes.RECTANGLE, { x:px2, y:1.84, w:1.46, h:0.44, fill:{color:NAVY}, line:{color:NAVY} });
+        sl8.addText(st(p), { x:px2, y:1.84, w:1.46, h:0.44, fontSize:10, color:WHITE, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
       });
-      var kwY2 = pillRowY + 0.5;
-    } else {
-      var kwY2 = 1.05;
     }
-    var maxBH = SH-kwY2-0.6;
-    if(s8.seoKeywords) {
-      sl8.addShape(pres.shapes.RECTANGLE, { x:M, y:kwY2, w:6.0, h:maxBH, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      sl8.addText('SEO KEYWORDS', { x:M+0.15, y:kwY2+0.15, w:5.7, h:0.2, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      sl8.addText(s8.seoKeywords, { x:M+0.15, y:kwY2+0.42, w:5.7, h:maxBH-0.55, fontSize:9, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' });
+
+    if (s8data.seoKeywords) {
+      sl8.addText('SEO KEYWORDS', { x:0.5, y:2.5, w:4.5, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      var kwLines = st(s8data.seoKeywords).split(',').map(function(k){return k.trim();}).filter(Boolean);
+      kwLines.slice(0,10).forEach(function(kw, i) {
+        var col2 = i % 2, row = Math.floor(i / 2);
+        var kx = 0.5 + col2 * 2.38, ky = 2.76 + row * 0.4;
+        sl8.addShape(pres.shapes.RECTANGLE, { x:kx, y:ky, w:2.24, h:0.32, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+        sl8.addText(kw, { x:kx+0.1, y:ky, w:2.1, h:0.32, fontSize:8.5, color:DKGREY, fontFace:'Arial', valign:'middle', margin:0 });
+      });
     }
-    if(s8.contentPillars) {
-      sl8.addShape(pres.shapes.RECTANGLE, { x:6.8, y:kwY2, w:6.0, h:maxBH, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      sl8.addText('CONTENT PILLARS', { x:6.95, y:kwY2+0.15, w:5.7, h:0.2, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      sl8.addText(s8.contentPillars, { x:6.95, y:kwY2+0.42, w:5.7, h:maxBH-0.55, fontSize:9, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' });
+
+    if (s8data.contentPillars) {
+      sl8.addText('CONTENT PILLARS', { x:5.45, y:1.58, w:4.1, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      var pillLines = st(s8data.contentPillars).split('\n').map(function(k){return k.replace(/^[-•*\d.]+\s*/,'').trim();}).filter(Boolean);
+      pillLines.slice(0,6).forEach(function(p, i) {
+        var ky = 1.84 + i * 0.52;
+        sl8.addShape(pres.shapes.RECTANGLE, { x:5.45, y:ky, w:4.1, h:0.44, fill:{color:i%2===0?LGREY:WHITE}, line:{color:'E5E7EB'} });
+        sl8.addText(String(i+1).padStart(2,'0'), { x:5.58, y:ky, w:0.4, h:0.44, fontSize:10, color:PINK, fontFace:'Arial', bold:true, valign:'middle', margin:0 });
+        sl8.addText(p, { x:6.02, y:ky, w:3.4, h:0.44, fontSize:9.5, color:DKGREY, fontFace:'Arial', valign:'middle', margin:0 });
+      });
     }
+
+    footer(sl8);
   }
 
-  // ── COMPETITION ──
-  var s4 = b.s4 || {};
-  var comps = (s4.competitors||[]).filter(function(c){return c.name;});
-  if(comps.length) {
+  // ── SLIDE 9: COMPETITION ─────────────────────────────────────
+  var comps = (s4data.competitors || []).filter(function(c) { return c.name; });
+  if (comps.length) {
     var sl9 = pres.addSlide();
     sl9.background = { color: WHITE };
-    addSlideHeader(sl9, 'Competition');
-    sectionTitle(sl9, 'The Competitive Landscape', M, 0.6, 12);
-    var cCols=Math.min(comps.length,4);
-    var cW2=(SW-M*2-(cCols-1)*0.18)/cCols;
-    comps.slice(0,8).forEach(function(c,i) {
-      var col2=i%cCols; var row=Math.floor(i/cCols);
-      var cx=M+col2*(cW2+0.18); var cy=1.1+row*1.4;
-      sl9.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:cW2, h:1.2, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      sl9.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:cW2, h:0.06, fill:{color:'C07B5A'}, line:{color:'C07B5A'} });
-      sl9.addText(c.name, { x:cx+0.12, y:cy+0.12, w:cW2-0.2, h:0.28, fontSize:11, bold:true, color:TEXT_DARK, fontFace:'Arial', margin:0 });
-      if(c.desc){ sl9.addText(c.desc, { x:cx+0.12, y:cy+0.42, w:cW2-0.2, h:0.7, fontSize:8.5, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' }); }
+    sectionLabel(sl9, 'COMPETITION');
+    slideTitle(sl9, 'The Competitive Landscape');
+
+    comps.slice(0,4).forEach(function(c, i) {
+      var col2 = i % 2, row = Math.floor(i / 2);
+      var cx = 0.5 + col2 * 4.6, cy = 1.55 + row * 1.9, w = 4.42, h = 1.72;
+      sl9.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:w, h:h, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+      sl9.addShape(pres.shapes.RECTANGLE, { x:cx, y:cy, w:w, h:0.06, fill:{color:NAVY}, line:{color:NAVY} });
+      sl9.addText(st(c.name), { x:cx+0.15, y:cy+0.12, w:w-0.3, h:0.3, fontSize:13, color:NAVY, fontFace:'Arial', bold:true, margin:0 });
+      if (c.desc) { sl9.addText(st(c.desc, 200), { x:cx+0.15, y:cy+0.48, w:w-0.3, h:1.1, fontSize:9, color:DKGREY, fontFace:'Arial', margin:0 }); }
     });
+
+    footer(sl9);
   }
 
-  // ── SALES PROCESS ──
-  var s10 = b.s10 || {};
-  if(s10.conversionGoal||s10.salesCycle||s10.dealValue||s10.objections) {
+  // ── SLIDE 10: SALES PROCESS ──────────────────────────────────
+  if (s10data.conversionGoal || s10data.salesCycle || s10data.dealValue || s10data.objections) {
     var sl10 = pres.addSlide();
     sl10.background = { color: WHITE };
-    addSlideHeader(sl10, 'Sales Process');
-    sectionTitle(sl10, 'How We Sell', M, 0.6, 12);
-    var spItems=[s10.conversionGoal&&{label:'Conversion Goal',value:s10.conversionGoal},s10.salesCycle&&{label:'Sales Cycle',value:s10.salesCycle},s10.dealValue&&{label:'Deal Value',value:s10.dealValue},s10.decisionMakers&&{label:'Decision Makers',value:s10.decisionMakers}].filter(Boolean);
-    if(spItems.length) {
-      var spW=(SW-M*2-(spItems.length-1)*0.18)/spItems.length;
-      var spColors=BRAND_PALETTE;
-      spItems.forEach(function(item,i){ statCard(sl10, M+i*(spW+0.18), 1.05, spW, 1.4, item.value, item.label, spColors[i%spColors.length]); });
+    sectionLabel(sl10, 'SALES PROCESS');
+    slideTitle(sl10, 'How We Sell');
+
+    var spItems = [
+      s10data.conversionGoal && { label:'Conversion Goal', value:s10data.conversionGoal },
+      s10data.salesCycle     && { label:'Sales Cycle',     value:s10data.salesCycle },
+      s10data.dealValue      && { label:'Deal Value',      value:s10data.dealValue },
+      s10data.decisionMakers && { label:'Decision Makers', value:s10data.decisionMakers },
+    ].filter(Boolean);
+
+    var spColors = [NAVY, PINK, GREY, NAVY];
+    if (spItems.length) {
+      var spW = (9.05 - (spItems.length - 1) * 0.14) / spItems.length;
+      spItems.forEach(function(item, i) {
+        var sx = 0.5 + i * (spW + 0.14);
+        sl10.addShape(pres.shapes.RECTANGLE, { x:sx, y:1.55, w:spW, h:1.1, fill:{color:spColors[i%spColors.length]}, line:{color:spColors[i%spColors.length]} });
+        sl10.addText(st(item.value, 30), { x:sx+0.1, y:1.62, w:spW-0.2, h:0.6, fontSize:18, color:WHITE, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
+        sl10.addText(item.label.toUpperCase(), { x:sx+0.1, y:2.2, w:spW-0.2, h:0.3, fontSize:7, color:WHITE, fontFace:'Arial', bold:true, align:'center', charSpacing:1, margin:0 });
+      });
     }
-    var spY2=2.65;
-    if(s10.objections) {
-      sl10.addShape(pres.shapes.RECTANGLE, { x:M, y:spY2, w:(SW-M*2)/2-0.1, h:2.5, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      sl10.addText('MAIN OBJECTIONS', { x:M+0.15, y:spY2+0.12, w:(SW-M*2)/2-0.3, h:0.2, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      sl10.addText(s10.objections, { x:M+0.15, y:spY2+0.38, w:(SW-M*2)/2-0.3, h:2.0, fontSize:9.5, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' });
+
+    var spY = spItems.length ? 2.85 : 1.55;
+    if (s10data.objections) {
+      sl10.addShape(pres.shapes.RECTANGLE, { x:0.5, y:spY, w:4.42, h:2.3, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+      sl10.addShape(pres.shapes.RECTANGLE, { x:0.5, y:spY, w:0.06, h:2.3, fill:{color:PINK}, line:{color:PINK} });
+      sl10.addText('MAIN OBJECTIONS', { x:0.7, y:spY+0.1, w:4.1, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      sl10.addText(st(s10data.objections, 400), { x:0.7, y:spY+0.35, w:4.1, h:1.85, fontSize:10, color:DKGREY, fontFace:'Arial', margin:0 });
     }
-    if(s10.process) {
-      var px3=M+(SW-M*2)/2+0.1;
-      sl10.addShape(pres.shapes.RECTANGLE, { x:px3, y:spY2, w:(SW-M*2)/2-0.1, h:2.5, fill:{color:LIGHT_BG}, line:{color:'E8E4E0'} });
-      sl10.addText('SALES PROCESS', { x:px3+0.15, y:spY2+0.12, w:(SW-M*2)/2-0.3, h:0.2, fontSize:7, color:TEXT_LIGHT, charSpacing:2, fontFace:'Arial', margin:0 });
-      sl10.addText(s10.process, { x:px3+0.15, y:spY2+0.38, w:(SW-M*2)/2-0.3, h:2.0, fontSize:9.5, color:TEXT_MID, fontFace:'Arial', margin:0, valign:'top' });
+    if (s10data.process) {
+      sl10.addShape(pres.shapes.RECTANGLE, { x:5.12, y:spY, w:4.43, h:2.3, fill:{color:LGREY}, line:{color:'E5E7EB'} });
+      sl10.addShape(pres.shapes.RECTANGLE, { x:5.12, y:spY, w:0.06, h:2.3, fill:{color:NAVY}, line:{color:NAVY} });
+      sl10.addText('SALES PROCESS', { x:5.32, y:spY+0.1, w:4.1, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      sl10.addText(st(s10data.process, 400), { x:5.32, y:spY+0.35, w:4.1, h:1.85, fontSize:10, color:DKGREY, fontFace:'Arial', margin:0 });
     }
+
+    footer(sl10);
   }
 
-  // ── WHAT WE STILL NEED ──
+  // ── SLIDE 11: WHAT WE STILL NEED ────────────────────────────
   var SECTION_LABELS2 = { core:'Organisation Info', s1:'Purpose & Values', s2:'Brand Guidelines', s3:'Products & Services', s4:'Competition', s6:'Target Audience', s7:'Social Proof', s8:'Channels & Keywords', s10:'Sales Process' };
   function sectionIsEmpty(secId) {
     var d = b[secId];
-    if(!d) return true;
+    if (!d) return true;
     return Object.entries(d).every(function(kv) {
-      if(kv[0].startsWith('_')) return true;
-      if(Array.isArray(kv[1])) return kv[1].length===0;
-      return !kv[1]||kv[1].toString().trim()==='';
+      if (kv[0].startsWith('_')) return true;
+      if (Array.isArray(kv[1])) return kv[1].length === 0;
+      return !kv[1] || kv[1].toString().trim() === '';
     });
   }
   var emptySects = Object.keys(SECTION_LABELS2).filter(sectionIsEmpty);
 
   var slFinal = pres.addSlide();
-  slFinal.background = { color: DARK_BG };
-  slFinal.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:SW, h:0.08, fill:{color:ACCENT}, line:{color:ACCENT} });
-  slFinal.addText('WHAT WE STILL NEED', { x:M, y:0.3, w:10, h:0.3, fontSize:9, color:ACCENT, charSpacing:4, fontFace:'Arial', margin:0 });
-  slFinal.addText('Sections to complete before we can begin', { x:M, y:0.75, w:10, h:0.55, fontSize:26, bold:true, color:WHITE, fontFace:'Arial', margin:0 });
+  slFinal.background = { color: '00001E' };
+  slFinal.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:SW, h:0.08, fill:{color:PINK}, line:{color:PINK} });
+  slFinal.addText('WHAT WE STILL NEED', { x:0.5, y:0.22, w:9, h:0.22, fontSize:7.5, color:PINK, fontFace:'Arial', bold:true, charSpacing:3, margin:0 });
+  slFinal.addText('Sections to complete before we can begin', { x:0.5, y:0.5, w:9, h:0.58, fontSize:26, bold:true, color:WHITE, fontFace:'Arial', margin:0 });
 
-  if(emptySects.length===0) {
-    slFinal.addText('All sections are complete — ready to go!', { x:M, y:2.0, w:10, h:0.5, fontSize:18, color:'6AAA7E', fontFace:'Arial', margin:0 });
+  if (emptySects.length === 0) {
+    slFinal.addText('All sections are complete — ready to go!', { x:0.5, y:2.0, w:9, h:0.5, fontSize:18, color:PINK, fontFace:'Arial', margin:0 });
   } else {
-    var itemY2=1.6;
+    var itemY2 = 1.28;
     emptySects.forEach(function(secId) {
-      slFinal.addShape(pres.shapes.RECTANGLE, { x:M, y:itemY2, w:SW-M*2, h:0.48, fill:{color:'1A1A1A'}, line:{color:'2A2A2A'} });
-      slFinal.addShape(pres.shapes.RECTANGLE, { x:M, y:itemY2, w:0.05, h:0.48, fill:{color:'C07B5A'}, line:{color:'C07B5A'} });
-      slFinal.addText(SECTION_LABELS2[secId]||secId, { x:M+0.18, y:itemY2+0.1, w:SW-M*2-0.3, h:0.28, fontSize:11, color:WHITE, fontFace:'Arial', bold:true, margin:0 });
-      slFinal.addText('No information added yet', { x:SW-4, y:itemY2+0.14, w:3.3, h:0.22, fontSize:8.5, color:'555555', fontFace:'Arial', align:'right', margin:0 });
-      itemY2+=0.56;
+      slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:9.05, h:0.72, fill:{color:'1A1A3E'}, line:{color:NAVY} });
+      slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:0.06, h:0.72, fill:{color:PINK}, line:{color:PINK} });
+      slFinal.addText(st(SECTION_LABELS2[secId] || secId), { x:0.7, y:itemY2+0.1, w:6, h:0.28, fontSize:13, color:WHITE, fontFace:'Arial', bold:true, margin:0 });
+      slFinal.addText('No information added yet', { x:0.7, y:itemY2+0.42, w:6, h:0.22, fontSize:9, color:'8888AA', fontFace:'Arial', italic:true, margin:0 });
+      slFinal.addShape(pres.shapes.RECTANGLE, { x:8.35, y:itemY2+0.17, w:1.0, h:0.36, fill:{color:PINK}, line:{color:PINK} });
+      slFinal.addText('PENDING', { x:8.35, y:itemY2+0.17, w:1.0, h:0.36, fontSize:7.5, color:'00001E', fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
+      itemY2 += 0.82;
     });
   }
 
-  // Download
+  // ── SLIDE 12: CLOSING ────────────────────────────────────────
+  var slClose = pres.addSlide();
+  slClose.background = { color: NAVY };
+  slClose.addShape(pres.shapes.RECTANGLE, { x:6.5, y:0, w:3.5, h:SH, fill:{color:PINK}, line:{color:PINK} });
+  slClose.addShape(pres.shapes.RECTANGLE, { x:0, y:0, w:0.07, h:SH, fill:{color:PINK}, line:{color:PINK} });
+
+  var closeQuote = st(s1.purpose || s1.heroStatement || s2data.heroStatement || brandName, 120);
+  var closeFontSize = closeQuote.length > 80 ? 22 : closeQuote.length > 50 ? 28 : 34;
+  slClose.addText(closeQuote, { x:0.4, y:1.0, w:5.8, h:2.4, fontSize:closeFontSize, color:WHITE, fontFace:'Arial', bold:true, align:'left', margin:0 });
+  slClose.addText('This brand review gives ' + brandName + ' a clear foundation — a shared understanding of purpose, audience, and voice that will inform every piece of content we create together.', { x:0.4, y:3.5, w:5.8, h:0.9, fontSize:11, color:MPINK, fontFace:'Arial', align:'left', margin:0 });
+
+  slClose.addText((core.website || (brandName.toLowerCase().replace(/\s/g,'') + '.com')), { x:6.6, y:2.3, w:3.3, h:0.4, fontSize:12, color:NAVY, fontFace:'Arial', bold:true, align:'center', margin:0 });
+  slClose.addText('Crank  ·  wearecrank.com', { x:6.6, y:4.8, w:3.3, h:0.28, fontSize:9, color:'4B0082', fontFace:'Arial', align:'center', margin:0 });
+
+  // ── DOWNLOAD ─────────────────────────────────────────────────
   try {
-    await pres.writeFile({ fileName: brandName.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'_brand_review.pptx' });
+    await pres.writeFile({ fileName: brandName.replace(/[^a-z0-9]/gi,'_').toLowerCase() + '_brand_review.pptx' });
   } catch(err) {
     console.error('writeFile error:', err);
     alert('Could not save PowerPoint: ' + err.message);
   }
   if (pptxBtn) { pptxBtn.textContent = origText; pptxBtn.disabled = false; }
 }
+
 
 // ════════════════════════════════════════════════════════════
 // ADMIN — USERS
