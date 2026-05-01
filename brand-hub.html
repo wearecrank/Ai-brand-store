@@ -2602,27 +2602,41 @@ async function exportPPTX() {
     return maxLen ? result.slice(0, maxLen) : result;
   }
 
-  // ── Pull brand colours from data, fall back to sensible defaults
+  // ── Pull brand colours from data
+  // Strategy: try role-based matching first, then fall back to position in palette
+  // Always use real brand colours — Crank defaults only if brand has NO colours stored
   function getBrandColours() {
     var cols = (s2data.colours || []).filter(function(c) { return c.hex; });
-    var primary = cols.find(function(c) { return c.role && c.role.toLowerCase().includes('primary'); });
-    var accent  = cols.find(function(c) { return c.role && (c.role.toLowerCase().includes('accent') || c.role.toLowerCase().includes('secondary')); });
-    var p = primary ? primary.hex.replace('#','') : '00006B';
-    var a = accent  ? accent.hex.replace('#','')  : 'FF79FF';
-    // Derive a muted version of accent for backgrounds
-    return { primary: p, accent: a };
+
+    // Positional fallback — first colour is primary, second is accent
+    var p = cols[0] ? cols[0].hex.replace('#','') : '19252F';
+    var a = cols[1] ? cols[1].hex.replace('#','') : '53AEEF';
+
+    // Override with role-matched if found (more specific wins)
+    var primaryRole = cols.find(function(c) { return c.role && c.role.toLowerCase().includes('primary'); });
+    var accentRole  = cols.find(function(c) { return c.role && (c.role.toLowerCase().includes('accent') || c.role.toLowerCase().includes('secondary')); });
+    if (primaryRole) p = primaryRole.hex.replace('#','');
+    if (accentRole)  a = accentRole.hex.replace('#','');
+
+    // Build full palette — all brand colours in order, min 4
+    var palette = cols.map(function(c){ return c.hex.replace('#',''); });
+    var crankFallback = ['19252F','53AEEF','85C515','FDBD17'];
+    while (palette.length < 4) { palette.push(crankFallback[palette.length % crankFallback.length]); }
+
+    return { primary: p, accent: a, palette: palette };
   }
 
-  var BC = getBrandColours();
-  var NAVY   = BC.primary;
-  var PINK   = BC.accent;
+  var BC     = getBrandColours();
+  var NAVY   = BC.primary;   // dominant brand colour — covers, bars, borders
+  var PINK   = BC.accent;    // secondary brand colour — section labels, highlights
+  var PALETTE = BC.palette;  // full set for cycling through cards
   var BLACK  = '00001E';
   var WHITE  = 'FFFFFF';
   var OFFWHITE = 'F8F8F8';
   var LGREY  = 'F3F4F6';
   var GREY   = '9CA3AF';
   var DKGREY = '374151';
-  var MPINK  = 'E2B3E4';  // muted card fill — fixed, not brand-derived
+  var MPINK  = PINK;         // was hardcoded 'E2B3E4' — now uses real brand accent
 
   var SW = 10;
   var SH = 5.625;
@@ -2684,7 +2698,7 @@ async function exportPPTX() {
     cover.addText(st2[1], { x:7.6, y:y+0.68, w:2.3, h:0.35, fontSize:9, color:'F0E0FF', fontFace:'Arial', align:'center', margin:0 });
   });
 
-  cover.addText('Prepared by Crank  ·  wearecrank.com', { x:0.5, y:5.22, w:6.7, h:0.22, fontSize:8, color:'6B67B0', fontFace:'Arial', align:'left', margin:0 });
+  cover.addText('Prepared by Crank  ·  wearecrank.com', { x:0.5, y:5.22, w:6.7, h:0.22, fontSize:8, color:PINK, fontFace:'Arial', align:'left', margin:0 });
 
   // ── SLIDE 2: ORG OVERVIEW ───────────────────────────────────
   if (core.overview || core.businessType) {
@@ -2739,7 +2753,7 @@ async function exportPPTX() {
       sl3.addText(st(s1.proposition, 300), { x:0.5, y:2.8, w:9, h:0.5, fontSize:11, color:DKGREY, fontFace:'Arial', margin:0 });
     }
 
-    var valColors = [PINK, NAVY, GREY, PINK, NAVY];
+    var valColors = PALETTE;
     vals.slice(0,3).forEach(function(v, i) {
       var x = 0.5 + i * 3.12;
       sl3.addShape(pres.shapes.RECTANGLE, { x:x, y:3.45, w:2.98, h:1.55, fill:{color:LGREY}, line:{color:'E5E7EB'} });
@@ -2808,7 +2822,7 @@ async function exportPPTX() {
 
     var pCols = Math.min(prods.length, 3);
     var pCardW = (9.05 - (pCols - 1) * 0.14) / pCols;
-    var badgeCols = [NAVY, '6D28D9', '0369A1', NAVY, '6D28D9', '0369A1'];
+    var badgeCols = PALETTE;
 
     prods.slice(0,6).forEach(function(p, i) {
       var col2 = i % pCols, row = Math.floor(i / pCols);
@@ -2875,7 +2889,7 @@ async function exportPPTX() {
     sectionLabel(sl7, 'SOCIAL PROOF');
     slideTitle(sl7, 'What We Have Achieved');
 
-    var statCols2 = [NAVY, PINK, '6B7280', NAVY];
+    var statCols2 = PALETTE;
     if (keyStats.length) {
       var sNum = Math.min(keyStats.length, 3);
       var sW = (9.05 - (sNum - 1) * 0.14) / sNum;
@@ -3035,10 +3049,10 @@ async function exportPPTX() {
   } else {
     var itemY2 = 1.28;
     emptySects.forEach(function(secId) {
-      slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:9.05, h:0.72, fill:{color:'1A1A3E'}, line:{color:NAVY} });
+      slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:9.05, h:0.72, fill:{color:NAVY}, line:{color:NAVY} });
       slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:0.06, h:0.72, fill:{color:PINK}, line:{color:PINK} });
       slFinal.addText(st(SECTION_LABELS2[secId] || secId), { x:0.7, y:itemY2+0.1, w:6, h:0.28, fontSize:13, color:WHITE, fontFace:'Arial', bold:true, margin:0 });
-      slFinal.addText('No information added yet', { x:0.7, y:itemY2+0.42, w:6, h:0.22, fontSize:9, color:'8888AA', fontFace:'Arial', italic:true, margin:0 });
+      slFinal.addText('No information added yet', { x:0.7, y:itemY2+0.42, w:6, h:0.22, fontSize:9, color:GREY, fontFace:'Arial', italic:true, margin:0 });
       slFinal.addShape(pres.shapes.RECTANGLE, { x:8.35, y:itemY2+0.17, w:1.0, h:0.36, fill:{color:PINK}, line:{color:PINK} });
       slFinal.addText('PENDING', { x:8.35, y:itemY2+0.17, w:1.0, h:0.36, fontSize:7.5, color:'00001E', fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
       itemY2 += 0.82;
