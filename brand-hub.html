@@ -906,8 +906,8 @@ async function discoverCompetitors() {
       });
 
       triggerSave();
-      const sec = document.querySelector('.section-panel.active');
-      if (sec) refreshPanel(sec);
+      var s4sec = SECTIONS.find(function(s){ return s.id === 's4'; });
+      if (s4sec) refreshPanel(s4sec);
       updateCompleteness('s4');
       if (statusEl) statusEl.innerHTML = '<span style="color:var(--success)">✓ Found ' + extracted.competitors.length + ' competitors</span>';
     } else {
