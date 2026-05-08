@@ -1081,26 +1081,43 @@ function mergeIntoSection(secId, extracted) {
   if (!currentBrand[secId]) currentBrand[secId] = {};
   const section = currentBrand[secId];
 
+  // Fields that should overwrite rather than append when re-imported
+  const overwriteFields = ['summary','targetIndustries','companySize','revenueRange',
+    'toneDesc','primaryFont','secondaryFont','fontNotes','heroStatement','elevatorPitch',
+    'keyMessages','neverSay','conversionGoal','salesCycle','dealValue','decisionMakers',
+    'seoKeywords','contentPillars','postingFrequency','paidChannels'];
+
   Object.entries(extracted).forEach(([key, value]) => {
     if (value === null || value === undefined || value === '') return;
 
     if (Array.isArray(value)) {
       if (!Array.isArray(section[key])) section[key] = [];
-      // Deduplicate by name to avoid duplicates on multiple URL scans
+
+      // Deduplicate by name — normalise to lowercase, also catch near-duplicates
+      // by checking if existing array already has items with very similar names
       var existingNames = section[key].map(function(item) {
-        return item && item.name ? item.name.toLowerCase().trim() : '';
-      });
+        return item && item.name ? item.name.toLowerCase().trim() : null;
+      }).filter(Boolean);
+
       var newItems = value.filter(function(item) {
-        if (!item || !item.name) return true;
-        return existingNames.indexOf(item.name.toLowerCase().trim()) === -1;
+        if (!item) return false;
+        // If item has no name, only add if the array is empty
+        if (!item.name || !item.name.trim()) return section[key].length === 0;
+        var n = item.name.toLowerCase().trim();
+        // Skip if exact match or very close match already exists
+        return !existingNames.some(function(ex) {
+          return ex === n || ex.includes(n) || n.includes(ex);
+        });
       });
+
       section[key] = [...section[key], ...newItems];
     } else if (typeof value === 'string' && value.trim()) {
-      // For text fields, append if there's existing content
-      if (section[key] && section[key].toString().trim()) {
-        section[key] = section[key] + String.fromCharCode(10,10) + value;
-      } else {
+      if (overwriteFields.indexOf(key) !== -1 || !section[key] || !section[key].toString().trim()) {
+        // Overwrite known single-value fields, or any empty field
         section[key] = value;
+      } else {
+        // For other text fields with existing content, append
+        section[key] = section[key] + String.fromCharCode(10,10) + value;
       }
     } else {
       section[key] = value;
@@ -1616,6 +1633,7 @@ function buildCoreForm() {
       <div class="form-group"><label>Brand Name</label><input type="text" data-field="core.name" value="${esc(d.name)}" placeholder="e.g. Acme Co."></div>
       <div class="form-group"><label>Tagline / Strapline</label><input type="text" data-field="core.tagline" value="${esc(d.tagline)}" placeholder="Short memorable line"></div>
     </div>
+    <div class="form-group"><label>Website URL</label><input type="text" data-field="core.website" value="${esc(d.website||'')}" placeholder="https://yourwebsite.com"></div>
     <div class="form-row">
       <div class="form-group"><label>Founded / Year Established</label><input type="text" data-field="core.founded" value="${esc(d.founded)}" placeholder="e.g. 2018"></div>
       <div class="form-group"><label>Industry / Sector</label><input type="text" data-field="core.industry" value="${esc(d.industry)}" placeholder="e.g. B2B SaaS, Retail"></div>
