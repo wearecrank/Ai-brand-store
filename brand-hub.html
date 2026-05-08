@@ -2039,7 +2039,12 @@ function initPanelBehaviours(panel, sec) {
     ];
     for (const [attr, fn] of removeMap) {
       const el = e.target.closest(`[${attr}]`);
-      if (el) { fn(parseInt(el.getAttribute(attr))); refresh(); triggerSave(); return; }
+      if (el) {
+        const idx = parseInt(el.getAttribute(attr));
+        // Defer past any blur/change events that fire when clicking away from a focused input
+        setTimeout(function() { fn(idx); refresh(); triggerSave(); }, 0);
+        return;
+      }
     }
     // Fetch competitor from their website
     const fetchComp = e.target.closest('[data-fetch-competitor]');
@@ -2117,22 +2122,8 @@ function handleArrayInput(e, sec) {
     const val = e.target.dataset[attr.replace('data-','')];
     if (val) { fn(val.split('.')); triggerSave(); return; }
   }
-  var compKey = e.target.dataset.competitors;
-  if (compKey && !compKey.endsWith('.url')) {
-    var pco = compKey.split('.');
-    if (!currentBrand.s4.competitors[pco[0]]) currentBrand.s4.competitors[pco[0]] = {};
-    currentBrand.s4.competitors[pco[0]][pco[1]] = e.target.value;
-    triggerSave(); updateCompleteness('s4');
-  }
   var tkKey = e.target.dataset.testimonials;
   if (tkKey) { var pts=tkKey.split('.'); if(!currentBrand.s7.testimonials[pts[0]])currentBrand.s7.testimonials[pts[0]]={};currentBrand.s7.testimonials[pts[0]][pts[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
-  // Competitor URL field
-  if (e.target.dataset.competitors && e.target.dataset.competitors.endsWith('.url')) {
-    var pcu = e.target.dataset.competitors.split('.');
-    if (!currentBrand.s4.competitors[pcu[0]]) currentBrand.s4.competitors[pcu[0]] = {};
-    currentBrand.s4.competitors[pcu[0]].url = e.target.value;
-    triggerSave();
-  }
   var csKey = e.target.dataset.cases;
   if (csKey) { var pcs=csKey.split('.'); if(!currentBrand.s7.caseStudies[pcs[0]])currentBrand.s7.caseStudies[pcs[0]]={};currentBrand.s7.caseStudies[pcs[0]][pcs[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
   var stKey = e.target.dataset.keystats;
@@ -2794,7 +2785,7 @@ async function exportPPTX() {
   coverStats.forEach(function(st2, i) {
     var y = 0.75 + i * 1.4;
     cover.addText(st2[0], { x:7.6, y:y, w:2.3, h:0.7, fontSize:44, color:WHITE, fontFace:'Arial', bold:true, align:'center', margin:0 });
-    cover.addText(st2[1], { x:7.6, y:y+0.68, w:2.3, h:0.35, fontSize:9, color:'F0E0FF', fontFace:'Arial', align:'center', margin:0 });
+    cover.addText(st2[1], { x:7.6, y:y+0.68, w:2.3, h:0.35, fontSize:9, color:WHITE, fontFace:'Arial', align:'center', margin:0 });
   });
 
   cover.addText('Prepared by Crank  ·  wearecrank.com', { x:0.5, y:5.22, w:6.7, h:0.22, fontSize:8, color:PINK, fontFace:'Arial', align:'left', margin:0 });
@@ -3170,7 +3161,7 @@ async function exportPPTX() {
   slClose.addText('This brand review gives ' + brandName + ' a clear foundation — a shared understanding of purpose, audience, and voice that will inform every piece of content we create together.', { x:0.4, y:3.5, w:5.8, h:0.9, fontSize:11, color:MPINK, fontFace:'Arial', align:'left', margin:0 });
 
   slClose.addText((core.website || (brandName.toLowerCase().replace(/\s/g,'') + '.com')), { x:6.6, y:2.3, w:3.3, h:0.4, fontSize:12, color:NAVY, fontFace:'Arial', bold:true, align:'center', margin:0 });
-  slClose.addText('Crank  ·  wearecrank.com', { x:6.6, y:4.8, w:3.3, h:0.28, fontSize:9, color:'4B0082', fontFace:'Arial', align:'center', margin:0 });
+  slClose.addText('Crank  ·  wearecrank.com', { x:6.6, y:4.8, w:3.3, h:0.28, fontSize:9, color:PINK, fontFace:'Arial', align:'center', margin:0 });
 
   // ── DOWNLOAD ─────────────────────────────────────────────────
   try {
