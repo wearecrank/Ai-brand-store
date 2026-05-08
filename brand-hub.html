@@ -147,8 +147,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .url-fetch-status{font-size:11px;color:var(--text-dim);margin-top:4px;min-height:16px}
 
 @media(max-width:900px){.hamburger{display:flex;}
-  /* Mobile: sidebar slides off-screen, always full width */
-  .sidebar{position:fixed;left:0;top:0;height:100vh;width:240px!important;min-width:240px!important;transform:translateX(0);transition:transform 0.25s ease}
+  /* Mobile: sidebar slides in above the overlay */
+  .sidebar{position:fixed;left:0;top:0;height:100vh;width:240px!important;min-width:240px!important;transform:translateX(0);transition:transform 0.25s ease;z-index:300!important}
   .sidebar.collapsed{width:240px!important;min-width:240px!important;transform:translateX(-100%)}
   .sidebar.collapsed *{visibility:visible!important;pointer-events:auto!important}
   .section-panel{padding:24px 16px}
@@ -654,6 +654,11 @@ document.getElementById('hamburger-btn').addEventListener('click', () => {
 
 document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
 
+// Close sidebar on mobile when a nav item is tapped
+document.getElementById('main-sidebar').addEventListener('click', function(e) {
+  if (isMobile() && e.target.closest('[data-section]')) closeSidebar();
+});
+
 // Start collapsed on mobile, open on desktop
 window.addEventListener('resize', () => {
   const sidebar = document.getElementById('main-sidebar');
@@ -858,6 +863,62 @@ async function suggestNextStep(b) {
     el.innerHTML = '<strong>Next to fill in</strong> ' + emptySections.slice(0,3).map(s => s.label).join(', ');
   }
   el.classList.add('visible');
+}
+
+async function discoverCompetitors() {
+  const statusEl = document.getElementById('discover-comp-status');
+  const btn = document.getElementById('btn-discover-competitors');
+  const website = currentBrand.core && currentBrand.core.website;
+  if (!website) return;
+
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent)">Analysing your website…</span>';
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        section: 's4_discover',
+        url: website,
+        fetchUrl: true
+      })
+    });
+
+    if (!response.ok) throw new Error(await getErrorMessage(response));
+
+    let text = await response.text();
+    text = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    const extracted = JSON.parse(text);
+
+    if (extracted.competitors && extracted.competitors.length > 0) {
+      if (!currentBrand.s4) currentBrand.s4 = { competitors: [] };
+      if (!currentBrand.s4.competitors) currentBrand.s4.competitors = [];
+
+      // Add discovered competitors that aren't already in the list
+      extracted.competitors.forEach(function(c) {
+        const alreadyExists = currentBrand.s4.competitors.some(function(existing) {
+          return existing.name && existing.name.toLowerCase() === (c.name||'').toLowerCase();
+        });
+        if (!alreadyExists && currentBrand.s4.competitors.length < 8) {
+          currentBrand.s4.competitors.push({ name: c.name||'', url: c.url||'', desc: c.desc||'' });
+        }
+      });
+
+      triggerSave();
+      const sec = document.querySelector('.section-panel.active');
+      if (sec) refreshPanel(sec);
+      updateCompleteness('s4');
+      if (statusEl) statusEl.innerHTML = '<span style="color:var(--success)">✓ Found ' + extracted.competitors.length + ' competitors</span>';
+    } else {
+      if (statusEl) statusEl.textContent = 'Could not identify competitors — try importing your website content first.';
+    }
+  } catch(e) {
+    if (statusEl) statusEl.textContent = 'Error: ' + (e.message || 'Something went wrong');
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = '✦ Discover competitors'; }
+  setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 6000);
 }
 
 async function fetchCompetitorInfo(index, url, sec) {
@@ -1740,6 +1801,7 @@ function buildS3Form() {
 function buildS4Form() {
   var d = currentBrand.s4 || {};
   var comps = d.competitors || [];
+  var brandWebsite = (currentBrand.core && currentBrand.core.website) || '';
   var compsHTML = comps.map(function(c,i) {
     return '<div class="repeatable-item">' +
       '<div class="item-header"><span class="item-number">Competitor ' + (i+1) + '</span><button class="btn-remove" data-remove-competitor="' + i + '">x</button></div>' +
@@ -1755,7 +1817,19 @@ function buildS4Form() {
     '</div>';
   }).join('');
 
+  var discoverSection = brandWebsite
+    ? '<div style="background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px">' +
+        '<div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px">Discover competitors with AI</div>' +
+        '<div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Claude will analyse <strong>' + esc(brandWebsite) + '</strong> and suggest who the main competitors are likely to be.</div>' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<button class="btn-import" id="btn-discover-competitors" style="font-size:11px;padding:6px 14px">✦ Discover competitors</button>' +
+          '<span id="discover-comp-status" style="font-size:11px;color:var(--text-dim)"></span>' +
+        '</div>' +
+      '</div>'
+    : '<div style="font-size:12px;color:var(--text-dim);background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">Add your website URL in Organisation Info and we can automatically suggest competitors.</div>';
+
   return '<div class="form-group"><label>Competitors (up to 8)</label>' +
+    discoverSection +
     '<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Add each competitor, paste their website URL and click Fetch to auto-populate their name and description.</div>' +
     '<div class="repeatable-list" id="competitors-list">' + compsHTML + '</div>' +
     (comps.length < 8 ? '<button class="btn-add" id="btn-add-competitor">+ Add competitor</button>' : '') +
@@ -1793,6 +1867,12 @@ function buildS6Form() {
       <div class="form-group"><label>Where They Spend Time</label><input type="text" data-personas="${i}.channels" value="${esc(p.channels)}" placeholder="e.g. Instagram, LinkedIn"></div>
     </div>`).join('');
   return `
+    <div class="form-row">
+      <div class="form-group"><label>Target Industries</label><input type="text" data-field="s6.targetIndustries" value="${esc(d.targetIndustries)}" placeholder="e.g. SaaS, Financial Services, Retail"></div>
+      <div class="form-group"><label>Company Size</label><input type="text" data-field="s6.companySize" value="${esc(d.companySize)}" placeholder="e.g. 50–500 employees, SME, Enterprise"></div>
+    </div>
+    <div class="form-group"><label>Annual Revenue Range</label><input type="text" data-field="s6.revenueRange" value="${esc(d.revenueRange)}" placeholder="e.g. £1M–£20M turnover"></div>
+    <div class="divider"></div>
     <div class="form-group">
       <label>Audience Personas (up to 4)</label>
       <div class="repeatable-list" id="personas-list">${personasHTML}</div>
@@ -1910,6 +1990,7 @@ function initPanelBehaviours(panel, sec) {
       'btn-add-colour': () => { currentBrand.s2.colours.push({name:'',hex:'#000000',role:''}); refresh(); },
       'btn-add-product': () => { currentBrand.s3.items.push({name:'',category:'product',desc:'',features:[],price:'',url:''}); refresh(); },
       'btn-add-competitor': () => { currentBrand.s4.competitors.push({name:'',url:'',desc:''}); refresh(); },
+      'btn-discover-competitors': () => { discoverCompetitors(); },
 
       'btn-add-persona': () => { currentBrand.s6.personas.push({name:'',age:'',location:'',needs:'',motivations:'',channels:''}); refresh(); },
       'btn-add-testimonial': () => { if(!currentBrand.s7.testimonials)currentBrand.s7.testimonials=[]; currentBrand.s7.testimonials.push({quote:'',name:'',company:'',result:''}); refresh(); },
