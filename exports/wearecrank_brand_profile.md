@@ -1,6 +1,6 @@
 # Organisation Profile: Wearecrank
 
-*Exported from Brand Hub — 1 May 2026*
+*Exported from Brand Hub — 9 May 2026*
 
 # Organisation Profile: Wearecrank
 
@@ -144,6 +144,12 @@ B2C ecommerce marketing services
 
 ### WhatsApp Marketing *(service)*
 Marketing and communication services via WhatsApp platform
+
+---
+
+## Competition
+
+**Key Competitors:** Digitas, Waveform, Brainlabs, Tinyclues, Mando, Littledata, Paid.com, Tinuiti
 
 ---
 
