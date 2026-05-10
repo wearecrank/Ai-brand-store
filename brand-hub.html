@@ -2784,20 +2784,24 @@ async function exportPPTX() {
       sl4.addText(st(s2data.toneDesc, 280), { x:0.5, y:1.82, w:4.5, h:0.88, fontSize:10.5, color:DKGREY, fontFace:'Arial', margin:0 });
     }
 
+    var typoY = 2.82;
     if (s2data.toneWords && s2data.toneWords.length) {
       sl4.addText('KEY WORDS', { x:0.5, y:2.82, w:4.5, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      var kwCount = Math.min(s2data.toneWords.length, 6);
+      var kwRows = Math.ceil(kwCount / 3);
       s2data.toneWords.slice(0,6).forEach(function(w, i) {
         var col2 = i % 3, row = Math.floor(i / 3);
         var kx = 0.5 + col2 * 1.55, ky = 3.06 + row * 0.44;
         sl4.addShape(pres.shapes.RECTANGLE, { x:kx, y:ky, w:1.42, h:0.34, fill:{color:LGREY}, line:{color:'E5E7EB'} });
         sl4.addText(st(w), { x:kx, y:ky, w:1.42, h:0.34, fontSize:9, color:NAVY, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
       });
+      typoY = 3.06 + kwRows * 0.44 + 0.2;
     }
 
     if (s2data.primaryFont || s2data.secondaryFont) {
       var fontStr = [s2data.primaryFont && ('Primary: ' + s2data.primaryFont), s2data.secondaryFont && ('Secondary: ' + s2data.secondaryFont)].filter(Boolean).join('  ·  ');
-      sl4.addText('TYPOGRAPHY', { x:0.5, y:3.66, w:4.5, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
-      sl4.addText(st(fontStr), { x:0.5, y:3.9, w:4.5, h:0.26, fontSize:10, color:DKGREY, fontFace:'Arial', margin:0 });
+      sl4.addText('TYPOGRAPHY', { x:0.5, y:typoY, w:4.5, h:0.2, fontSize:7, color:GREY, fontFace:'Arial', bold:true, charSpacing:2, margin:0 });
+      sl4.addText(st(fontStr), { x:0.5, y:typoY+0.24, w:4.5, h:0.36, fontSize:10, color:DKGREY, fontFace:'Arial', margin:0 });
     }
 
     // Right: colour swatches
