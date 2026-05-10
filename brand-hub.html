@@ -147,8 +147,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .url-fetch-status{font-size:11px;color:var(--text-dim);margin-top:4px;min-height:16px}
 
 @media(max-width:900px){.hamburger{display:flex;}
-  /* Mobile: sidebar slides off-screen, always full width */
-  .sidebar{position:fixed;left:0;top:0;height:100vh;width:240px!important;min-width:240px!important;transform:translateX(0);transition:transform 0.25s ease}
+  /* Mobile: sidebar slides in above the overlay */
+  .sidebar{position:fixed;left:0;top:0;height:100vh;width:240px!important;min-width:240px!important;transform:translateX(0);transition:transform 0.25s ease;z-index:300!important}
   .sidebar.collapsed{width:240px!important;min-width:240px!important;transform:translateX(-100%)}
   .sidebar.collapsed *{visibility:visible!important;pointer-events:auto!important}
   .section-panel{padding:24px 16px}
@@ -307,6 +307,28 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
 .hidden{display:none!important}
 .divider{height:1px;background:var(--card-border);margin:24px 0}
 
+/* ── GITHUB MODAL ── */
+.github-modal{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:32px;width:480px;max-width:92vw}
+.github-modal h3{font-family:var(--font-display);font-size:22px;margin-bottom:6px;color:var(--text)}
+.github-modal .modal-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.5}
+.github-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.github-field label{font-size:11px;font-weight:500;color:var(--text-muted);letter-spacing:0.3px;text-transform:uppercase}
+.github-field input{background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-mono);font-size:13px;padding:9px 12px;outline:none;transition:border-color var(--transition);width:100%}
+.github-field input:focus{border-color:var(--accent-border);box-shadow:0 0 0 2px var(--accent-soft)}
+.github-field input::placeholder{color:var(--text-dim);font-family:var(--font-body)}
+.github-hint{font-size:11px;color:var(--text-dim);margin-top:3px;line-height:1.5}
+.github-hint a{color:var(--accent);text-decoration:none}
+.github-hint a:hover{text-decoration:underline}
+.github-status{display:flex;align-items:center;gap:8px;font-size:12px;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:16px;display:none}
+.github-status.info{background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent)}
+.github-status.success{background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.3);color:#27ae60}
+.github-status.error{background:var(--danger-soft);border:1px solid rgba(192,57,43,0.3);color:#e87070}
+.github-status.visible{display:flex}
+.github-spinner{width:13px;height:13px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;opacity:0.7}
+.github-modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.btn-github-sidebar{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--card-border);color:var(--text-muted);font-family:var(--font-body);font-size:11px;font-weight:500;cursor:pointer;transition:all var(--transition);white-space:nowrap;flex-shrink:0}
+.btn-github-sidebar:hover{background:var(--surface2);color:var(--text);border-color:var(--accent-border)}
+
 @media print {
   .sidebar, .section-panels .import-bar, .btn, .btn-remove, .btn-add,
   .completeness-badge, .save-indicator, #hamburger-btn { display: none !important; }
@@ -402,6 +424,9 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
       <div style="display:flex;gap:6px">
         <button class="btn btn-secondary btn-full" id="btn-export-md" style="flex:1">↓ Export all to AI</button>
         <button class="copy-md-btn" id="btn-copy-md" title="Copy to clipboard">⎘</button>
+        <button class="btn-github-sidebar" id="btn-export-github" title="Push to GitHub">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        </button>
       </div>
       <button class="btn btn-secondary btn-full" id="btn-export-pdf">↓ Export as PowerPoint</button>
       <button class="btn btn-primary btn-full" id="btn-present">▶ Present</button>
@@ -439,6 +464,14 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
       <span class="admin-badge">Admin</span>
       <button class="btn btn-secondary" id="btn-admin-back">← Back</button>
     </div>
+  </div>
+
+  <div class="admin-card" style="margin-bottom:16px">
+    <h3 style="margin-bottom:4px">GitHub Integration</h3>
+    <p style="font-size:13px;color:var(--text-muted);font-weight:300;line-height:1.6">
+      GitHub credentials are stored securely as environment variables inside the Cloudflare Worker — not in the database or the browser.
+      To update them, go to your Cloudflare dashboard → Workers → your worker → Settings → Variables, and set <code style="font-family:var(--font-mono);font-size:12px;color:var(--accent)">GITHUB_TOKEN</code> and <code style="font-family:var(--font-mono);font-size:12px;color:var(--accent)">GITHUB_REPO</code>.
+    </p>
   </div>
 
   <div class="admin-card">
@@ -499,6 +532,19 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btn-cancel-reset">Cancel</button>
       <button class="btn btn-primary" id="btn-confirm-reset">Save PIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ GITHUB EXPORT MODAL ════════ -->
+<div id="modal-github" class="modal-overlay hidden">
+  <div class="github-modal">
+    <h3>Push to GitHub</h3>
+    <p class="modal-sub">Save this brand profile into the <code style="font-family:var(--font-mono);font-size:12px;color:var(--accent)">exports/</code> folder of your connected repository.</p>
+    <div id="github-status" class="github-status"></div>
+    <div class="github-modal-actions">
+      <button class="btn btn-ghost" id="btn-github-cancel">Cancel</button>
+      <button class="btn btn-primary" id="btn-github-push">Push to GitHub</button>
     </div>
   </div>
 </div>
@@ -607,6 +653,11 @@ document.getElementById('hamburger-btn').addEventListener('click', () => {
 });
 
 document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
+
+// Close sidebar on mobile when a nav item is tapped
+document.getElementById('main-sidebar').addEventListener('click', function(e) {
+  if (isMobile() && e.target.closest('[data-section]')) closeSidebar();
+});
 
 // Start collapsed on mobile, open on desktop
 window.addEventListener('resize', () => {
@@ -814,6 +865,62 @@ async function suggestNextStep(b) {
   el.classList.add('visible');
 }
 
+async function discoverCompetitors() {
+  const statusEl = document.getElementById('discover-comp-status');
+  const btn = document.getElementById('btn-discover-competitors');
+  const website = currentBrand.core && currentBrand.core.website;
+  if (!website) return;
+
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent)">Analysing your website…</span>';
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        section: 's4_discover',
+        url: website,
+        fetchUrl: true
+      })
+    });
+
+    if (!response.ok) throw new Error(await getErrorMessage(response));
+
+    let text = await response.text();
+    text = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    const extracted = JSON.parse(text);
+
+    if (extracted.competitors && extracted.competitors.length > 0) {
+      if (!currentBrand.s4) currentBrand.s4 = { competitors: [] };
+      if (!currentBrand.s4.competitors) currentBrand.s4.competitors = [];
+
+      // Add discovered competitors that aren't already in the list
+      extracted.competitors.forEach(function(c) {
+        const alreadyExists = currentBrand.s4.competitors.some(function(existing) {
+          return existing.name && existing.name.toLowerCase() === (c.name||'').toLowerCase();
+        });
+        if (!alreadyExists && currentBrand.s4.competitors.length < 8) {
+          currentBrand.s4.competitors.push({ name: c.name||'', url: c.url||'', desc: c.desc||'' });
+        }
+      });
+
+      triggerSave();
+      var s4sec = SECTIONS.find(function(s){ return s.id === 's4'; });
+      if (s4sec) refreshPanel(s4sec);
+      updateCompleteness('s4');
+      if (statusEl) statusEl.innerHTML = '<span style="color:var(--success)">✓ Found ' + extracted.competitors.length + ' competitors</span>';
+    } else {
+      if (statusEl) statusEl.textContent = 'Could not identify competitors — try importing your website content first.';
+    }
+  } catch(e) {
+    if (statusEl) statusEl.textContent = 'Error: ' + (e.message || 'Something went wrong');
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = '✦ Discover competitors'; }
+  setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 6000);
+}
+
 async function fetchCompetitorInfo(index, url, sec) {
   const statusEl = document.getElementById('comp-fetch-status-' + index);
   if (!statusEl) return;
@@ -974,26 +1081,49 @@ function mergeIntoSection(secId, extracted) {
   if (!currentBrand[secId]) currentBrand[secId] = {};
   const section = currentBrand[secId];
 
+  // Fields that should NEVER overwrite if already set by the user
+  const neverOverwrite = ['name', 'tagline', 'logo'];
+
+  // Fields that should overwrite rather than append when re-imported
+  const overwriteFields = ['summary','targetIndustries','companySize','revenueRange',
+    'toneDesc','primaryFont','secondaryFont','fontNotes','heroStatement','elevatorPitch',
+    'keyMessages','neverSay','conversionGoal','salesCycle','dealValue','decisionMakers',
+    'seoKeywords','contentPillars','postingFrequency','paidChannels'];
+
   Object.entries(extracted).forEach(([key, value]) => {
     if (value === null || value === undefined || value === '') return;
 
+    // Never overwrite identity fields if already populated by the user
+    if (neverOverwrite.indexOf(key) !== -1 && section[key] && section[key].toString().trim()) return;
+
     if (Array.isArray(value)) {
       if (!Array.isArray(section[key])) section[key] = [];
-      // Deduplicate by name to avoid duplicates on multiple URL scans
+
+      // Deduplicate by name — normalise to lowercase, also catch near-duplicates
+      // by checking if existing array already has items with very similar names
       var existingNames = section[key].map(function(item) {
-        return item && item.name ? item.name.toLowerCase().trim() : '';
-      });
+        return item && item.name ? item.name.toLowerCase().trim() : null;
+      }).filter(Boolean);
+
       var newItems = value.filter(function(item) {
-        if (!item || !item.name) return true;
-        return existingNames.indexOf(item.name.toLowerCase().trim()) === -1;
+        if (!item) return false;
+        // If item has no name, only add if the array is empty
+        if (!item.name || !item.name.trim()) return section[key].length === 0;
+        var n = item.name.toLowerCase().trim();
+        // Skip if exact match or very close match already exists
+        return !existingNames.some(function(ex) {
+          return ex === n || ex.includes(n) || n.includes(ex);
+        });
       });
+
       section[key] = [...section[key], ...newItems];
     } else if (typeof value === 'string' && value.trim()) {
-      // For text fields, append if there's existing content
-      if (section[key] && section[key].toString().trim()) {
-        section[key] = section[key] + String.fromCharCode(10,10) + value;
-      } else {
+      if (overwriteFields.indexOf(key) !== -1 || !section[key] || !section[key].toString().trim()) {
+        // Overwrite known single-value fields, or any empty field
         section[key] = value;
+      } else {
+        // For other text fields with existing content, append
+        section[key] = section[key] + String.fromCharCode(10,10) + value;
       }
     } else {
       section[key] = value;
@@ -1005,6 +1135,7 @@ function mergeIntoSection(secId, extracted) {
 // LOGIN
 // ════════════════════════════════════════════════════════════
 let pinEntry = '';
+let loginInProgress = false;
 
 function updatePinDots() {
   for (let i = 0; i < 4; i++) {
@@ -1063,6 +1194,8 @@ async function attemptLogin() {
   const name = document.getElementById('login-name').value.trim().toLowerCase();
   const pin = pinEntry;
   if (!name || pin.length < 4) return;
+  if (loginInProgress) return; // Prevent double-tap firing two requests
+  loginInProgress = true;
 
   // Hash the PIN before checking against the database
   const pinHash = await hashPin(pin);
@@ -1073,6 +1206,8 @@ async function attemptLogin() {
     .ilike('name', name)
     .eq('pin_hash', pinHash)
     .single();
+
+  loginInProgress = false;
 
   if (error || !data) {
     document.getElementById('login-error').style.display = 'block';
@@ -1105,6 +1240,7 @@ document.getElementById('btn-logout').addEventListener('click', () => {
   currentUser = null;
   currentBrand = null;
   pinEntry = '';
+  loginInProgress = false;
   updatePinDots();
   document.getElementById('login-name').value = '';
   document.getElementById('login-error').style.display = 'none';
@@ -1503,6 +1639,7 @@ function buildCoreForm() {
       <div class="form-group"><label>Brand Name</label><input type="text" data-field="core.name" value="${esc(d.name)}" placeholder="e.g. Acme Co."></div>
       <div class="form-group"><label>Tagline / Strapline</label><input type="text" data-field="core.tagline" value="${esc(d.tagline)}" placeholder="Short memorable line"></div>
     </div>
+    <div class="form-group"><label>Website URL</label><input type="text" data-field="core.website" value="${esc(d.website||'')}" placeholder="https://yourwebsite.com"></div>
     <div class="form-row">
       <div class="form-group"><label>Founded / Year Established</label><input type="text" data-field="core.founded" value="${esc(d.founded)}" placeholder="e.g. 2018"></div>
       <div class="form-group"><label>Industry / Sector</label><input type="text" data-field="core.industry" value="${esc(d.industry)}" placeholder="e.g. B2B SaaS, Retail"></div>
@@ -1688,6 +1825,7 @@ function buildS3Form() {
 function buildS4Form() {
   var d = currentBrand.s4 || {};
   var comps = d.competitors || [];
+  var brandWebsite = (currentBrand.core && currentBrand.core.website) || '';
   var compsHTML = comps.map(function(c,i) {
     return '<div class="repeatable-item">' +
       '<div class="item-header"><span class="item-number">Competitor ' + (i+1) + '</span><button class="btn-remove" data-remove-competitor="' + i + '">x</button></div>' +
@@ -1703,7 +1841,19 @@ function buildS4Form() {
     '</div>';
   }).join('');
 
+  var discoverSection = brandWebsite
+    ? '<div style="background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px">' +
+        '<div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px">Discover competitors with AI</div>' +
+        '<div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Claude will analyse <strong>' + esc(brandWebsite) + '</strong> and suggest who the main competitors are likely to be.</div>' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<button class="btn-import" id="btn-discover-competitors" style="font-size:11px;padding:6px 14px">✦ Discover competitors</button>' +
+          '<span id="discover-comp-status" style="font-size:11px;color:var(--text-dim)"></span>' +
+        '</div>' +
+      '</div>'
+    : '<div style="font-size:12px;color:var(--text-dim);background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">Add your website URL in Organisation Info and we can automatically suggest competitors.</div>';
+
   return '<div class="form-group"><label>Competitors (up to 8)</label>' +
+    discoverSection +
     '<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Add each competitor, paste their website URL and click Fetch to auto-populate their name and description.</div>' +
     '<div class="repeatable-list" id="competitors-list">' + compsHTML + '</div>' +
     (comps.length < 8 ? '<button class="btn-add" id="btn-add-competitor">+ Add competitor</button>' : '') +
@@ -1741,6 +1891,12 @@ function buildS6Form() {
       <div class="form-group"><label>Where They Spend Time</label><input type="text" data-personas="${i}.channels" value="${esc(p.channels)}" placeholder="e.g. Instagram, LinkedIn"></div>
     </div>`).join('');
   return `
+    <div class="form-row">
+      <div class="form-group"><label>Target Industries</label><input type="text" data-field="s6.targetIndustries" value="${esc(d.targetIndustries)}" placeholder="e.g. SaaS, Financial Services, Retail"></div>
+      <div class="form-group"><label>Company Size</label><input type="text" data-field="s6.companySize" value="${esc(d.companySize)}" placeholder="e.g. 50–500 employees, SME, Enterprise"></div>
+    </div>
+    <div class="form-group"><label>Annual Revenue Range</label><input type="text" data-field="s6.revenueRange" value="${esc(d.revenueRange)}" placeholder="e.g. £1M–£20M turnover"></div>
+    <div class="divider"></div>
     <div class="form-group">
       <label>Audience Personas (up to 4)</label>
       <div class="repeatable-list" id="personas-list">${personasHTML}</div>
@@ -1858,6 +2014,7 @@ function initPanelBehaviours(panel, sec) {
       'btn-add-colour': () => { currentBrand.s2.colours.push({name:'',hex:'#000000',role:''}); refresh(); },
       'btn-add-product': () => { currentBrand.s3.items.push({name:'',category:'product',desc:'',features:[],price:'',url:''}); refresh(); },
       'btn-add-competitor': () => { currentBrand.s4.competitors.push({name:'',url:'',desc:''}); refresh(); },
+      'btn-discover-competitors': () => { discoverCompetitors(); },
 
       'btn-add-persona': () => { currentBrand.s6.personas.push({name:'',age:'',location:'',needs:'',motivations:'',channels:''}); refresh(); },
       'btn-add-testimonial': () => { if(!currentBrand.s7.testimonials)currentBrand.s7.testimonials=[]; currentBrand.s7.testimonials.push({quote:'',name:'',company:'',result:''}); refresh(); },
@@ -1888,7 +2045,12 @@ function initPanelBehaviours(panel, sec) {
     ];
     for (const [attr, fn] of removeMap) {
       const el = e.target.closest(`[${attr}]`);
-      if (el) { fn(parseInt(el.getAttribute(attr))); refresh(); triggerSave(); return; }
+      if (el) {
+        const idx = parseInt(el.getAttribute(attr));
+        // Defer past any blur/change events that fire when clicking away from a focused input
+        setTimeout(function() { fn(idx); refresh(); triggerSave(); }, 0);
+        return;
+      }
     }
     // Fetch competitor from their website
     const fetchComp = e.target.closest('[data-fetch-competitor]');
@@ -1966,22 +2128,8 @@ function handleArrayInput(e, sec) {
     const val = e.target.dataset[attr.replace('data-','')];
     if (val) { fn(val.split('.')); triggerSave(); return; }
   }
-  var compKey = e.target.dataset.competitors;
-  if (compKey && !compKey.endsWith('.url')) {
-    var pco = compKey.split('.');
-    if (!currentBrand.s4.competitors[pco[0]]) currentBrand.s4.competitors[pco[0]] = {};
-    currentBrand.s4.competitors[pco[0]][pco[1]] = e.target.value;
-    triggerSave(); updateCompleteness('s4');
-  }
   var tkKey = e.target.dataset.testimonials;
   if (tkKey) { var pts=tkKey.split('.'); if(!currentBrand.s7.testimonials[pts[0]])currentBrand.s7.testimonials[pts[0]]={};currentBrand.s7.testimonials[pts[0]][pts[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
-  // Competitor URL field
-  if (e.target.dataset.competitors && e.target.dataset.competitors.endsWith('.url')) {
-    var pcu = e.target.dataset.competitors.split('.');
-    if (!currentBrand.s4.competitors[pcu[0]]) currentBrand.s4.competitors[pcu[0]] = {};
-    currentBrand.s4.competitors[pcu[0]].url = e.target.value;
-    triggerSave();
-  }
   var csKey = e.target.dataset.cases;
   if (csKey) { var pcs=csKey.split('.'); if(!currentBrand.s7.caseStudies[pcs[0]])currentBrand.s7.caseStudies[pcs[0]]={};currentBrand.s7.caseStudies[pcs[0]][pcs[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
   var stKey = e.target.dataset.keystats;
@@ -2620,11 +2768,16 @@ async function exportPPTX() {
     // by using the primary instead for text, but keep accent for bg accents
     var accentTextColor = isHexLight(a) ? p : 'FFFFFF';
 
-    return { primary: p, accent: a, accentText: accentTextColor };
+    // Build full palette from all brand colours, min 4 for cycling
+    var palette = cols.map(function(c){ return c.hex.replace('#',''); });
+    var crankFallback = ['19252F','53AEEF','85C515','FDBD17'];
+    while (palette.length < 4) { palette.push(crankFallback[palette.length % crankFallback.length]); }
+    return { primary: p, accent: a, accentText: accentTextColor, palette: palette };
   }
 
   var BC = getBrandColours();
   var NAVY   = BC.primary;
+  var PALETTE = BC.palette;
   var PINK   = BC.accent;
   var BLACK  = '00001E';
   var WHITE  = 'FFFFFF';
@@ -2700,10 +2853,10 @@ async function exportPPTX() {
   coverStats.forEach(function(st2, i) {
     var y = 0.75 + i * 1.4;
     cover.addText(st2[0], { x:7.6, y:y, w:2.3, h:0.7, fontSize:44, color:ON_PINK, fontFace:'Arial', bold:true, align:'center', margin:0 });
-    cover.addText(st2[1], { x:7.6, y:y+0.68, w:2.3, h:0.35, fontSize:9, color:isHexLight(PINK)?'333333':'F0E0FF', fontFace:'Arial', align:'center', margin:0 });
+    cover.addText(st2[1], { x:7.6, y:y+0.68, w:2.3, h:0.35, fontSize:9, color:isHexLight(PINK)?ON_NAVY:'F0E0FF', fontFace:'Arial', align:'center', margin:0 });
   });
 
-  cover.addText('Prepared by Crank  ·  wearecrank.com', { x:0.5, y:5.22, w:6.7, h:0.22, fontSize:8, color:'6B67B0', fontFace:'Arial', align:'left', margin:0 });
+  cover.addText('Prepared by Crank  ·  wearecrank.com', { x:0.5, y:5.22, w:6.7, h:0.22, fontSize:8, color:GREY, fontFace:'Arial', align:'left', margin:0 });
 
   // ── SLIDE 2: ORG OVERVIEW ───────────────────────────────────
   if (core.overview || core.businessType) {
@@ -2831,7 +2984,7 @@ async function exportPPTX() {
 
     var pCols = Math.min(prods.length, 3);
     var pCardW = (9.05 - (pCols - 1) * 0.14) / pCols;
-    var badgeCols = [NAVY, '6D28D9', '0369A1', NAVY, '6D28D9', '0369A1'];
+    var badgeCols = PALETTE;
 
     prods.slice(0,6).forEach(function(p, i) {
       var col2 = i % pCols, row = Math.floor(i / pCols);
@@ -2898,7 +3051,7 @@ async function exportPPTX() {
     sectionLabel(sl7, 'SOCIAL PROOF');
     slideTitle(sl7, 'What We Have Achieved');
 
-    var statCols2 = [NAVY, PINK, '6B7280', NAVY];
+    var statCols2 = PALETTE;
     if (keyStats.length) {
       var sNum = Math.min(keyStats.length, 3);
       var sW = (9.05 - (sNum - 1) * 0.14) / sNum;
@@ -3058,10 +3211,10 @@ async function exportPPTX() {
   } else {
     var itemY2 = 1.28;
     emptySects.forEach(function(secId) {
-      slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:9.05, h:0.72, fill:{color:'1A1A3E'}, line:{color:NAVY} });
+      slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:9.05, h:0.72, fill:{color:BLACK}, line:{color:NAVY} });
       slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:0.06, h:0.72, fill:{color:PINK}, line:{color:PINK} });
       slFinal.addText(st(SECTION_LABELS2[secId] || secId), { x:0.7, y:itemY2+0.1, w:6, h:0.28, fontSize:13, color:WHITE, fontFace:'Arial', bold:true, margin:0 });
-      slFinal.addText('No information added yet', { x:0.7, y:itemY2+0.42, w:6, h:0.22, fontSize:9, color:'8888AA', fontFace:'Arial', italic:true, margin:0 });
+      slFinal.addText('No information added yet', { x:0.7, y:itemY2+0.42, w:6, h:0.22, fontSize:9, color:GREY, fontFace:'Arial', italic:true, margin:0 });
       slFinal.addShape(pres.shapes.RECTANGLE, { x:8.35, y:itemY2+0.17, w:1.0, h:0.36, fill:{color:PINK}, line:{color:PINK} });
       slFinal.addText('PENDING', { x:8.35, y:itemY2+0.17, w:1.0, h:0.36, fontSize:7.5, color:'00001E', fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
       itemY2 += 0.82;
@@ -3080,7 +3233,7 @@ async function exportPPTX() {
   slClose.addText('This brand review gives ' + brandName + ' a clear foundation — a shared understanding of purpose, audience, and voice that will inform every piece of content we create together.', { x:0.4, y:3.5, w:5.8, h:0.9, fontSize:11, color:isHexLight(NAVY)?GREY:MPINK, fontFace:'Arial', align:'left', margin:0 });
 
   slClose.addText((core.website || (brandName.toLowerCase().replace(/\s/g,'') + '.com')), { x:6.6, y:2.3, w:3.3, h:0.4, fontSize:12, color:ON_PINK, fontFace:'Arial', bold:true, align:'center', margin:0 });
-  slClose.addText('Crank  ·  wearecrank.com', { x:6.6, y:4.8, w:3.3, h:0.28, fontSize:9, color:'4B0082', fontFace:'Arial', align:'center', margin:0 });
+  slClose.addText('Crank  ·  wearecrank.com', { x:6.6, y:4.8, w:3.3, h:0.28, fontSize:9, color:GREY, fontFace:'Arial', align:'center', margin:0 });
 
   // ── DOWNLOAD ─────────────────────────────────────────────────
   try {
@@ -3091,6 +3244,8 @@ async function exportPPTX() {
   }
   if (pptxBtn) { pptxBtn.textContent = origText; pptxBtn.disabled = false; }
 }
+
+
 
 
 
@@ -3167,6 +3322,79 @@ document.getElementById('btn-add-user').addEventListener('click', async () => {
   document.getElementById('new-user-pin').value = '';
   loadAdminUsers();
 });
+
+// ════════════════════════════════════════════════════════════
+// GITHUB EXPORT — all credentials stored server-side in Cloudflare Worker
+// The browser never sees the token or repo name
+// ════════════════════════════════════════════════════════════
+
+function githubShowModal() {
+  const statusEl = document.getElementById('github-status');
+  statusEl.className = 'github-status';
+  statusEl.textContent = '';
+  document.getElementById('modal-github').classList.remove('hidden');
+}
+
+function githubSetStatus(type, message, showSpinner) {
+  const el = document.getElementById('github-status');
+  el.className = 'github-status visible ' + type;
+  el.innerHTML = (showSpinner ? '<div class="github-spinner"></div>' : '') + '<span>' + message + '</span>';
+}
+
+async function githubPushFile() {
+  const b = currentBrand;
+  const brandName = b.core?.name || 'brand';
+  const fileName = brandName.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_brand_profile.md';
+  const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  let md = '# Organisation Profile: ' + brandName + '\n\n';
+  md += '*Exported from Brand Hub — ' + dateStr + '*\n\n';
+  md += brandToMarkdown(b);
+
+  const pushBtn = document.getElementById('btn-github-push');
+  pushBtn.disabled = true;
+  githubSetStatus('info', 'Pushing to GitHub…', true);
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'github_push',
+        githubFile: fileName,
+        githubContent: md
+      })
+    });
+
+    const result = await res.json();
+
+    if (res.ok && result.success) {
+      githubSetStatus('success',
+        '✓ ' + (result.updated ? 'Updated' : 'Created') + ' — <a href="' + result.url +
+        '" target="_blank" rel="noopener" style="color:inherit;font-weight:600">' +
+        result.path + ' ↗</a>'
+      );
+    } else {
+      githubSetStatus('error', result.message || 'Something went wrong. Please try again.');
+    }
+  } catch(e) {
+    githubSetStatus('error', 'Network error. Check your connection and try again.');
+  }
+
+  pushBtn.disabled = false;
+}
+
+document.getElementById('btn-export-github').addEventListener('click', function() {
+  if (!currentBrand) { alert('Please open a brand first.'); return; }
+  githubShowModal();
+});
+document.getElementById('btn-github-cancel').addEventListener('click', function() {
+  document.getElementById('modal-github').classList.add('hidden');
+});
+document.getElementById('modal-github').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.add('hidden');
+});
+document.getElementById('btn-github-push').addEventListener('click', githubPushFile);
 </script>
 </body>
 </html>
