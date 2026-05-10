@@ -147,8 +147,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);height:
 .url-fetch-status{font-size:11px;color:var(--text-dim);margin-top:4px;min-height:16px}
 
 @media(max-width:900px){.hamburger{display:flex;}
-  /* Mobile: sidebar slides in above the overlay */
-  .sidebar{position:fixed;left:0;top:0;height:100vh;width:240px!important;min-width:240px!important;transform:translateX(0);transition:transform 0.25s ease;z-index:300!important}
+  /* Mobile: sidebar slides off-screen, always full width */
+  .sidebar{position:fixed;left:0;top:0;height:100vh;width:240px!important;min-width:240px!important;transform:translateX(0);transition:transform 0.25s ease}
   .sidebar.collapsed{width:240px!important;min-width:240px!important;transform:translateX(-100%)}
   .sidebar.collapsed *{visibility:visible!important;pointer-events:auto!important}
   .section-panel{padding:24px 16px}
@@ -307,28 +307,6 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
 .hidden{display:none!important}
 .divider{height:1px;background:var(--card-border);margin:24px 0}
 
-/* ── GITHUB MODAL ── */
-.github-modal{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:32px;width:480px;max-width:92vw}
-.github-modal h3{font-family:var(--font-display);font-size:22px;margin-bottom:6px;color:var(--text)}
-.github-modal .modal-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.5}
-.github-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.github-field label{font-size:11px;font-weight:500;color:var(--text-muted);letter-spacing:0.3px;text-transform:uppercase}
-.github-field input{background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-mono);font-size:13px;padding:9px 12px;outline:none;transition:border-color var(--transition);width:100%}
-.github-field input:focus{border-color:var(--accent-border);box-shadow:0 0 0 2px var(--accent-soft)}
-.github-field input::placeholder{color:var(--text-dim);font-family:var(--font-body)}
-.github-hint{font-size:11px;color:var(--text-dim);margin-top:3px;line-height:1.5}
-.github-hint a{color:var(--accent);text-decoration:none}
-.github-hint a:hover{text-decoration:underline}
-.github-status{display:flex;align-items:center;gap:8px;font-size:12px;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:16px;display:none}
-.github-status.info{background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent)}
-.github-status.success{background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.3);color:#27ae60}
-.github-status.error{background:var(--danger-soft);border:1px solid rgba(192,57,43,0.3);color:#e87070}
-.github-status.visible{display:flex}
-.github-spinner{width:13px;height:13px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;opacity:0.7}
-.github-modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
-.btn-github-sidebar{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--card-border);color:var(--text-muted);font-family:var(--font-body);font-size:11px;font-weight:500;cursor:pointer;transition:all var(--transition);white-space:nowrap;flex-shrink:0}
-.btn-github-sidebar:hover{background:var(--surface2);color:var(--text);border-color:var(--accent-border)}
-
 @media print {
   .sidebar, .section-panels .import-bar, .btn, .btn-remove, .btn-add,
   .completeness-badge, .save-indicator, #hamburger-btn { display: none !important; }
@@ -424,9 +402,6 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
       <div style="display:flex;gap:6px">
         <button class="btn btn-secondary btn-full" id="btn-export-md" style="flex:1">↓ Export all to AI</button>
         <button class="copy-md-btn" id="btn-copy-md" title="Copy to clipboard">⎘</button>
-        <button class="btn-github-sidebar" id="btn-export-github" title="Push to GitHub">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-        </button>
       </div>
       <button class="btn btn-secondary btn-full" id="btn-export-pdf">↓ Export as PowerPoint</button>
       <button class="btn btn-primary btn-full" id="btn-present">▶ Present</button>
@@ -464,14 +439,6 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
       <span class="admin-badge">Admin</span>
       <button class="btn btn-secondary" id="btn-admin-back">← Back</button>
     </div>
-  </div>
-
-  <div class="admin-card" style="margin-bottom:16px">
-    <h3 style="margin-bottom:4px">GitHub Integration</h3>
-    <p style="font-size:13px;color:var(--text-muted);font-weight:300;line-height:1.6">
-      GitHub credentials are stored securely as environment variables inside the Cloudflare Worker — not in the database or the browser.
-      To update them, go to your Cloudflare dashboard → Workers → your worker → Settings → Variables, and set <code style="font-family:var(--font-mono);font-size:12px;color:var(--accent)">GITHUB_TOKEN</code> and <code style="font-family:var(--font-mono);font-size:12px;color:var(--accent)">GITHUB_REPO</code>.
-    </p>
   </div>
 
   <div class="admin-card">
@@ -532,19 +499,6 @@ input[type="color"]{padding:4px;height:38px;cursor:pointer}
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btn-cancel-reset">Cancel</button>
       <button class="btn btn-primary" id="btn-confirm-reset">Save PIN</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════════ GITHUB EXPORT MODAL ════════ -->
-<div id="modal-github" class="modal-overlay hidden">
-  <div class="github-modal">
-    <h3>Push to GitHub</h3>
-    <p class="modal-sub">Save this brand profile into the <code style="font-family:var(--font-mono);font-size:12px;color:var(--accent)">exports/</code> folder of your connected repository.</p>
-    <div id="github-status" class="github-status"></div>
-    <div class="github-modal-actions">
-      <button class="btn btn-ghost" id="btn-github-cancel">Cancel</button>
-      <button class="btn btn-primary" id="btn-github-push">Push to GitHub</button>
     </div>
   </div>
 </div>
@@ -653,11 +607,6 @@ document.getElementById('hamburger-btn').addEventListener('click', () => {
 });
 
 document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
-
-// Close sidebar on mobile when a nav item is tapped
-document.getElementById('main-sidebar').addEventListener('click', function(e) {
-  if (isMobile() && e.target.closest('[data-section]')) closeSidebar();
-});
 
 // Start collapsed on mobile, open on desktop
 window.addEventListener('resize', () => {
@@ -865,62 +814,6 @@ async function suggestNextStep(b) {
   el.classList.add('visible');
 }
 
-async function discoverCompetitors() {
-  const statusEl = document.getElementById('discover-comp-status');
-  const btn = document.getElementById('btn-discover-competitors');
-  const website = currentBrand.core && currentBrand.core.website;
-  if (!website) return;
-
-  if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent)">Analysing your website…</span>';
-  if (btn) { btn.disabled = true; btn.textContent = '…'; }
-
-  try {
-    const response = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        section: 's4_discover',
-        url: website,
-        fetchUrl: true
-      })
-    });
-
-    if (!response.ok) throw new Error(await getErrorMessage(response));
-
-    let text = await response.text();
-    text = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
-    const extracted = JSON.parse(text);
-
-    if (extracted.competitors && extracted.competitors.length > 0) {
-      if (!currentBrand.s4) currentBrand.s4 = { competitors: [] };
-      if (!currentBrand.s4.competitors) currentBrand.s4.competitors = [];
-
-      // Add discovered competitors that aren't already in the list
-      extracted.competitors.forEach(function(c) {
-        const alreadyExists = currentBrand.s4.competitors.some(function(existing) {
-          return existing.name && existing.name.toLowerCase() === (c.name||'').toLowerCase();
-        });
-        if (!alreadyExists && currentBrand.s4.competitors.length < 8) {
-          currentBrand.s4.competitors.push({ name: c.name||'', url: c.url||'', desc: c.desc||'' });
-        }
-      });
-
-      triggerSave();
-      var s4sec = SECTIONS.find(function(s){ return s.id === 's4'; });
-      if (s4sec) refreshPanel(s4sec);
-      updateCompleteness('s4');
-      if (statusEl) statusEl.innerHTML = '<span style="color:var(--success)">✓ Found ' + extracted.competitors.length + ' competitors</span>';
-    } else {
-      if (statusEl) statusEl.textContent = 'Could not identify competitors — try importing your website content first.';
-    }
-  } catch(e) {
-    if (statusEl) statusEl.textContent = 'Error: ' + (e.message || 'Something went wrong');
-  }
-
-  if (btn) { btn.disabled = false; btn.textContent = '✦ Discover competitors'; }
-  setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 6000);
-}
-
 async function fetchCompetitorInfo(index, url, sec) {
   const statusEl = document.getElementById('comp-fetch-status-' + index);
   if (!statusEl) return;
@@ -1081,43 +974,26 @@ function mergeIntoSection(secId, extracted) {
   if (!currentBrand[secId]) currentBrand[secId] = {};
   const section = currentBrand[secId];
 
-  // Fields that should overwrite rather than append when re-imported
-  const overwriteFields = ['summary','targetIndustries','companySize','revenueRange',
-    'toneDesc','primaryFont','secondaryFont','fontNotes','heroStatement','elevatorPitch',
-    'keyMessages','neverSay','conversionGoal','salesCycle','dealValue','decisionMakers',
-    'seoKeywords','contentPillars','postingFrequency','paidChannels'];
-
   Object.entries(extracted).forEach(([key, value]) => {
     if (value === null || value === undefined || value === '') return;
 
     if (Array.isArray(value)) {
       if (!Array.isArray(section[key])) section[key] = [];
-
-      // Deduplicate by name — normalise to lowercase, also catch near-duplicates
-      // by checking if existing array already has items with very similar names
+      // Deduplicate by name to avoid duplicates on multiple URL scans
       var existingNames = section[key].map(function(item) {
-        return item && item.name ? item.name.toLowerCase().trim() : null;
-      }).filter(Boolean);
-
-      var newItems = value.filter(function(item) {
-        if (!item) return false;
-        // If item has no name, only add if the array is empty
-        if (!item.name || !item.name.trim()) return section[key].length === 0;
-        var n = item.name.toLowerCase().trim();
-        // Skip if exact match or very close match already exists
-        return !existingNames.some(function(ex) {
-          return ex === n || ex.includes(n) || n.includes(ex);
-        });
+        return item && item.name ? item.name.toLowerCase().trim() : '';
       });
-
+      var newItems = value.filter(function(item) {
+        if (!item || !item.name) return true;
+        return existingNames.indexOf(item.name.toLowerCase().trim()) === -1;
+      });
       section[key] = [...section[key], ...newItems];
     } else if (typeof value === 'string' && value.trim()) {
-      if (overwriteFields.indexOf(key) !== -1 || !section[key] || !section[key].toString().trim()) {
-        // Overwrite known single-value fields, or any empty field
-        section[key] = value;
-      } else {
-        // For other text fields with existing content, append
+      // For text fields, append if there's existing content
+      if (section[key] && section[key].toString().trim()) {
         section[key] = section[key] + String.fromCharCode(10,10) + value;
+      } else {
+        section[key] = value;
       }
     } else {
       section[key] = value;
@@ -1129,7 +1005,6 @@ function mergeIntoSection(secId, extracted) {
 // LOGIN
 // ════════════════════════════════════════════════════════════
 let pinEntry = '';
-let loginInProgress = false;
 
 function updatePinDots() {
   for (let i = 0; i < 4; i++) {
@@ -1188,8 +1063,6 @@ async function attemptLogin() {
   const name = document.getElementById('login-name').value.trim().toLowerCase();
   const pin = pinEntry;
   if (!name || pin.length < 4) return;
-  if (loginInProgress) return; // Prevent double-tap firing two requests
-  loginInProgress = true;
 
   // Hash the PIN before checking against the database
   const pinHash = await hashPin(pin);
@@ -1200,8 +1073,6 @@ async function attemptLogin() {
     .ilike('name', name)
     .eq('pin_hash', pinHash)
     .single();
-
-  loginInProgress = false;
 
   if (error || !data) {
     document.getElementById('login-error').style.display = 'block';
@@ -1234,7 +1105,6 @@ document.getElementById('btn-logout').addEventListener('click', () => {
   currentUser = null;
   currentBrand = null;
   pinEntry = '';
-  loginInProgress = false;
   updatePinDots();
   document.getElementById('login-name').value = '';
   document.getElementById('login-error').style.display = 'none';
@@ -1633,7 +1503,6 @@ function buildCoreForm() {
       <div class="form-group"><label>Brand Name</label><input type="text" data-field="core.name" value="${esc(d.name)}" placeholder="e.g. Acme Co."></div>
       <div class="form-group"><label>Tagline / Strapline</label><input type="text" data-field="core.tagline" value="${esc(d.tagline)}" placeholder="Short memorable line"></div>
     </div>
-    <div class="form-group"><label>Website URL</label><input type="text" data-field="core.website" value="${esc(d.website||'')}" placeholder="https://yourwebsite.com"></div>
     <div class="form-row">
       <div class="form-group"><label>Founded / Year Established</label><input type="text" data-field="core.founded" value="${esc(d.founded)}" placeholder="e.g. 2018"></div>
       <div class="form-group"><label>Industry / Sector</label><input type="text" data-field="core.industry" value="${esc(d.industry)}" placeholder="e.g. B2B SaaS, Retail"></div>
@@ -1819,7 +1688,6 @@ function buildS3Form() {
 function buildS4Form() {
   var d = currentBrand.s4 || {};
   var comps = d.competitors || [];
-  var brandWebsite = (currentBrand.core && currentBrand.core.website) || '';
   var compsHTML = comps.map(function(c,i) {
     return '<div class="repeatable-item">' +
       '<div class="item-header"><span class="item-number">Competitor ' + (i+1) + '</span><button class="btn-remove" data-remove-competitor="' + i + '">x</button></div>' +
@@ -1835,19 +1703,7 @@ function buildS4Form() {
     '</div>';
   }).join('');
 
-  var discoverSection = brandWebsite
-    ? '<div style="background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px">' +
-        '<div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px">Discover competitors with AI</div>' +
-        '<div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Claude will analyse <strong>' + esc(brandWebsite) + '</strong> and suggest who the main competitors are likely to be.</div>' +
-        '<div style="display:flex;align-items:center;gap:10px">' +
-          '<button class="btn-import" id="btn-discover-competitors" style="font-size:11px;padding:6px 14px">✦ Discover competitors</button>' +
-          '<span id="discover-comp-status" style="font-size:11px;color:var(--text-dim)"></span>' +
-        '</div>' +
-      '</div>'
-    : '<div style="font-size:12px;color:var(--text-dim);background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">Add your website URL in Organisation Info and we can automatically suggest competitors.</div>';
-
   return '<div class="form-group"><label>Competitors (up to 8)</label>' +
-    discoverSection +
     '<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Add each competitor, paste their website URL and click Fetch to auto-populate their name and description.</div>' +
     '<div class="repeatable-list" id="competitors-list">' + compsHTML + '</div>' +
     (comps.length < 8 ? '<button class="btn-add" id="btn-add-competitor">+ Add competitor</button>' : '') +
@@ -1885,12 +1741,6 @@ function buildS6Form() {
       <div class="form-group"><label>Where They Spend Time</label><input type="text" data-personas="${i}.channels" value="${esc(p.channels)}" placeholder="e.g. Instagram, LinkedIn"></div>
     </div>`).join('');
   return `
-    <div class="form-row">
-      <div class="form-group"><label>Target Industries</label><input type="text" data-field="s6.targetIndustries" value="${esc(d.targetIndustries)}" placeholder="e.g. SaaS, Financial Services, Retail"></div>
-      <div class="form-group"><label>Company Size</label><input type="text" data-field="s6.companySize" value="${esc(d.companySize)}" placeholder="e.g. 50–500 employees, SME, Enterprise"></div>
-    </div>
-    <div class="form-group"><label>Annual Revenue Range</label><input type="text" data-field="s6.revenueRange" value="${esc(d.revenueRange)}" placeholder="e.g. £1M–£20M turnover"></div>
-    <div class="divider"></div>
     <div class="form-group">
       <label>Audience Personas (up to 4)</label>
       <div class="repeatable-list" id="personas-list">${personasHTML}</div>
@@ -2008,7 +1858,6 @@ function initPanelBehaviours(panel, sec) {
       'btn-add-colour': () => { currentBrand.s2.colours.push({name:'',hex:'#000000',role:''}); refresh(); },
       'btn-add-product': () => { currentBrand.s3.items.push({name:'',category:'product',desc:'',features:[],price:'',url:''}); refresh(); },
       'btn-add-competitor': () => { currentBrand.s4.competitors.push({name:'',url:'',desc:''}); refresh(); },
-      'btn-discover-competitors': () => { discoverCompetitors(); },
 
       'btn-add-persona': () => { currentBrand.s6.personas.push({name:'',age:'',location:'',needs:'',motivations:'',channels:''}); refresh(); },
       'btn-add-testimonial': () => { if(!currentBrand.s7.testimonials)currentBrand.s7.testimonials=[]; currentBrand.s7.testimonials.push({quote:'',name:'',company:'',result:''}); refresh(); },
@@ -2039,12 +1888,7 @@ function initPanelBehaviours(panel, sec) {
     ];
     for (const [attr, fn] of removeMap) {
       const el = e.target.closest(`[${attr}]`);
-      if (el) {
-        const idx = parseInt(el.getAttribute(attr));
-        // Defer past any blur/change events that fire when clicking away from a focused input
-        setTimeout(function() { fn(idx); refresh(); triggerSave(); }, 0);
-        return;
-      }
+      if (el) { fn(parseInt(el.getAttribute(attr))); refresh(); triggerSave(); return; }
     }
     // Fetch competitor from their website
     const fetchComp = e.target.closest('[data-fetch-competitor]');
@@ -2122,8 +1966,22 @@ function handleArrayInput(e, sec) {
     const val = e.target.dataset[attr.replace('data-','')];
     if (val) { fn(val.split('.')); triggerSave(); return; }
   }
+  var compKey = e.target.dataset.competitors;
+  if (compKey && !compKey.endsWith('.url')) {
+    var pco = compKey.split('.');
+    if (!currentBrand.s4.competitors[pco[0]]) currentBrand.s4.competitors[pco[0]] = {};
+    currentBrand.s4.competitors[pco[0]][pco[1]] = e.target.value;
+    triggerSave(); updateCompleteness('s4');
+  }
   var tkKey = e.target.dataset.testimonials;
   if (tkKey) { var pts=tkKey.split('.'); if(!currentBrand.s7.testimonials[pts[0]])currentBrand.s7.testimonials[pts[0]]={};currentBrand.s7.testimonials[pts[0]][pts[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
+  // Competitor URL field
+  if (e.target.dataset.competitors && e.target.dataset.competitors.endsWith('.url')) {
+    var pcu = e.target.dataset.competitors.split('.');
+    if (!currentBrand.s4.competitors[pcu[0]]) currentBrand.s4.competitors[pcu[0]] = {};
+    currentBrand.s4.competitors[pcu[0]].url = e.target.value;
+    triggerSave();
+  }
   var csKey = e.target.dataset.cases;
   if (csKey) { var pcs=csKey.split('.'); if(!currentBrand.s7.caseStudies[pcs[0]])currentBrand.s7.caseStudies[pcs[0]]={};currentBrand.s7.caseStudies[pcs[0]][pcs[1]]=e.target.value; triggerSave(); updateCompleteness('s7'); }
   var stKey = e.target.dataset.keystats;
@@ -2692,41 +2550,98 @@ async function exportPPTX() {
     return maxLen ? result.slice(0, maxLen) : result;
   }
 
-  // ── Pull brand colours from data
-  // Strategy: try role-based matching first, then fall back to position in palette
-  // Always use real brand colours — Crank defaults only if brand has NO colours stored
-  function getBrandColours() {
-    var cols = (s2data.colours || []).filter(function(c) { return c.hex; });
-
-    // Positional fallback — first colour is primary, second is accent
-    var p = cols[0] ? cols[0].hex.replace('#','') : '19252F';
-    var a = cols[1] ? cols[1].hex.replace('#','') : '53AEEF';
-
-    // Override with role-matched if found (more specific wins)
-    var primaryRole = cols.find(function(c) { return c.role && c.role.toLowerCase().includes('primary'); });
-    var accentRole  = cols.find(function(c) { return c.role && (c.role.toLowerCase().includes('accent') || c.role.toLowerCase().includes('secondary')); });
-    if (primaryRole) p = primaryRole.hex.replace('#','');
-    if (accentRole)  a = accentRole.hex.replace('#','');
-
-    // Build full palette — all brand colours in order, min 4
-    var palette = cols.map(function(c){ return c.hex.replace('#',''); });
-    var crankFallback = ['19252F','53AEEF','85C515','FDBD17'];
-    while (palette.length < 4) { palette.push(crankFallback[palette.length % crankFallback.length]); }
-
-    return { primary: p, accent: a, palette: palette };
+  // ── Pull brand colours from data, fall back to sensible defaults
+  function hexLuminance(hex) {
+    // Returns 0 (black) to 1 (white)
+    hex = hex.replace('#','');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    var r = parseInt(hex.slice(0,2),16)/255;
+    var g = parseInt(hex.slice(2,4),16)/255;
+    var b = parseInt(hex.slice(4,6),16)/255;
+    var toLinear = function(c) { return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+    return 0.2126*toLinear(r) + 0.7152*toLinear(g) + 0.0722*toLinear(b);
+  }
+  function isHexLight(hex) { return hexLuminance(hex) > 0.35; }
+  function isHexDark(hex)  { return hexLuminance(hex) < 0.15; }
+  function isHexVivid(hex) {
+    // A colour is vivid if it's neither very light nor very dark
+    var l = hexLuminance(hex);
+    return l > 0.04 && l < 0.6;
+  }
+  function contrastRatio(hex1, hex2) {
+    var l1 = hexLuminance(hex1), l2 = hexLuminance(hex2);
+    var lighter = Math.max(l1,l2), darker = Math.min(l1,l2);
+    return (lighter + 0.05) / (darker + 0.05);
   }
 
-  var BC     = getBrandColours();
-  var NAVY   = BC.primary;   // dominant brand colour — covers, bars, borders
-  var PINK   = BC.accent;    // secondary brand colour — section labels, highlights
-  var PALETTE = BC.palette;  // full set for cycling through cards
+  function getBrandColours() {
+    var cols = (s2data.colours || []).filter(function(c) { return c.hex && c.hex.length >= 4; });
+    var hexes = cols.map(function(c) { return c.hex.replace('#',''); });
+
+    // Try to find a good dark colour for primary (needs to contrast on white)
+    var darkCols = hexes.filter(function(h) { return contrastRatio(h,'FFFFFF') >= 4.5; });
+    // Try to find a vivid accent (not too light, not too dark)
+    var vividCols = hexes.filter(function(h) { return isHexVivid(h) && !isHexLight(h); });
+    // Fallback: any col that contrasts reasonably on white
+    var medCols = hexes.filter(function(h) { return contrastRatio(h,'FFFFFF') >= 3; });
+
+    // Pick primary: prefer role-labelled, otherwise darkest col available
+    var primaryByRole = cols.find(function(c) { return c.role && (c.role.toLowerCase().includes('primary') || c.role.toLowerCase().includes('background') || c.role.toLowerCase().includes('dark')); });
+    var p;
+    if (primaryByRole && !isHexLight(primaryByRole.hex.replace('#',''))) {
+      p = primaryByRole.hex.replace('#','');
+    } else if (darkCols.length) {
+      // pick darkest
+      p = darkCols.sort(function(a,b){ return hexLuminance(a)-hexLuminance(b); })[0];
+    } else if (medCols.length) {
+      p = medCols.sort(function(a,b){ return hexLuminance(a)-hexLuminance(b); })[0];
+    } else {
+      p = '1E293B'; // safe dark slate fallback
+    }
+
+    // Pick accent: prefer role-labelled vivid, otherwise most vivid col that isn't primary
+    var accentByRole = cols.find(function(c) { return c.role && (c.role.toLowerCase().includes('accent') || c.role.toLowerCase().includes('secondary') || c.role.toLowerCase().includes('highlight')); });
+    var a;
+    if (accentByRole && isHexVivid(accentByRole.hex.replace('#','')) && accentByRole.hex.replace('#','') !== p) {
+      a = accentByRole.hex.replace('#','');
+    } else {
+      var candidates = vividCols.filter(function(h){ return h !== p; });
+      if (candidates.length) {
+        // pick the one with highest contrast against primary
+        a = candidates.sort(function(x,y){ return contrastRatio(y,p)-contrastRatio(x,p); })[0];
+      } else if (medCols.length) {
+        a = medCols.filter(function(h){return h!==p;})[0] || p;
+      } else {
+        a = 'E11D48'; // safe vivid fallback
+      }
+    }
+
+    // Final safety check: if accent is too light to use as text on white, darken it
+    // by using the primary instead for text, but keep accent for bg accents
+    var accentTextColor = isHexLight(a) ? p : 'FFFFFF';
+
+    return { primary: p, accent: a, accentText: accentTextColor };
+  }
+
+  var BC = getBrandColours();
+  var NAVY   = BC.primary;
+  var PINK   = BC.accent;
   var BLACK  = '00001E';
   var WHITE  = 'FFFFFF';
   var OFFWHITE = 'F8F8F8';
   var LGREY  = 'F3F4F6';
   var GREY   = '9CA3AF';
   var DKGREY = '374151';
-  var MPINK  = PINK;         // was hardcoded 'E2B3E4' — now uses real brand accent
+  var MPINK  = 'E2B3E4';  // muted card fill — fixed, not brand-derived
+
+  // Ensure text on primary bg is readable
+  var ON_NAVY  = isHexLight(NAVY) ? '111111' : 'FFFFFF';
+  // Ensure text on accent bg is readable
+  var ON_PINK  = isHexLight(PINK) ? '111111' : 'FFFFFF';
+  // Section label colour — use accent if vivid enough, else use navy
+  var LABEL_COL = isHexLight(PINK) ? NAVY : PINK;
+  // Divider colour — use muted accent if light, else muted pink
+  var DIVIDER_COL = isHexLight(PINK) ? (isHexLight(NAVY) ? '9CA3AF' : NAVY) : MPINK;
 
   var SW = 10;
   var SH = 5.625;
@@ -2740,17 +2655,17 @@ async function exportPPTX() {
   function footer(s) {
     s.addShape(pres.shapes.RECTANGLE, { x:0, y:5.33, w:SW, h:0.295, fill:{color:'0A0A0A'}, line:{color:'0A0A0A'} });
     s.addText(brandName + '  |  Brand Review  |  ' + new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'}), { x:0.4, y:5.34, w:7, h:0.24, fontSize:7.5, color:'555555', fontFace:'Arial', align:'left', valign:'middle', margin:0 });
-    s.addText('Crank', { x:8.8, y:5.34, w:0.9, h:0.24, fontSize:7.5, color:PINK, fontFace:'Arial', bold:true, align:'right', valign:'middle', margin:0 });
+    s.addText('Crank', { x:8.8, y:5.34, w:0.9, h:0.24, fontSize:7.5, color:LABEL_COL, fontFace:'Arial', bold:true, align:'right', valign:'middle', margin:0 });
   }
 
   function sectionLabel(s, label) {
-    s.addText(label, { x:0.5, y:0.22, w:9, h:0.22, fontSize:7.5, color:PINK, fontFace:'Arial', bold:true, charSpacing:3, align:'left', margin:0 });
+    s.addText(label, { x:0.5, y:0.22, w:9, h:0.22, fontSize:7.5, color:LABEL_COL, fontFace:'Arial', bold:true, charSpacing:3, align:'left', margin:0 });
   }
 
   function slideTitle(s, title, sub) {
     s.addText(title, { x:0.5, y:0.5, w:9, h:0.58, fontSize:26, color:'111111', fontFace:'Arial', bold:true, align:'left', margin:0 });
     if (sub) { s.addText(sub, { x:0.5, y:1.1, w:9, h:0.28, fontSize:11, color:GREY, fontFace:'Arial', align:'left', margin:0 }); }
-    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.4, w:9.05, h:0.025, fill:{color:MPINK}, line:{color:MPINK} });
+    s.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.4, w:9.05, h:0.025, fill:{color:DIVIDER_COL}, line:{color:DIVIDER_COL} });
   }
 
   function darkCard(s, x, y, w, h, accentColor) {
@@ -2770,8 +2685,8 @@ async function exportPPTX() {
   if (core.logo) {
     try { cover.addImage({ data:core.logo, x:0.55, y:0.5, w:2.2, h:1.0, sizing:{type:'contain',w:2.2,h:1.0} }); logoY = 1.65; } catch(e) {}
   }
-  cover.addText(brandName, { x:0.5, y:logoY, w:6.7, h:1.8, fontSize:60, bold:true, color:WHITE, fontFace:'Arial', margin:0 });
-  if (core.tagline) { cover.addText(st(core.tagline), { x:0.55, y:logoY+1.85, w:6.7, h:0.38, fontSize:13, color:MPINK, fontFace:'Arial', italic:true, margin:0 }); }
+  cover.addText(brandName, { x:0.5, y:logoY, w:6.7, h:1.8, fontSize:60, bold:true, color:ON_NAVY, fontFace:'Arial', margin:0 });
+  if (core.tagline) { cover.addText(st(core.tagline), { x:0.55, y:logoY+1.85, w:6.7, h:0.38, fontSize:13, color:isHexLight(NAVY)?GREY:MPINK, fontFace:'Arial', italic:true, margin:0 }); }
   cover.addText('Brand Hub  ·  Confidential  ·  ' + new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'}), { x:0.55, y:3.15, w:6.7, h:0.28, fontSize:10, color:MPINK, fontFace:'Arial', margin:0 });
 
   // Stats on pink panel — build from what's filled in
@@ -2784,11 +2699,11 @@ async function exportPPTX() {
 
   coverStats.forEach(function(st2, i) {
     var y = 0.75 + i * 1.4;
-    cover.addText(st2[0], { x:7.6, y:y, w:2.3, h:0.7, fontSize:44, color:WHITE, fontFace:'Arial', bold:true, align:'center', margin:0 });
-    cover.addText(st2[1], { x:7.6, y:y+0.68, w:2.3, h:0.35, fontSize:9, color:WHITE, fontFace:'Arial', align:'center', margin:0 });
+    cover.addText(st2[0], { x:7.6, y:y, w:2.3, h:0.7, fontSize:44, color:ON_PINK, fontFace:'Arial', bold:true, align:'center', margin:0 });
+    cover.addText(st2[1], { x:7.6, y:y+0.68, w:2.3, h:0.35, fontSize:9, color:isHexLight(PINK)?'333333':'F0E0FF', fontFace:'Arial', align:'center', margin:0 });
   });
 
-  cover.addText('Prepared by Crank  ·  wearecrank.com', { x:0.5, y:5.22, w:6.7, h:0.22, fontSize:8, color:PINK, fontFace:'Arial', align:'left', margin:0 });
+  cover.addText('Prepared by Crank  ·  wearecrank.com', { x:0.5, y:5.22, w:6.7, h:0.22, fontSize:8, color:'6B67B0', fontFace:'Arial', align:'left', margin:0 });
 
   // ── SLIDE 2: ORG OVERVIEW ───────────────────────────────────
   if (core.overview || core.businessType) {
@@ -2835,7 +2750,7 @@ async function exportPPTX() {
     var heroText = s1.heroStatement || s2data.heroStatement || s1.purpose || '';
     if (heroText) {
       sl3.addShape(pres.shapes.RECTANGLE, { x:0.5, y:1.55, w:9.05, h:0.88, fill:{color:NAVY}, line:{color:NAVY} });
-      sl3.addText(st(heroText, 100), { x:0.5, y:1.55, w:9.05, h:0.88, fontSize:22, color:WHITE, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
+      sl3.addText(st(heroText, 100), { x:0.5, y:1.55, w:9.05, h:0.88, fontSize:22, color:ON_NAVY, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
     }
 
     if (s1.proposition) {
@@ -2843,7 +2758,7 @@ async function exportPPTX() {
       sl3.addText(st(s1.proposition, 300), { x:0.5, y:2.8, w:9, h:0.5, fontSize:11, color:DKGREY, fontFace:'Arial', margin:0 });
     }
 
-    var valColors = PALETTE;
+    var valColors = [PINK, NAVY, GREY, PINK, NAVY];
     vals.slice(0,3).forEach(function(v, i) {
       var x = 0.5 + i * 3.12;
       sl3.addShape(pres.shapes.RECTANGLE, { x:x, y:3.45, w:2.98, h:1.55, fill:{color:LGREY}, line:{color:'E5E7EB'} });
@@ -2912,7 +2827,7 @@ async function exportPPTX() {
 
     var pCols = Math.min(prods.length, 3);
     var pCardW = (9.05 - (pCols - 1) * 0.14) / pCols;
-    var badgeCols = PALETTE;
+    var badgeCols = [NAVY, '6D28D9', '0369A1', NAVY, '6D28D9', '0369A1'];
 
     prods.slice(0,6).forEach(function(p, i) {
       var col2 = i % pCols, row = Math.floor(i / pCols);
@@ -2979,7 +2894,7 @@ async function exportPPTX() {
     sectionLabel(sl7, 'SOCIAL PROOF');
     slideTitle(sl7, 'What We Have Achieved');
 
-    var statCols2 = PALETTE;
+    var statCols2 = [NAVY, PINK, '6B7280', NAVY];
     if (keyStats.length) {
       var sNum = Math.min(keyStats.length, 3);
       var sW = (9.05 - (sNum - 1) * 0.14) / sNum;
@@ -2989,9 +2904,9 @@ async function exportPPTX() {
         sl7.addShape(pres.shapes.RECTANGLE, { x:x, y:1.55, w:sW, h:0.06, fill:{color:PINK}, line:{color:PINK} });
         var statVal = st(st3.value, 20);
         var statFontSize = statVal.length > 10 ? 18 : statVal.length > 6 ? 24 : 34;
-        sl7.addText(statVal, { x:x, y:1.58, w:sW, h:0.75, fontSize:statFontSize, color:PINK, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
+        sl7.addText(statVal, { x:x, y:1.58, w:sW, h:0.75, fontSize:statFontSize, color:isHexLight(PINK)?'FFFFFF':PINK, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
         var ctxText = st(st3.context||'Key stat', 60).toUpperCase();
-        sl7.addText(ctxText, { x:x+0.1, y:2.35, w:sW-0.2, h:0.26, fontSize:6.5, color:MPINK, fontFace:'Arial', bold:true, align:'center', charSpacing:1, margin:0 });
+        sl7.addText(ctxText, { x:x+0.1, y:2.35, w:sW-0.2, h:0.26, fontSize:6.5, color:isHexLight(NAVY)?'CCCCCC':MPINK, fontFace:'Arial', bold:true, align:'center', charSpacing:1, margin:0 });
       });
     }
 
@@ -3000,13 +2915,13 @@ async function exportPPTX() {
     testi.slice(0,2).forEach(function(t, i) {
       var tx = 0.5 + i * 4.8, tw = 4.45;
       sl7.addShape(pres.shapes.RECTANGLE, { x:tx, y:testiY, w:tw, h:testiH, fill:{color:LGREY}, line:{color:'E5E7EB'} });
-      sl7.addText('\u201C', { x:tx+0.15, y:testiY-0.04, w:0.5, h:0.5, fontSize:38, color:PINK, fontFace:'Arial', bold:true, align:'left', margin:0 });
+      sl7.addText('\u201C', { x:tx+0.15, y:testiY-0.04, w:0.5, h:0.5, fontSize:38, color:LABEL_COL, fontFace:'Arial', bold:true, align:'left', margin:0 });
       var quoteText = st(t.quote, 220);
       var quoteFontSize = quoteText.length > 160 ? 8.5 : 9.5;
       sl7.addText(quoteText, { x:tx+0.2, y:testiY+0.32, w:tw-0.35, h:testiH-0.7, fontSize:quoteFontSize, color:DKGREY, fontFace:'Arial', italic:true, margin:0 });
       sl7.addShape(pres.shapes.RECTANGLE, { x:tx+0.2, y:testiY+testiH-0.55, w:tw-0.35, h:0.02, fill:{color:PINK}, line:{color:PINK} });
       var attr = [t.name, t.company].filter(Boolean).join('  ·  ');
-      sl7.addText(st(attr, 60), { x:tx+0.2, y:testiY+testiH-0.48, w:tw-0.35, h:0.3, fontSize:8.5, color:NAVY, fontFace:'Arial', bold:true, margin:0 });
+      sl7.addText(st(attr, 60), { x:tx+0.2, y:testiY+testiH-0.48, w:tw-0.35, h:0.3, fontSize:8.5, color:isHexLight(NAVY)?DKGREY:NAVY, fontFace:'Arial', bold:true, margin:0 });
     });
 
     footer(sl7);
@@ -3045,7 +2960,7 @@ async function exportPPTX() {
       pillLines.slice(0,6).forEach(function(p, i) {
         var ky = 1.84 + i * 0.52;
         sl8.addShape(pres.shapes.RECTANGLE, { x:5.45, y:ky, w:4.1, h:0.44, fill:{color:i%2===0?LGREY:WHITE}, line:{color:'E5E7EB'} });
-        sl8.addText(String(i+1).padStart(2,'0'), { x:5.58, y:ky, w:0.4, h:0.44, fontSize:10, color:PINK, fontFace:'Arial', bold:true, valign:'middle', margin:0 });
+        sl8.addText(String(i+1).padStart(2,'0'), { x:5.58, y:ky, w:0.4, h:0.44, fontSize:10, color:LABEL_COL, fontFace:'Arial', bold:true, valign:'middle', margin:0 });
         sl8.addText(p, { x:6.02, y:ky, w:3.4, h:0.44, fontSize:9.5, color:DKGREY, fontFace:'Arial', valign:'middle', margin:0 });
       });
     }
@@ -3139,10 +3054,10 @@ async function exportPPTX() {
   } else {
     var itemY2 = 1.28;
     emptySects.forEach(function(secId) {
-      slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:9.05, h:0.72, fill:{color:NAVY}, line:{color:NAVY} });
+      slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:9.05, h:0.72, fill:{color:'1A1A3E'}, line:{color:NAVY} });
       slFinal.addShape(pres.shapes.RECTANGLE, { x:0.5, y:itemY2, w:0.06, h:0.72, fill:{color:PINK}, line:{color:PINK} });
       slFinal.addText(st(SECTION_LABELS2[secId] || secId), { x:0.7, y:itemY2+0.1, w:6, h:0.28, fontSize:13, color:WHITE, fontFace:'Arial', bold:true, margin:0 });
-      slFinal.addText('No information added yet', { x:0.7, y:itemY2+0.42, w:6, h:0.22, fontSize:9, color:GREY, fontFace:'Arial', italic:true, margin:0 });
+      slFinal.addText('No information added yet', { x:0.7, y:itemY2+0.42, w:6, h:0.22, fontSize:9, color:'8888AA', fontFace:'Arial', italic:true, margin:0 });
       slFinal.addShape(pres.shapes.RECTANGLE, { x:8.35, y:itemY2+0.17, w:1.0, h:0.36, fill:{color:PINK}, line:{color:PINK} });
       slFinal.addText('PENDING', { x:8.35, y:itemY2+0.17, w:1.0, h:0.36, fontSize:7.5, color:'00001E', fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
       itemY2 += 0.82;
@@ -3157,11 +3072,11 @@ async function exportPPTX() {
 
   var closeQuote = st(s1.purpose || s1.heroStatement || s2data.heroStatement || brandName, 120);
   var closeFontSize = closeQuote.length > 80 ? 22 : closeQuote.length > 50 ? 28 : 34;
-  slClose.addText(closeQuote, { x:0.4, y:1.0, w:5.8, h:2.4, fontSize:closeFontSize, color:WHITE, fontFace:'Arial', bold:true, align:'left', margin:0 });
-  slClose.addText('This brand review gives ' + brandName + ' a clear foundation — a shared understanding of purpose, audience, and voice that will inform every piece of content we create together.', { x:0.4, y:3.5, w:5.8, h:0.9, fontSize:11, color:MPINK, fontFace:'Arial', align:'left', margin:0 });
+  slClose.addText(closeQuote, { x:0.4, y:1.0, w:5.8, h:2.4, fontSize:closeFontSize, color:ON_NAVY, fontFace:'Arial', bold:true, align:'left', margin:0 });
+  slClose.addText('This brand review gives ' + brandName + ' a clear foundation — a shared understanding of purpose, audience, and voice that will inform every piece of content we create together.', { x:0.4, y:3.5, w:5.8, h:0.9, fontSize:11, color:isHexLight(NAVY)?GREY:MPINK, fontFace:'Arial', align:'left', margin:0 });
 
-  slClose.addText((core.website || (brandName.toLowerCase().replace(/\s/g,'') + '.com')), { x:6.6, y:2.3, w:3.3, h:0.4, fontSize:12, color:NAVY, fontFace:'Arial', bold:true, align:'center', margin:0 });
-  slClose.addText('Crank  ·  wearecrank.com', { x:6.6, y:4.8, w:3.3, h:0.28, fontSize:9, color:PINK, fontFace:'Arial', align:'center', margin:0 });
+  slClose.addText((core.website || (brandName.toLowerCase().replace(/\s/g,'') + '.com')), { x:6.6, y:2.3, w:3.3, h:0.4, fontSize:12, color:ON_PINK, fontFace:'Arial', bold:true, align:'center', margin:0 });
+  slClose.addText('Crank  ·  wearecrank.com', { x:6.6, y:4.8, w:3.3, h:0.28, fontSize:9, color:'4B0082', fontFace:'Arial', align:'center', margin:0 });
 
   // ── DOWNLOAD ─────────────────────────────────────────────────
   try {
@@ -3172,6 +3087,7 @@ async function exportPPTX() {
   }
   if (pptxBtn) { pptxBtn.textContent = origText; pptxBtn.disabled = false; }
 }
+
 
 
 // ════════════════════════════════════════════════════════════
@@ -3247,79 +3163,6 @@ document.getElementById('btn-add-user').addEventListener('click', async () => {
   document.getElementById('new-user-pin').value = '';
   loadAdminUsers();
 });
-
-// ════════════════════════════════════════════════════════════
-// GITHUB EXPORT — all credentials stored server-side in Cloudflare Worker
-// The browser never sees the token or repo name
-// ════════════════════════════════════════════════════════════
-
-function githubShowModal() {
-  const statusEl = document.getElementById('github-status');
-  statusEl.className = 'github-status';
-  statusEl.textContent = '';
-  document.getElementById('modal-github').classList.remove('hidden');
-}
-
-function githubSetStatus(type, message, showSpinner) {
-  const el = document.getElementById('github-status');
-  el.className = 'github-status visible ' + type;
-  el.innerHTML = (showSpinner ? '<div class="github-spinner"></div>' : '') + '<span>' + message + '</span>';
-}
-
-async function githubPushFile() {
-  const b = currentBrand;
-  const brandName = b.core?.name || 'brand';
-  const fileName = brandName.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_brand_profile.md';
-  const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-
-  let md = '# Organisation Profile: ' + brandName + '\n\n';
-  md += '*Exported from Brand Hub — ' + dateStr + '*\n\n';
-  md += brandToMarkdown(b);
-
-  const pushBtn = document.getElementById('btn-github-push');
-  pushBtn.disabled = true;
-  githubSetStatus('info', 'Pushing to GitHub…', true);
-
-  try {
-    const res = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'github_push',
-        githubFile: fileName,
-        githubContent: md
-      })
-    });
-
-    const result = await res.json();
-
-    if (res.ok && result.success) {
-      githubSetStatus('success',
-        '✓ ' + (result.updated ? 'Updated' : 'Created') + ' — <a href="' + result.url +
-        '" target="_blank" rel="noopener" style="color:inherit;font-weight:600">' +
-        result.path + ' ↗</a>'
-      );
-    } else {
-      githubSetStatus('error', result.message || 'Something went wrong. Please try again.');
-    }
-  } catch(e) {
-    githubSetStatus('error', 'Network error. Check your connection and try again.');
-  }
-
-  pushBtn.disabled = false;
-}
-
-document.getElementById('btn-export-github').addEventListener('click', function() {
-  if (!currentBrand) { alert('Please open a brand first.'); return; }
-  githubShowModal();
-});
-document.getElementById('btn-github-cancel').addEventListener('click', function() {
-  document.getElementById('modal-github').classList.add('hidden');
-});
-document.getElementById('modal-github').addEventListener('click', function(e) {
-  if (e.target === this) this.classList.add('hidden');
-});
-document.getElementById('btn-github-push').addEventListener('click', githubPushFile);
 </script>
 </body>
 </html>
