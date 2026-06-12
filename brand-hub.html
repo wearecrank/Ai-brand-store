@@ -2838,9 +2838,14 @@ async function exportPPTX() {
   if (core.logo) {
     try { cover.addImage({ data:core.logo, x:0.55, y:0.5, w:2.2, h:1.0, sizing:{type:'contain',w:2.2,h:1.0} }); logoY = 1.65; } catch(e) {}
   }
-  cover.addText(brandName, { x:0.5, y:logoY, w:6.7, h:1.8, fontSize:60, bold:true, color:ON_NAVY, fontFace:'Arial', margin:0 });
-  if (core.tagline) { cover.addText(st(core.tagline), { x:0.55, y:logoY+1.85, w:6.7, h:0.38, fontSize:13, color:isHexLight(NAVY)?GREY:MPINK, fontFace:'Arial', italic:true, margin:0 }); }
-  cover.addText('Brand Hub  ·  Confidential  ·  ' + new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'}), { x:0.55, y:3.15, w:6.7, h:0.28, fontSize:10, color:MPINK, fontFace:'Arial', margin:0 });
+  var titleH = 1.8;
+  cover.addText(brandName, { x:0.5, y:logoY, w:6.7, h:titleH, fontSize:60, bold:true, color:ON_NAVY, fontFace:'Arial', margin:0 });
+  // Position tagline and meta line safely below the title box — never inside it
+  var titleBottom = logoY + titleH;
+  var taglineY = Math.max(titleBottom + 0.08, logoY + 1.85);
+  if (core.tagline) { cover.addText(st(core.tagline), { x:0.55, y:taglineY, w:6.7, h:0.38, fontSize:13, color:isHexLight(NAVY)?GREY:MPINK, fontFace:'Arial', italic:true, margin:0 }); }
+  var metaY = Math.max(taglineY + 0.42, titleBottom + 0.55);
+  cover.addText('Brand Hub  ·  Confidential  ·  ' + new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'}), { x:0.55, y:metaY, w:6.7, h:0.28, fontSize:10, color:MPINK, fontFace:'Arial', margin:0 });
 
   // Stats on pink panel — build from what's filled in
   var coverStats = [
@@ -3061,7 +3066,7 @@ async function exportPPTX() {
         sl7.addShape(pres.shapes.RECTANGLE, { x:x, y:1.55, w:sW, h:0.06, fill:{color:PINK}, line:{color:PINK} });
         var statVal = st(st3.value, 20);
         var statFontSize = statVal.length > 10 ? 18 : statVal.length > 6 ? 24 : 34;
-        sl7.addText(statVal, { x:x, y:1.58, w:sW, h:0.75, fontSize:statFontSize, color:isHexLight(PINK)?'FFFFFF':PINK, fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
+        sl7.addText(statVal, { x:x, y:1.58, w:sW, h:0.75, fontSize:statFontSize, color:isHexLight(NAVY)?NAVY:'FFFFFF', fontFace:'Arial', bold:true, align:'center', valign:'middle', margin:0 });
         var ctxText = st(st3.context||'Key stat', 60).toUpperCase();
         sl7.addText(ctxText, { x:x+0.1, y:2.35, w:sW-0.2, h:0.26, fontSize:6.5, color:isHexLight(NAVY)?'CCCCCC':MPINK, fontFace:'Arial', bold:true, align:'center', charSpacing:1, margin:0 });
       });
